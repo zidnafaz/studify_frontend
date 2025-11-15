@@ -33,8 +33,9 @@ class MyApp extends StatelessWidget {
             centerTitle: true,
           ),
         ),
-        home: const WelcomeScreen(),
+        home: const AuthWrapper(),
         routes: {
+          '/welcome': (context) => const WelcomeScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const HomeScreen(),
@@ -75,8 +76,13 @@ class _AuthWrapperState extends State<AuthWrapper> {
           case AuthStatus.authenticated:
             return const HomeScreen();
           case AuthStatus.unauthenticated:
+            return const WelcomeScreen();
           case AuthStatus.loading:
-            return const LoginScreen();
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
         }
       },
     );
