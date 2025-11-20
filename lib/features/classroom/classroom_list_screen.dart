@@ -3,6 +3,7 @@ import 'create_class_screen.dart';
 import 'join_class_screen.dart';
 import 'classroom_detail_screen.dart';
 import 'classroom_service.dart';
+import '../profile/profile_screen.dart';
 
 class ClassroomListScreen extends StatefulWidget {
   const ClassroomListScreen({Key? key}) : super(key: key);
@@ -23,7 +24,29 @@ class _ClassroomListScreenState extends State<ClassroomListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("My Classrooms")),
+      appBar: AppBar(
+        title: const Text("My Classrooms"),
+        actions: [
+          IconButton(
+            tooltip: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            onPressed: () async {
+              final signedOut = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+              if (signedOut == true && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Signed out successfully'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
       body: FutureBuilder(
         future: futureClassrooms,
         builder: (context, snapshot) {
