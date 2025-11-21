@@ -3,11 +3,11 @@ class ApiConstants {
   // Uncomment salah satu baseUrl sesuai kebutuhan:
   
   // LOCAL DEVELOPMENT (Laravel artisan serve):
-  static const String baseUrl = 'http://10.0.2.2:8000'; // Android Emulator
+  // static const String baseUrl = 'http://10.0.2.2:8000'; // Android Emulator
   // static const String baseUrl = 'http://127.0.0.1:8000'; // iOS/Web
   
   // RENDER (Latest deployment) - dev branch:
-  // static const String baseUrl = 'https://studify-backend-api-dev.onrender.com';
+  static const String baseUrl = 'https://studify-backend-api-dev.onrender.com';
   
   // Auth Endpoints
   static const String register = '$baseUrl/api/users';
