@@ -28,3 +28,13 @@ class ValidationException extends ApiException {
     super.errors,
   }) : super(statusCode: 422);
 }
+
+class NotFoundException extends ApiException {
+  NotFoundException({super.message = 'Resource not found'})
+      : super(statusCode: 404);
+}
+
+class ForbiddenException extends ApiException {
+  ForbiddenException({super.message = 'Forbidden access'})
+      : super(statusCode: 403);
+}
