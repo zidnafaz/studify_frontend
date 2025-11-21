@@ -6,7 +6,7 @@ import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'core/constants/app_color.dart';
-
+import 'presentation/screens/personal_schedule/personal_schedule_screen.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const HomeScreen(),
+          '/personal-schedule': (context) => const PersonalScheduleScreen(),
         },
       ),
     );
