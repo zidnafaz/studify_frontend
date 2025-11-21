@@ -1,4 +1,4 @@
-name: studify_frontend
+name: studify
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -12,6 +12,25 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  
+  # HTTP Client
+  http: ^1.2.2
+  
+  # State Management
+  provider: ^6.1.2
+  
+  # Local Storage
+  shared_preferences: ^2.3.3
+  
+  # JSON Serialization
+  json_annotation: ^4.9.0
+  
+  # SVG Support
+  flutter_svg: ^2.0.10+1
+  
+  # Forms & Validation (removed - using manual validation)
+  # flutter_form_builder: ^9.4.2
+  # form_builder_validators: ^11.0.0
 
   # Tambahkan ini!
   http: ^1.2.1
@@ -21,6 +40,10 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  
+  # JSON Code Generation
+  build_runner: ^2.4.13
+  json_serializable: ^6.8.0
 
 flutter:
   uses-material-design: true
