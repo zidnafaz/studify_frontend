@@ -5,6 +5,7 @@ import 'package:studify/data/models/classroom_model.dart';
 import 'package:studify/presentation/screens/classroom/classroom_detail_screen.dart';
 import 'package:studify/presentation/screens/classroom/classroom_info_screen.dart';
 import 'package:studify/presentation/screens/classroom/classroom_list_screen.dart';
+import 'package:studify/presentation/screens/personal_schedule/personal_schedule_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
@@ -59,6 +60,8 @@ class MyApp extends StatelessWidget {
                 ModalRoute.of(context)!.settings.arguments as Classroom;
             return ClassroomInfoScreen(classroom: args);
           },
+
+          '/personal-schedule': (context) => const PersonalScheduleScreen(),
         },
       ),
     );
