@@ -202,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: roleValue,
+                  initialValue: roleValue,
                   items: const [
                     DropdownMenuItem(value: 'Student', child: Text('Student')),
                     DropdownMenuItem(value: 'Class President', child: Text('Class President')),
@@ -460,7 +460,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _profile = ProfileStore.instance.data;
       });
       if (!mounted) return;
-      Navigator.of(context).pop(true);
+      
+      _showMessage('Signed out successfully');
     }
   }
 
@@ -504,7 +505,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         CircleAvatar(
                           radius: 36,
-                          backgroundColor: AppColor.secondary.withOpacity(.25),
+                          backgroundColor: AppColor.secondary.withValues(alpha: 0.25),
                           child: Text(
                             _profile.name.isEmpty
                                 ? '?'
@@ -567,7 +568,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColor.primary.withOpacity(.05),
+                        color: AppColor.primary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -630,7 +631,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: interests
                       .map(
                         (interest) => Chip(
-                          backgroundColor: AppColor.accent.withOpacity(.15),
+                          backgroundColor: AppColor.accent.withValues(alpha: 0.15),
                           label: Text(
                             interest,
                             style: const TextStyle(
@@ -821,7 +822,7 @@ class _ProfileSection extends StatelessWidget {
                   ListTile(
                     leading: CircleAvatar(
                       radius: 20,
-                      backgroundColor: AppColor.primary.withOpacity(.08),
+                      backgroundColor: AppColor.primary.withValues(alpha: 0.08),
                       child: Icon(
                         item.icon,
                         color: AppColor.primary,
