@@ -202,6 +202,95 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     );
   }
 
+  Future<void> _showDeleteConfirmDialog(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColor.backgroundSecondary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Hapus Jadwal',
+          style: TextStyle(color: AppColor.textPrimary),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus jadwal "${widget.schedule.title}"? Tindakan ini tidak dapat dibatalkan.',
+          style: const TextStyle(color: AppColor.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColor.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _deleteSchedule(context);
+    }
+  }
+
+  Future<void> _deleteSchedule(BuildContext context) async {
+    final provider = Provider.of<ClassroomProvider>(context, listen: false);
+    // Store context and navigator before async operations
+    final currentContext = context;
+    final navigator = Navigator.of(currentContext);
+
+    try {
+      await provider.deleteClassSchedule(
+        classroomId: widget.classroom.id,
+        scheduleId: widget.schedule.id,
+      );
+
+      // Refresh schedules list
+      await provider.fetchClassSchedules(widget.classroom.id);
+
+      if (mounted) {
+        // Close detail sheet
+        navigator.pop();
+        
+        // Show success message after a short delay to ensure sheet is closed
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            ScaffoldMessenger.of(currentContext).showSnackBar(
+              const SnackBar(
+                content: Text('Jadwal berhasil dihapus'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      // Close sheet even if there's an error
+      if (mounted) {
+        navigator.pop();
+        // Show error message after a short delay to ensure sheet is closed
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            ScaffoldMessenger.of(currentContext).showSnackBar(
+              SnackBar(
+                content: Text('Gagal menghapus jadwal: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
+      }
+    }
+  }
+
   String _formatTime(DateTime time) {
     return DateFormat('HH:mm').format(time);
   }
@@ -456,34 +545,6 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                         ),
                       ),
                     ),
-                    if (canEdit) ...[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Close detail sheet first
-                          _showEditScheduleSheet(context);
-                        },
-                        child: const Text(
-                          'Edit',
-                          style: TextStyle(
-                            color: AppColor.primary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => _showDeleteConfirmDialog(context),
-                        child: const Text(
-                          'Hapus',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                
                   ],
                 ),
               ),
