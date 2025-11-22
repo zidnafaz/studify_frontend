@@ -148,6 +148,9 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
   }
 
   void _showEditScheduleSheet(BuildContext context) {
+    // Close detail sheet first
+    Navigator.pop(context);
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -442,7 +445,6 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
@@ -454,7 +456,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                         ),
                       ),
                     ),
-                    if (canEdit)
+                    if (canEdit) ...[
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context); // Close detail sheet first
@@ -469,6 +471,19 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                           ),
                         ),
                       ),
+                      TextButton(
+                        onPressed: () => _showDeleteConfirmDialog(context),
+                        child: const Text(
+                          'Hapus',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                
                   ],
                 ),
               ),
@@ -518,6 +533,40 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                       _buildInfoCard(),
 
                       const SizedBox(height: 20),
+
+                      // Action Buttons
+                      if (canEdit) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _showEditScheduleSheet(context),
+                                icon: const Icon(Icons.edit, size: 18),
+                                label: const Text('Edit'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  side: const BorderSide(color: AppColor.primary),
+                                  foregroundColor: AppColor.primary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () => _showDeleteConfirmDialog(context),
+                                icon: const Icon(Icons.delete, size: 18),
+                                label: const Text('Hapus'),
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
 
                       // Reminder section
                       _buildReminderSection(),

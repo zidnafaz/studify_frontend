@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/auth_provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
+import '../../../providers/classroom_provider.dart';
+import '../../../providers/personal_schedule_provider.dart';
 import '../../../core/constants/app_color.dart';
+import '../../../data/models/personal_schedule_model.dart';
 import '../classroom/classroom_list_screen.dart';
+import '../../../features/profile/profile_screen.dart';
+import '../../widgets/schedule_calendar.dart';
+import '../../widgets/sheets/add_personal_schedule_sheet.dart';
+import '../../widgets/sheets/personal_schedule_detail_sheet.dart';
+import '../classroom/classroom_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const _HomeTab(),
     const ClassroomScreen(),
-    const _ProfileTab(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -80,309 +89,572 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Home Tab
-class _HomeTab extends StatelessWidget {
+// Home Tab with Schedule View
+class _HomeTab extends StatefulWidget {
   const _HomeTab();
+
+  @override
+  State<_HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<_HomeTab> {
+  String _selectedFilter = 'Personal Schedule';
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  bool _showAllSchedules = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = _focusedDay;
+    
+    // Fetch data on init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PersonalScheduleProvider>(context, listen: false)
+          .fetchPersonalSchedules();
+      Provider.of<ClassroomProvider>(context, listen: false)
+          .fetchClassrooms();
+    });
+  }
+
+  List<String> _getFilterOptions() {
+    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classrooms = classroomProvider.classrooms;
+    
+    final options = <String>['Personal Schedule'];
+    
+    // Add classroom options
+    for (var classroom in classrooms) {
+      options.add(classroom.name);
+    }
+    
+    // Add "All Schedule" at the end
+    options.add('All Schedule');
+    
+    return options;
+  }
+
+  Map<String, List<PersonalSchedule>> _groupSchedulesByDate(List<PersonalSchedule> schedules) {
+    final Map<String, List<PersonalSchedule>> grouped = {};
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+
+    for (var schedule in schedules) {
+      final scheduleDate = DateTime(
+        schedule.startTime.year,
+        schedule.startTime.month,
+        schedule.startTime.day,
+      );
+
+      if (_showAllSchedules && scheduleDate.isBefore(today)) {
+        continue;
+      }
+
+      if (!_showAllSchedules && !isSameDay(scheduleDate, _selectedDay)) {
+        continue;
+      }
+
+      String dateKey;
+      if (isSameDay(scheduleDate, today)) {
+        dateKey = 'Today';
+      } else if (isSameDay(scheduleDate, tomorrow)) {
+        dateKey = 'Tomorrow';
+      } else if (scheduleDate.year == now.year) {
+        dateKey = DateFormat('d MMM').format(scheduleDate);
+      } else {
+        dateKey = DateFormat('d MMM yyyy').format(scheduleDate);
+      }
+
+      if (!grouped.containsKey(dateKey)) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey]!.add(schedule);
+    }
+
+    grouped.forEach((key, value) {
+      value.sort((a, b) => a.startTime.compareTo(b.startTime));
+    });
+
+    return grouped;
+  }
+
+  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<PersonalSchedule> schedules) {
+    final Map<DateTime, List<ScheduleEvent>> events = {};
+    
+    for (var schedule in schedules) {
+      final date = DateTime(
+        schedule.startTime.year,
+        schedule.startTime.month,
+        schedule.startTime.day,
+      );
+      
+      if (!events.containsKey(date)) {
+        events[date] = [];
+      }
+      
+      events[date]!.add(ScheduleEvent(
+        color: schedule.color,
+        title: schedule.title,
+      ));
+    }
+    
+    return events;
+  }
+
+  String _getScheduleHeaderText() {
+    if (_showAllSchedules) {
+      return 'Upcoming Schedule';
+    } else {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final tomorrow = today.add(const Duration(days: 1));
+      final selected = DateTime(
+        _selectedDay!.year,
+        _selectedDay!.month,
+        _selectedDay!.day,
+      );
+
+      if (isSameDay(selected, today)) {
+        return 'Today\'s Schedule';
+      } else if (isSameDay(selected, tomorrow)) {
+        return 'Tomorrow\'s Schedule';
+      } else if (selected.year == now.year) {
+        return 'Schedule ${DateFormat('d MMM').format(selected)}';
+      } else {
+        return 'Schedule ${DateFormat('d MMM yyyy').format(selected)}';
+      }
+    }
+  }
+
+  IconData _getDateIcon(String dateKey) {
+    if (dateKey == 'Today') {
+      return Icons.today;
+    } else if (dateKey == 'Tomorrow') {
+      return Icons.event;
+    } else {
+      return Icons.calendar_month;
+    }
+  }
+
+  Widget _buildScheduleList(List<PersonalSchedule> schedules) {
+    final groupedSchedules = _groupSchedulesByDate(schedules);
+
+    if (groupedSchedules.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_busy,
+              size: 64,
+              color: AppColor.textSecondary.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _showAllSchedules 
+                  ? 'No upcoming schedules' 
+                  : 'No schedule on this date',
+              style: const TextStyle(
+                color: AppColor.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      itemCount: groupedSchedules.length,
+      itemBuilder: (context, groupIndex) {
+        final dateKey = groupedSchedules.keys.elementAt(groupIndex);
+        final schedulesForDate = groupedSchedules[dateKey]!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_showAllSchedules) ...[
+              Container(
+                margin: EdgeInsets.only(bottom: 12, top: groupIndex > 0 ? 20 : 0),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColor.secondary.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _getDateIcon(dateKey),
+                      size: 16,
+                      color: AppColor.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      dateKey,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            
+            Padding(
+              padding: EdgeInsets.only(bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0),
+              child: _PersonalScheduleCard(
+                schedules: schedulesForDate,
+                onScheduleTap: (schedule) {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => PersonalScheduleDetailSheet(
+                      schedule: schedule,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddScheduleSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddPersonalScheduleSheet(
+        onSave: (data) async {
+          final provider = Provider.of<PersonalScheduleProvider>(context, listen: false);
+          await provider.createPersonalSchedule(
+            title: data['title'],
+            startTime: DateTime.parse(data['start_time']),
+            endTime: DateTime.parse(data['end_time']),
+            location: data['location'],
+            description: data['description'],
+            color: data['color'],
+          );
+        },
+      ),
+    );
+  }
+
+  void _handleFilterChange(String? value) {
+    if (value == null) return;
+    
+    setState(() {
+      _selectedFilter = value;
+    });
+
+    // If a classroom is selected, navigate to classroom detail
+    if (value != 'Personal Schedule' && value != 'All Schedule') {
+      final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+      final classroom = classroomProvider.classrooms.firstWhere(
+        (c) => c.name == value,
+      );
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ClassroomDetailScreen(classroom: classroom),
+        ),
+      );
+      
+      // Reset filter after navigation
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _selectedFilter = 'Personal Schedule';
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.backgroundPrimary,
-      appBar: AppBar(
-        title: const Text('Studify'),
-        backgroundColor: AppColor.backgroundSecondary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _handleLogout(context),
-            tooltip: 'Logout',
-          ),
-        ],
-      ),
-      body: Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
-          final user = authProvider.user;
-          
-          return Center(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(88),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Theme.of(context).primaryColor,
-                child: Text(
-                  user?.name.substring(0, 1).toUpperCase() ?? 'U',
-                  style: const TextStyle(
-                    fontSize: 40,
-                    color: AppColor.backgroundSecondary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: SafeArea(
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColor.primary,
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 24),
-              Text(
-                'Selamat Datang!',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                user?.name ?? 'User',
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                user?.email ?? '',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 48),
-              Card(
-                color: AppColor.backgroundSecondary,
+              child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 48,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(height: 16),
                       const Text(
-                        'Fitur jadwal akan segera hadir!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
+                        'Studify',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      Consumer<ClassroomProvider>(
+                        builder: (context, classroomProvider, child) {
+                          final filterOptions = _getFilterOptions();
+                          
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: DropdownButton<String>(
+                              value: _selectedFilter,
+                              dropdownColor: AppColor.backgroundSecondary,
+                              underline: const SizedBox(),
+                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: filterOptions.map((String option) {
+                                return DropdownMenuItem<String>(
+                                  value: option,
+                                  child: Text(option),
+                                );
+                              }).toList(),
+                              onChanged: _handleFilterChange,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
+      ),
+      body: Consumer<PersonalScheduleProvider>(
+        builder: (context, provider, child) {
+          final schedules = provider.schedules;
+          final isLoading = provider.isLoading;
+          final calendarEvents = _getCalendarEvents(schedules);
+
+          // Show personal schedules only when filter is "Personal Schedule" or "All Schedule"
+          final shouldShowPersonalSchedules = 
+              _selectedFilter == 'Personal Schedule' || _selectedFilter == 'All Schedule';
+
+          if (!shouldShowPersonalSchedules) {
+            return const Center(
+              child: Text('Select a classroom to view its schedules'),
+            );
+          }
+
+          return Column(
+            children: [
+              // Calendar
+              ScheduleCalendar(
+                focusedDay: _focusedDay,
+                selectedDay: _selectedDay,
+                onDaySelected: (selectedDay, focusedDay) {
+                  setState(() {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                    _showAllSchedules = false;
+                  });
+                },
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                events: calendarEvents,
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Schedule list header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _getScheduleHeaderText(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.textPrimary,
+                      ),
+                    ),
+                    if (!_showAllSchedules)
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _showAllSchedules = true;
+                            _selectedDay = DateTime.now();
+                          });
+                        },
+                        child: const Text(
+                          'View All',
+                          style: TextStyle(
+                            color: AppColor.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Schedule list
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _buildScheduleList(schedules),
+              ),
+            ],
           );
         },
       ),
+      floatingActionButton: _selectedFilter == 'Personal Schedule' || _selectedFilter == 'All Schedule'
+          ? FloatingActionButton(
+              onPressed: _showAddScheduleSheet,
+              backgroundColor: AppColor.primary,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
     );
-  }
-
-  Future<void> _handleLogout(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Apakah Anda yakin ingin keluar?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      await context.read<AuthProvider>().logout();
-      if (context.mounted) {
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
-    }
   }
 }
 
-// Profile Tab
-class _ProfileTab extends StatelessWidget {
-  const _ProfileTab();
+// Custom ScheduleCard for PersonalSchedule
+class _PersonalScheduleCard extends StatelessWidget {
+  final List<PersonalSchedule> schedules;
+  final Function(PersonalSchedule)? onScheduleTap;
+
+  const _PersonalScheduleCard({
+    required this.schedules,
+    this.onScheduleTap,
+  });
+
+  String _formatTime(DateTime time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  Widget _buildScheduleItem(PersonalSchedule schedule, bool isLast) {
+    return Column(
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onScheduleTap != null ? () => onScheduleTap!(schedule) : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Color(int.parse(schedule.color.replaceFirst('#', '0xFF'))),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColor.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        
+                        Text(
+                          schedule.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.textPrimary,
+                          ),
+                        ),
+                        if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            schedule.location!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColor.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (!isLast)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Divider(
+              color: AppColor.textSecondary.withOpacity(0.2),
+              thickness: 1,
+              height: 1,
+            ),
+          ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: AppColor.backgroundSecondary,
-      ),
-      body: Consumer<AuthProvider>(
-        builder: (context, authProvider, child) {
-          final user = authProvider.user;
-          
-          return ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          const SizedBox(height: 20),
-          Center(
-            child: CircleAvatar(
-              radius: 60,
-              backgroundColor: AppColor.primary,
-              child: Text(
-                user?.name.substring(0, 1).toUpperCase() ?? 'U',
-                style: const TextStyle(
-                  fontSize: 48,
-                  color: AppColor.backgroundSecondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Center(
-            child: Text(
-              user?.name ?? 'User',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColor.textPrimary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Center(
-            child: Text(
-              user?.email ?? '',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColor.textSecondary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 40),
-          _buildProfileCard(
-            icon: Icons.email_outlined,
-            title: 'Email',
-            subtitle: user?.email ?? '',
-          ),
-          const SizedBox(height: 12),
-          _buildProfileCard(
-            icon: Icons.person_outline,
-            title: 'Nama',
-            subtitle: user?.name ?? '',
-          ),
-          const SizedBox(height: 12),
-          _buildProfileCard(
-            icon: Icons.calendar_today_outlined,
-            title: 'Bergabung',
-            subtitle: user?.createdAt ?? '',
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () => _handleLogout(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.logout),
-            label: const Text(
-              'Logout',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildProfileCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
     return Container(
       decoration: BoxDecoration(
         color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: schedules.asMap().entries.map((entry) {
+            final index = entry.key;
+            final schedule = entry.value;
+            final isLast = index == schedules.length - 1;
+            return _buildScheduleItem(schedule, isLast);
+          }).toList(),
         ),
       ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColor.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: AppColor.primary,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColor.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColor.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
-  }
-
-  Future<void> _handleLogout(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Apakah Anda yakin ingin keluar?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      await context.read<AuthProvider>().logout();
-      if (context.mounted) {
-        Navigator.of(context).pushReplacementNamed('/login');
-      }
-    }
   }
 }
