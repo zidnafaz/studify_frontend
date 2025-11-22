@@ -13,138 +13,120 @@ class ClassroomProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<Classroom> get classrooms => _classrooms;
+  // public getters
+  List<Classroom> get classrooms => List.unmodifiable(_classrooms);
   Classroom? get selectedClassroom => _selectedClassroom;
-  List<ClassSchedule> get schedules => _schedules;
+  List<ClassSchedule> get schedules => List.unmodifiable(_schedules);
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // Get all classrooms
+  // -------------------------
+  // PRIVATE HELPERS
+  // -------------------------
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+  }
+
+  /// Helper to execute an async operation with consistent loading + error handling.
+  /// [operation] should perform changes to provider state but NOT call notifyListeners().
+  /// notifyOnce: whether this wrapper should call notifyListeners at the end.
+  Future<T> _withLoading<T>(
+    Future<T> Function() operation, {
+    bool notifyOnce = true,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+    if (notifyOnce) notifyListeners();
+
+    try {
+      final res = await operation();
+      return res;
+    } on ApiException catch (e) {
+      _setError(e.message);
+      rethrow;
+    } catch (e) {
+      _setError('Terjadi kesalahan: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+      if (notifyOnce) notifyListeners();
+    }
+  }
+
+  // -------------------------
+  // API METHODS (safe)
+  // -------------------------
+
   Future<void> fetchClassrooms() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _classrooms = await _classroomService.getClassrooms();
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    await _withLoading(() async {
+      final result = await _classroomService.getClassrooms();
+      // replace and notify once (via _withLoading finally)
+      _classrooms = result;
+      return result;
+    });
   }
 
-  // Get classroom by ID
+  /// Fetch single classroom and set _selectedClassroom.
   Future<void> fetchClassroom(int classroomId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _selectedClassroom = await _classroomService.getClassroom(classroomId);
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    await _withLoading(() async {
+      final result = await _classroomService.getClassroom(classroomId);
+      _selectedClassroom = result;
+      return result;
+    });
   }
 
-  // Create classroom
   Future<Classroom> createClassroom({
     required String name,
     String? description,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final classroom = await _classroomService.createClassroom(
         name: name,
         description: description,
       );
-      _classrooms.add(classroom);
-      _isLoading = false;
-      notifyListeners();
+      _classrooms = List.from(_classrooms)..add(classroom);
       return classroom;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Join classroom
   Future<Classroom> joinClassroom(String uniqueCode) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final classroom = await _classroomService.joinClassroom(uniqueCode);
-      _classrooms.add(classroom);
-      _isLoading = false;
-      notifyListeners();
+      _classrooms = List.from(_classrooms)..add(classroom);
       return classroom;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Get schedules for a classroom
-  Future<void> fetchClassSchedules(int classroomId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      _schedules = await _classroomService.getClassSchedules(classroomId);
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
+  /// [notify] controls whether this call triggers notifyListeners().
+  /// Use notify: false when calling internally then notify once at outer operation.
+  Future<void> fetchClassSchedules(int classroomId, {bool notify = true}) async {
+    // If notify == false, we manage loading/error without notify; otherwise use wrapper
+    if (!notify) {
+      try {
+        final result = await _classroomService.getClassSchedules(classroomId);
+        _schedules = result;
+      } on ApiException catch (e) {
+        _errorMessage = e.message;
+        rethrow;
+      } catch (e) {
+        _errorMessage = 'Terjadi kesalahan: $e';
+        rethrow;
+      }
+      return;
     }
+
+    await _withLoading(() async {
+      final result = await _classroomService.getClassSchedules(classroomId);
+      _schedules = result;
+      return result;
+    });
   }
 
-  // Create schedule
   Future<ClassSchedule> createClassSchedule({
     required int classroomId,
     required String title,
@@ -159,11 +141,7 @@ class ClassroomProvider with ChangeNotifier {
     List<int>? repeatDays,
     int? repeatCount,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final schedule = await _classroomService.createClassSchedule(
         classroomId: classroomId,
         title: title,
@@ -178,27 +156,15 @@ class ClassroomProvider with ChangeNotifier {
         repeatDays: repeatDays,
         repeatCount: repeatCount,
       );
-      
-      // Refresh schedules to get all created schedules (in case of repeating)
-      await fetchClassSchedules(classroomId);
-      
-      _isLoading = false;
-      notifyListeners();
+
+      // Refresh schedules internally without firing notify twice.
+      await fetchClassSchedules(classroomId, notify: false);
+
+      // After internal refresh, we'll return to _withLoading which will notify once.
       return schedule;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Update schedule
   Future<ClassSchedule> updateClassSchedule({
     required int classroomId,
     required int scheduleId,
@@ -212,11 +178,7 @@ class ClassroomProvider with ChangeNotifier {
     int? coordinator1,
     int? coordinator2,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final schedule = await _classroomService.updateClassSchedule(
         classroomId: classroomId,
         scheduleId: scheduleId,
@@ -230,197 +192,97 @@ class ClassroomProvider with ChangeNotifier {
         coordinator1: coordinator1,
         coordinator2: coordinator2,
       );
-      
-      final index = _schedules.indexWhere((s) => s.id == scheduleId);
-      if (index != -1) {
-        _schedules[index] = schedule;
+
+      final idx = _schedules.indexWhere((s) => s.id == scheduleId);
+      if (idx != -1) {
+        _schedules[idx] = schedule;
       }
-      
-      _isLoading = false;
-      notifyListeners();
+
       return schedule;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Delete schedule
   Future<void> deleteClassSchedule({
     required int classroomId,
     required int scheduleId,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       await _classroomService.deleteClassSchedule(
         classroomId: classroomId,
         scheduleId: scheduleId,
       );
-      
       _schedules.removeWhere((s) => s.id == scheduleId);
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      return true;
+    });
   }
 
-  // Leave classroom
   Future<void> leaveClassroom(int classroomId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       await _classroomService.leaveClassroom(classroomId);
-      
       _classrooms.removeWhere((c) => c.id == classroomId);
       if (_selectedClassroom?.id == classroomId) {
         _selectedClassroom = null;
       }
-      
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      return true;
+    });
   }
 
-  // Remove member
   Future<void> removeMember({
     required int classroomId,
     required int userId,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       await _classroomService.removeMember(
         classroomId: classroomId,
         userId: userId,
       );
-      
-      // Refresh classroom data to get updated members list
+
+      // refresh classroom data but avoid double-notify: use notify: false
       await fetchClassroom(classroomId);
-      
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      await fetchClassSchedules(classroomId, notify: false);
+      return true;
+    });
   }
 
-  // Transfer ownership
   Future<void> transferOwnership({
     required int classroomId,
     required int newOwnerId,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       await _classroomService.transferOwnership(
         classroomId: classroomId,
         newOwnerId: newOwnerId,
       );
-      
-      // Refresh classroom data to get updated owner info
+
+      // refresh detail
       await fetchClassroom(classroomId);
-      
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      return true;
+    });
   }
 
-  // Update classroom description
   Future<void> updateClassroomDescription({
     required int classroomId,
     String? description,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       final updatedClassroom = await _classroomService.updateClassroomDescription(
         classroomId: classroomId,
         description: description,
       );
-      
-      // Update in list
-      final index = _classrooms.indexWhere((c) => c.id == classroomId);
-      if (index != -1) {
-        _classrooms[index] = updatedClassroom;
-      }
-      
-      // Update selected classroom if it's the same
+
+      final idx = _classrooms.indexWhere((c) => c.id == classroomId);
+      if (idx != -1) _classrooms[idx] = updatedClassroom;
+
       if (_selectedClassroom?.id == classroomId) {
         _selectedClassroom = updatedClassroom;
       }
-      
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+
+      return updatedClassroom;
+    });
   }
 
   void clearError() {
-    _errorMessage = null;
+    _setError(null);
     notifyListeners();
   }
 

@@ -17,10 +17,71 @@ class AuthProvider with ChangeNotifier {
   User? _user;
   String? _errorMessage;
 
+  // public getters
   AuthStatus get status => _status;
   User? get user => _user;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
+
+  // -------------------------
+  // PRIVATE HELPERS
+  // -------------------------
+
+  void _setStatus(AuthStatus status) {
+    _status = status;
+  }
+
+  void _setUser(User? user) {
+    _user = user;
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+  }
+
+  /// Helper to execute an async operation with consistent status + error handling.
+  /// [operation] should perform changes to provider state but NOT call notifyListeners().
+  /// notifyOnce: whether this wrapper should call notifyListeners at the end.
+  Future<T> _withStatus<T>(
+    Future<T> Function() operation, {
+    AuthStatus? initialStatus,
+    bool notifyOnce = true,
+  }) async {
+    if (initialStatus != null) {
+      _setStatus(initialStatus);
+    }
+    _setError(null);
+    if (notifyOnce) notifyListeners();
+
+    try {
+      final res = await operation();
+      return res;
+    } on ValidationException catch (e) {
+      _setStatus(AuthStatus.unauthenticated);
+      _setError(_formatValidationErrors(e.errors));
+      if (notifyOnce) notifyListeners();
+      rethrow;
+    } on UnauthorizedException catch (e) {
+      _setStatus(AuthStatus.unauthenticated);
+      _setError(e.message);
+      if (notifyOnce) notifyListeners();
+      rethrow;
+    } on ApiException catch (e) {
+      _setStatus(AuthStatus.unauthenticated);
+      _setError(e.message);
+      if (notifyOnce) notifyListeners();
+      rethrow;
+    } catch (e) {
+      _setStatus(AuthStatus.unauthenticated);
+      _setError('An unexpected error occurred');
+      if (notifyOnce) notifyListeners();
+      rethrow;
+    }
+  }
+
+  // -------------------------
+  // API METHODS (safe)
+  // -------------------------
 
   // Check Authentication Status
   Future<void> checkAuthStatus() async {
@@ -30,18 +91,18 @@ class AuthProvider with ChangeNotifier {
       if (isAuth) {
         final userData = await _authService.getUserData();
         if (userData != null) {
-          _user = userData;
-          _status = AuthStatus.authenticated;
+          _setUser(userData);
+          _setStatus(AuthStatus.authenticated);
         } else {
-          _status = AuthStatus.unauthenticated;
+          _setStatus(AuthStatus.unauthenticated);
         }
       } else {
-        _status = AuthStatus.unauthenticated;
+        _setStatus(AuthStatus.unauthenticated);
       }
       
       notifyListeners();
     } catch (e) {
-      _status = AuthStatus.unauthenticated;
+      _setStatus(AuthStatus.unauthenticated);
       notifyListeners();
     }
   }
@@ -54,36 +115,23 @@ class AuthProvider with ChangeNotifier {
     required String passwordConfirmation,
   }) async {
     try {
-      _status = AuthStatus.loading;
-      _errorMessage = null;
-      notifyListeners();
+      return await _withStatus(() async {
+        final authResponse = await _authService.register(
+          name: name,
+          email: email,
+          password: password,
+          passwordConfirmation: passwordConfirmation,
+        );
 
-      final authResponse = await _authService.register(
-        name: name,
-        email: email,
-        password: password,
-        passwordConfirmation: passwordConfirmation,
-      );
-
-      _user = authResponse.user;
-      _status = AuthStatus.authenticated;
-      notifyListeners();
-      
-      return true;
-    } on ValidationException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = _formatValidationErrors(e.errors);
-      notifyListeners();
+        _setUser(authResponse.user);
+        _setStatus(AuthStatus.authenticated);
+        return true;
+      }, initialStatus: AuthStatus.loading);
+    } on ValidationException {
       return false;
-    } on ApiException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = e.message;
-      notifyListeners();
+    } on ApiException {
       return false;
     } catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = 'An unexpected error occurred';
-      notifyListeners();
       return false;
     }
   }
@@ -94,39 +142,23 @@ class AuthProvider with ChangeNotifier {
     required String password,
   }) async {
     try {
-      _status = AuthStatus.loading;
-      _errorMessage = null;
-      notifyListeners();
+      return await _withStatus(() async {
+        final authResponse = await _authService.login(
+          email: email,
+          password: password,
+        );
 
-      final authResponse = await _authService.login(
-        email: email,
-        password: password,
-      );
-
-      _user = authResponse.user;
-      _status = AuthStatus.authenticated;
-      notifyListeners();
-      
-      return true;
-    } on ValidationException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = _formatValidationErrors(e.errors);
-      notifyListeners();
+        _setUser(authResponse.user);
+        _setStatus(AuthStatus.authenticated);
+        return true;
+      }, initialStatus: AuthStatus.loading);
+    } on ValidationException {
       return false;
-    } on UnauthorizedException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = e.message;
-      notifyListeners();
+    } on UnauthorizedException {
       return false;
-    } on ApiException catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = e.message;
-      notifyListeners();
+    } on ApiException {
       return false;
     } catch (e) {
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = 'An unexpected error occurred';
-      notifyListeners();
       return false;
     }
   }
@@ -139,9 +171,9 @@ class AuthProvider with ChangeNotifier {
       // Log error but still continue with logout
       debugPrint('Logout error: $e');
     } finally {
-      _user = null;
-      _status = AuthStatus.unauthenticated;
-      _errorMessage = null;
+      _setUser(null);
+      _setStatus(AuthStatus.unauthenticated);
+      _setError(null);
       notifyListeners();
     }
   }
@@ -150,7 +182,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> refreshToken() async {
     try {
       final authResponse = await _authService.refreshToken();
-      _user = authResponse.user;
+      _setUser(authResponse.user);
       notifyListeners();
     } catch (e) {
       // If refresh fails, logout
@@ -160,7 +192,7 @@ class AuthProvider with ChangeNotifier {
 
   // Clear Error
   void clearError() {
-    _errorMessage = null;
+    _setError(null);
     notifyListeners();
   }
 

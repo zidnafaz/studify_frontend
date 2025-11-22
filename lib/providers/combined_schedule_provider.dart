@@ -12,37 +12,65 @@ class CombinedScheduleProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<CombinedSchedule> get schedules => _schedules;
-  List<ScheduleSource> get availableSources => _availableSources;
+  // public getters
+  List<CombinedSchedule> get schedules => List.unmodifiable(_schedules);
+  List<ScheduleSource> get availableSources => List.unmodifiable(_availableSources);
   String? get currentFilter => _currentFilter;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // -------------------------
+  // PRIVATE HELPERS
+  // -------------------------
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+  }
+
+  /// Helper to execute an async operation with consistent loading + error handling.
+  /// [operation] should perform changes to provider state but NOT call notifyListeners().
+  /// notifyOnce: whether this wrapper should call notifyListeners at the end.
+  Future<T> _withLoading<T>(
+    Future<T> Function() operation, {
+    bool notifyOnce = true,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+    if (notifyOnce) notifyListeners();
+
+    try {
+      final res = await operation();
+      return res;
+    } on ApiException catch (e) {
+      _setError(e.message);
+      rethrow;
+    } catch (e) {
+      _setError('Terjadi kesalahan: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+      if (notifyOnce) notifyListeners();
+    }
+  }
+
+  // -------------------------
+  // API METHODS (safe)
+  // -------------------------
+
   /// Get combined schedules with optional source filter
   /// [source] can be: null (all), 'personal', or 'classroom:{id}'
   Future<void> fetchCombinedSchedules({String? source}) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       final response = await _combinedScheduleService.getCombinedSchedules(source: source);
       _schedules = response.data;
       _availableSources = response.meta.availableSources;
       _currentFilter = response.meta.currentFilter;
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      return response;
+    });
   }
 
   /// Refresh schedules with current filter
@@ -59,4 +87,3 @@ class CombinedScheduleProvider with ChangeNotifier {
     notifyListeners();
   }
 }
-

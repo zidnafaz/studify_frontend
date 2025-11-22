@@ -16,6 +16,7 @@ void main() {
           'updated_at': '2024-01-01T00:00:00.000000Z',
         },
         'access_token': 'test_token_123',
+        'refresh_token': 'refresh_token_456',
         'token_type': 'Bearer',
         'expires_in': 3600,
       };
@@ -28,6 +29,7 @@ void main() {
       expect(authResponse.user.name, 'John Doe');
       expect(authResponse.user.email, 'john@example.com');
       expect(authResponse.accessToken, 'test_token_123');
+      expect(authResponse.refreshToken, 'refresh_token_456');
       expect(authResponse.tokenType, 'Bearer');
       expect(authResponse.expiresIn, 3600);
     });
@@ -46,6 +48,7 @@ void main() {
       final authResponse = AuthResponse(
         user: user,
         accessToken: 'test_token_123',
+        refreshToken: 'refresh_token_456',
         tokenType: 'Bearer',
         expiresIn: 3600,
       );
@@ -56,6 +59,7 @@ void main() {
       // Assert
       expect(json['user'], isA<User>());
       expect(json['access_token'], 'test_token_123');
+      expect(json['refresh_token'], 'refresh_token_456');
       expect(json['token_type'], 'Bearer');
       expect(json['expires_in'], 3600);
       
@@ -78,6 +82,7 @@ void main() {
           'updated_at': '2024-01-01T00:00:00.000000Z',
         },
         'access_token': 'jwt_token_xyz',
+        'refresh_token': 'refresh_jwt_token',
         'token_type': 'JWT',
         'expires_in': 7200,
       };
@@ -87,6 +92,7 @@ void main() {
 
       // Assert
       expect(authResponse.tokenType, 'JWT');
+      expect(authResponse.refreshToken, 'refresh_jwt_token');
       expect(authResponse.expiresIn, 7200);
     });
 
@@ -102,6 +108,7 @@ void main() {
           'updated_at': '2024-01-01T00:00:00.000000Z',
         },
         'access_token': 'access_token',
+        'refresh_token': 'refresh_token',
         'token_type': 'Bearer',
         'expires_in': 3600,
       };
@@ -112,6 +119,32 @@ void main() {
       // Assert
       expect(authResponse.user.emailVerifiedAt, '2024-01-01T12:00:00.000000Z');
       expect(authResponse.user.id, 5);
+      expect(authResponse.refreshToken, 'refresh_token');
+    });
+
+    test('should handle null refreshToken', () {
+      // Arrange
+      final json = {
+        'user': {
+          'id': 1,
+          'name': 'John Doe',
+          'email': 'john@example.com',
+          'email_verified_at': null,
+          'created_at': '2024-01-01T00:00:00.000000Z',
+          'updated_at': '2024-01-01T00:00:00.000000Z',
+        },
+        'access_token': 'test_token_123',
+        'refresh_token': null,
+        'token_type': 'Bearer',
+        'expires_in': 3600,
+      };
+
+      // Act
+      final authResponse = AuthResponse.fromJson(json);
+
+      // Assert
+      expect(authResponse.accessToken, 'test_token_123');
+      expect(authResponse.refreshToken, isNull);
     });
   });
 }

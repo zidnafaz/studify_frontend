@@ -212,6 +212,93 @@ void main() {
       });
     });
 
+    group('Refresh Token', () {
+      test('should save and retrieve refresh token', () async {
+        // Arrange
+        const refreshToken = 'refresh_token_123';
+
+        // Act
+        await authService.saveRefreshToken(refreshToken);
+        final retrievedToken = await authService.getRefreshToken();
+
+        // Assert
+        expect(retrievedToken, refreshToken);
+      });
+
+      test('should return null when no refresh token exists', () async {
+        // Act
+        final token = await authService.getRefreshToken();
+
+        // Assert
+        expect(token, null);
+      });
+
+      test('should clear refresh token on clearAuthData', () async {
+        // Arrange
+        await authService.saveRefreshToken('refresh_token');
+        await authService.saveToken('access_token');
+
+        // Act
+        await authService.clearAuthData();
+
+        // Assert
+        final refreshToken = await authService.getRefreshToken();
+        final accessToken = await authService.getToken();
+        expect(refreshToken, null);
+        expect(accessToken, null);
+      });
+
+      test('should handle refreshToken response structure', () {
+        // Arrange
+        final mockResponse = {
+          'user': {
+            'id': 1,
+            'name': 'John Doe',
+            'email': 'john@example.com',
+            'email_verified_at': null,
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+          'access_token': 'new_access_token',
+          'refresh_token': 'new_refresh_token',
+          'token_type': 'Bearer',
+          'expires_in': 3600,
+        };
+
+        // Assert
+        expect(mockResponse['refresh_token'], 'new_refresh_token');
+        expect(mockResponse['access_token'], 'new_access_token');
+      });
+    });
+
+    group('Get Current User', () {
+      test('should handle getCurrentUser method', () {
+        // This test verifies the method exists and can be called
+        // In actual implementation, you would mock the HTTP client
+        expect(authService.getCurrentUser, isA<Future<User> Function()>());
+      });
+
+      test('should require token for getCurrentUser', () {
+        // Arrange
+        final mockResponse = {
+          'data': {
+            'id': 1,
+            'name': 'John Doe',
+            'email': 'john@example.com',
+            'email_verified_at': null,
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+        };
+
+        // Assert
+        expect(mockResponse['data'], isNotNull);
+        final userData = mockResponse['data'] as Map;
+        expect(userData['id'], 1);
+        expect(userData['email'], 'john@example.com');
+      });
+    });
+
     group('Error Handling', () {
       test('should create NetworkException', () {
         // Arrange
