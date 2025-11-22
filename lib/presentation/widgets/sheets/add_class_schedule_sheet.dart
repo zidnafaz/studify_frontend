@@ -196,6 +196,10 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
     setState(() => _isLoading = true);
 
+    // Store context and navigator before async operations
+    final currentContext = context;
+    final navigator = Navigator.of(currentContext);
+
     try {
       final startDateTime = DateTime(
         _selectedDate.year,
@@ -235,17 +239,25 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
       await widget.onSave(data);
 
+      // Close sheet after successful save
       if (mounted) {
-        Navigator.pop(context, true);
+        navigator.pop(true);
       }
     } catch (e) {
+      // Close sheet even if there's an error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal membuat jadwal: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        navigator.pop(false);
+        // Show error message after a short delay to ensure sheet is closed
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            ScaffoldMessenger.of(currentContext).showSnackBar(
+              SnackBar(
+                content: Text('Gagal membuat jadwal: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
       }
     } finally {
       if (mounted) {
