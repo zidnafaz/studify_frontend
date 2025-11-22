@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:studify/core/constants/app_color.dart';
 import 'package:studify/data/models/class_schedule_model.dart';
@@ -27,6 +28,11 @@ void main() {
   late User ownerUser;
   late User coordinatorUser;
   late User regularUser;
+
+  setUpAll(() async {
+    // Initialize locale data for intl package
+    await initializeDateFormatting('id_ID', null);
+  });
 
   setUp(() {
     ownerUser = User(

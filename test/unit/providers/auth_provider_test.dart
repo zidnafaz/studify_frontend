@@ -166,20 +166,25 @@ void main() {
     });
 
     group('Edge Cases', () {
-      test('should handle empty credentials gracefully', () {
-        // This tests the structure without actual API call
-        expect(() => authProvider.login(email: '', password: ''), 
-          returnsNormally);
+      test('should handle empty credentials gracefully', () async {
+        // This test will make actual API call and should handle error gracefully
+        final result = await authProvider.login(email: '', password: '');
+        // Should return false and set error message
+        expect(result, false);
+        expect(authProvider.status, AuthStatus.unauthenticated);
       });
 
-      test('should handle empty registration data gracefully', () {
-        // This tests the structure without actual API call
-        expect(() => authProvider.register(
+      test('should handle empty registration data gracefully', () async {
+        // This test will make actual API call and should handle error gracefully
+        final result = await authProvider.register(
           name: '',
           email: '',
           password: '',
           passwordConfirmation: '',
-        ), returnsNormally);
+        );
+        // Should return false and set error message
+        expect(result, false);
+        expect(authProvider.status, AuthStatus.unauthenticated);
       });
 
       test('should handle null error message', () {
