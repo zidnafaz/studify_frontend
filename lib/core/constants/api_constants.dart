@@ -28,6 +28,10 @@ class ApiConstants {
   static String classSchedules(int classroomId) => '$baseUrl/api/classrooms/$classroomId/schedules';
   static String classScheduleDetail(int classroomId, int scheduleId) => '$baseUrl/api/classrooms/$classroomId/schedules/$scheduleId';
   
+  // Personal Schedule Endpoints
+  static const String personalSchedules = '$baseUrl/api/personal-schedules';
+  static String personalScheduleDetail(int scheduleId) => '$baseUrl/api/personal-schedules/$scheduleId';
+  
   // Headers
   static Map<String, String> headers({String? token}) {
     final headers = {
