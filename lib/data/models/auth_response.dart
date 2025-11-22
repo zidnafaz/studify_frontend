@@ -8,6 +8,8 @@ class AuthResponse {
   final User user;
   @JsonKey(name: 'access_token')
   final String accessToken;
+  @JsonKey(name: 'refresh_token')
+  final String? refreshToken;
   @JsonKey(name: 'token_type')
   final String tokenType;
   @JsonKey(name: 'expires_in')
@@ -16,6 +18,7 @@ class AuthResponse {
   AuthResponse({
     required this.user,
     required this.accessToken,
+    this.refreshToken,
     required this.tokenType,
     required this.expiresIn,
   });

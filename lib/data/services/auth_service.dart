@@ -8,6 +8,7 @@ import '../models/auth_response.dart';
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
+  static const String _refreshTokenKey = 'refresh_token';
   static const String _userKey = 'user_data';
   
   // Separate Dio instance for auth endpoints (no interceptors)
@@ -162,7 +163,11 @@ class AuthService {
   // Refresh Token
   Future<AuthResponse> refreshToken() async {
     try {
-      final token = await getToken();
+      // Try to use refresh_token first, fallback to access_token
+      String? token = await getRefreshToken();
+      if (token == null) {
+        token = await getToken();
+      }
       
       if (token == null) {
         throw UnauthorizedException(message: 'No token found');
@@ -195,6 +200,18 @@ class AuthService {
     return prefs.getString(_tokenKey);
   }
 
+  // Save Refresh Token
+  Future<void> saveRefreshToken(String refreshToken) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_refreshTokenKey, refreshToken);
+  }
+
+  // Get Refresh Token
+  Future<String?> getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_refreshTokenKey);
+  }
+
   // Save User Data
   Future<void> saveUserData(User user) async {
     final prefs = await SharedPreferences.getInstance();
@@ -217,6 +234,7 @@ class AuthService {
   Future<void> clearAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+    await prefs.remove(_refreshTokenKey);
     await prefs.remove(_userKey);
   }
 
@@ -245,8 +263,11 @@ class AuthService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final authResponse = AuthResponse.fromJson(jsonData['data']);
         
-        // Save token and user data
+        // Save token, refresh token, and user data
         saveToken(authResponse.accessToken);
+        if (authResponse.refreshToken != null) {
+          saveRefreshToken(authResponse.refreshToken!);
+        }
         saveUserData(authResponse.user);
         
         return authResponse;
