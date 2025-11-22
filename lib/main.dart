@@ -8,6 +8,7 @@ import 'package:studify/presentation/screens/classroom/classroom_list_screen.dar
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'providers/personal_schedule_provider.dart';
+import 'providers/combined_schedule_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ClassroomProvider()),
         ChangeNotifierProvider(create: (_) => PersonalScheduleProvider()),
+        ChangeNotifierProvider(create: (_) => CombinedScheduleProvider()),
       ],
       child: MaterialApp(
         title: 'Studify',
