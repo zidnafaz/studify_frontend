@@ -93,6 +93,24 @@ void main() {
       });
     });
 
+    group('Refresh Token', () {
+      test('should handle refreshToken method', () {
+        // This test verifies the method exists and can be called
+        // In actual implementation, you would mock the service
+        expect(authProvider.refreshToken, isA<Future<void> Function()>());
+      });
+    });
+
+    group('Clear Error', () {
+      test('should clear error message', () {
+        // Act
+        authProvider.clearError();
+
+        // Assert
+        expect(authProvider.errorMessage, isNull);
+      });
+    });
+
     group('State Management', () {
       test('should have correct status enum values', () {
         // Assert

@@ -10,34 +10,62 @@ class PersonalScheduleProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<PersonalSchedule> get schedules => _schedules;
+  // public getters
+  List<PersonalSchedule> get schedules => List.unmodifiable(_schedules);
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // Get all personal schedules
-  Future<void> fetchPersonalSchedules() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  // -------------------------
+  // PRIVATE HELPERS
+  // -------------------------
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+  }
+
+  /// Helper to execute an async operation with consistent loading + error handling.
+  /// [operation] should perform changes to provider state but NOT call notifyListeners().
+  /// notifyOnce: whether this wrapper should call notifyListeners at the end.
+  Future<T> _withLoading<T>(
+    Future<T> Function() operation, {
+    bool notifyOnce = true,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+    if (notifyOnce) notifyListeners();
 
     try {
-      _schedules = await _personalScheduleService.getPersonalSchedules();
-      _isLoading = false;
-      notifyListeners();
+      final res = await operation();
+      return res;
     } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
+      _setError(e.message);
       rethrow;
     } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
+      _setError('Terjadi kesalahan: $e');
       rethrow;
+    } finally {
+      _setLoading(false);
+      if (notifyOnce) notifyListeners();
     }
   }
 
-  // Create personal schedule
+  // -------------------------
+  // API METHODS (safe)
+  // -------------------------
+
+  Future<void> fetchPersonalSchedules() async {
+    await _withLoading(() async {
+      final result = await _personalScheduleService.getPersonalSchedules();
+      _schedules = result;
+      _schedules.sort((a, b) => a.startTime.compareTo(b.startTime));
+      return result;
+    });
+  }
+
   Future<PersonalSchedule> createPersonalSchedule({
     required String title,
     required DateTime startTime,
@@ -46,11 +74,7 @@ class PersonalScheduleProvider with ChangeNotifier {
     String? description,
     String? color,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final schedule = await _personalScheduleService.createPersonalSchedule(
         title: title,
         startTime: startTime,
@@ -59,25 +83,12 @@ class PersonalScheduleProvider with ChangeNotifier {
         description: description,
         color: color,
       );
-      _schedules.add(schedule);
+      _schedules = List.from(_schedules)..add(schedule);
       _schedules.sort((a, b) => a.startTime.compareTo(b.startTime));
-      _isLoading = false;
-      notifyListeners();
       return schedule;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Update personal schedule
   Future<PersonalSchedule> updatePersonalSchedule({
     required int scheduleId,
     String? title,
@@ -87,11 +98,7 @@ class PersonalScheduleProvider with ChangeNotifier {
     String? description,
     String? color,
   }) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    return await _withLoading(() async {
       final schedule = await _personalScheduleService.updatePersonalSchedule(
         scheduleId: scheduleId,
         title: title,
@@ -106,44 +113,16 @@ class PersonalScheduleProvider with ChangeNotifier {
         _schedules[index] = schedule;
         _schedules.sort((a, b) => a.startTime.compareTo(b.startTime));
       }
-      _isLoading = false;
-      notifyListeners();
       return schedule;
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    });
   }
 
-  // Delete personal schedule
   Future<void> deletePersonalSchedule(int scheduleId) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await _withLoading(() async {
       await _personalScheduleService.deletePersonalSchedule(scheduleId);
       _schedules.removeWhere((s) => s.id == scheduleId);
-      _isLoading = false;
-      notifyListeners();
-    } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+      return true;
+    });
   }
 }
 

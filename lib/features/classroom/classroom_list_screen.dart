@@ -3,7 +3,7 @@ import 'create_class_screen.dart';
 import 'join_class_screen.dart';
 import 'classroom_detail_screen.dart';
 import 'classroom_service.dart';
-import '../profile/profile_screen.dart';
+import '../../presentation/screens/auth/profile_screen.dart';
 
 class ClassroomListScreen extends StatefulWidget {
   const ClassroomListScreen({Key? key}) : super(key: key);

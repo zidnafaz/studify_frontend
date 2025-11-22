@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../../core/constants/app_color.dart';
-import 'profile_store.dart';
+import 'package:provider/provider.dart';
+import '../../../core/constants/app_color.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../features/profile/profile_store.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -30,10 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
 
@@ -70,7 +68,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const Spacer(),
                     IconButton(
-                      onPressed: () => Navigator.of(bottomSheetContext).pop(false),
+                      onPressed: () =>
+                          Navigator.of(bottomSheetContext).pop(false),
                       icon: const Icon(Icons.close),
                     ),
                   ],
@@ -78,9 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Full Name'),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Name is required';
@@ -91,9 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Email'),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -169,14 +164,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const Spacer(),
                     IconButton(
-                      onPressed: () => Navigator.of(bottomSheetContext).pop(false),
+                      onPressed: () =>
+                          Navigator.of(bottomSheetContext).pop(false),
                       icon: const Icon(Icons.close),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  initialValue: _profile.name.isEmpty ? 'Guest User' : _profile.name,
+                  initialValue: _profile.name.isEmpty
+                      ? 'Guest User'
+                      : _profile.name,
                   enabled: false,
                   decoration: const InputDecoration(
                     labelText: 'Full Name',
@@ -186,9 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Phone Number'),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -205,12 +201,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   initialValue: roleValue,
                   items: const [
                     DropdownMenuItem(value: 'Student', child: Text('Student')),
-                    DropdownMenuItem(value: 'Class President', child: Text('Class President')),
-                    DropdownMenuItem(value: 'Course coordinator', child: Text('Course coordinator')),
+                    DropdownMenuItem(
+                      value: 'Class President',
+                      child: Text('Class President'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Course coordinator',
+                      child: Text('Course coordinator'),
+                    ),
                   ],
-                  decoration: const InputDecoration(
-                    labelText: 'Role',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Role'),
                   onChanged: (value) {
                     if (value != null) {
                       roleValue = value;
@@ -282,7 +282,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const Spacer(),
                     IconButton(
-                      onPressed: () => Navigator.of(bottomSheetContext).pop(false),
+                      onPressed: () =>
+                          Navigator.of(bottomSheetContext).pop(false),
                       icon: const Icon(Icons.close),
                     ),
                   ],
@@ -304,9 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: newPassword,
-                  decoration: const InputDecoration(
-                    labelText: 'New password',
-                  ),
+                  decoration: const InputDecoration(labelText: 'New password'),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.length < 6) {
@@ -380,7 +379,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Spacer(),
                       IconButton(
-                        onPressed: () => Navigator.of(bottomSheetContext).pop(false),
+                        onPressed: () =>
+                            Navigator.of(bottomSheetContext).pop(false),
                         icon: const Icon(Icons.close),
                       ),
                     ],
@@ -390,7 +390,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: const Text('Assignment reminders'),
                     subtitle: const Text('Due dates and new tasks'),
                     value: assignment,
-                    onChanged: (value) => setModalState(() => assignment = value),
+                    onChanged: (value) =>
+                        setModalState(() => assignment = value),
                   ),
                   SwitchListTile(
                     title: const Text('Daily productivity tips'),
@@ -402,13 +403,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: const Text('Class updates'),
                     subtitle: const Text('Announcements from mentors'),
                     value: classUpdate,
-                    onChanged: (value) => setModalState(() => classUpdate = value),
+                    onChanged: (value) =>
+                        setModalState(() => classUpdate = value),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(bottomSheetContext).pop(true),
+                      onPressed: () =>
+                          Navigator.of(bottomSheetContext).pop(true),
                       child: const Text('Save preferences'),
                     ),
                   ),
@@ -454,14 +457,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
 
-    if (confirm == true) {
+    if (confirm == true && mounted) {
+      // Clear profile store
       ProfileStore.instance.reset();
-      setState(() {
-        _profile = ProfileStore.instance.data;
-      });
+
+      // Logout via AuthProvider
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.logout();
+
       if (!mounted) return;
-      
-      _showMessage('Signed out successfully');
+
+      // Navigate to welcome screen
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil('/welcome', (route) => false);
     }
   }
 
@@ -472,7 +481,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'Productivity',
       'UI/UX',
       'AI Research',
-      'Writing'
+      'Writing',
     ];
 
     final stats = [
@@ -482,9 +491,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
+      appBar: AppBar(title: const Text('Profile')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -505,16 +512,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         CircleAvatar(
                           radius: 36,
-                          backgroundColor: AppColor.secondary.withValues(alpha: 0.25),
+                          backgroundColor: AppColor.secondary.withValues(
+                            alpha: 0.25,
+                          ),
                           child: Text(
                             _profile.name.isEmpty
                                 ? '?'
                                 : _profile.name
-                                    .split(' ')
-                                    .take(2)
-                                    .map((word) => word.isNotEmpty ? word[0] : '')
-                                    .join()
-                                    .toUpperCase(),
+                                      .split(' ')
+                                      .take(2)
+                                      .map(
+                                        (word) =>
+                                            word.isNotEmpty ? word[0] : '',
+                                      )
+                                      .join()
+                                      .toUpperCase(),
                             style: const TextStyle(
                               color: AppColor.primary,
                               fontSize: 24,
@@ -528,7 +540,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _profile.name.isEmpty ? 'Guest User' : _profile.name,
+                                _profile.name.isEmpty
+                                    ? 'Guest User'
+                                    : _profile.name,
                                 style: const TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w600,
@@ -537,7 +551,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _profile.email.isEmpty ? 'No email' : _profile.email,
+                                _profile.email.isEmpty
+                                    ? 'No email'
+                                    : _profile.email,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColor.textSecondary,
@@ -545,7 +561,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _profile.phone.isEmpty ? 'No phone' : _profile.phone,
+                                _profile.phone.isEmpty
+                                    ? 'No phone'
+                                    : _profile.phone,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppColor.textSecondary,
@@ -631,7 +649,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: interests
                       .map(
                         (interest) => Chip(
-                          backgroundColor: AppColor.accent.withValues(alpha: 0.15),
+                          backgroundColor: AppColor.accent.withValues(
+                            alpha: 0.15,
+                          ),
                           label: Text(
                             interest,
                             style: const TextStyle(
@@ -772,9 +792,7 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               stat.label,
-              style: const TextStyle(
-                color: AppColor.textSecondary,
-              ),
+              style: const TextStyle(color: AppColor.textSecondary),
             ),
           ],
         ),
@@ -801,10 +819,7 @@ class _ProfileSection extends StatelessWidget {
   final List<_ProfileItem> items;
   final void Function(String title)? onItemTap;
 
-  const _ProfileSection({
-    required this.items,
-    this.onItemTap,
-  });
+  const _ProfileSection({required this.items, this.onItemTap});
 
   @override
   Widget build(BuildContext context) {
@@ -823,10 +838,7 @@ class _ProfileSection extends StatelessWidget {
                     leading: CircleAvatar(
                       radius: 20,
                       backgroundColor: AppColor.primary.withValues(alpha: 0.08),
-                      child: Icon(
-                        item.icon,
-                        color: AppColor.primary,
-                      ),
+                      child: Icon(item.icon, color: AppColor.primary),
                     ),
                     title: Text(
                       item.title,
@@ -837,12 +849,11 @@ class _ProfileSection extends StatelessWidget {
                     ),
                     subtitle: Text(
                       item.subtitle,
-                      style: const TextStyle(
-                        color: AppColor.textSecondary,
-                      ),
+                      style: const TextStyle(color: AppColor.textSecondary),
                     ),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: item.onTap ??
+                    onTap:
+                        item.onTap ??
                         () {
                           if (onItemTap != null) {
                             onItemTap!(item.title);
@@ -850,11 +861,7 @@ class _ProfileSection extends StatelessWidget {
                         },
                   ),
                   if (item != items.last)
-                    Divider(
-                      indent: 72,
-                      height: 0,
-                      color: Colors.grey.shade200,
-                    ),
+                    Divider(indent: 72, height: 0, color: Colors.grey.shade200),
                 ],
               ),
             )
@@ -863,4 +870,3 @@ class _ProfileSection extends StatelessWidget {
     );
   }
 }
-

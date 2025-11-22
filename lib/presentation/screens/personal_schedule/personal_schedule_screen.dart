@@ -27,7 +27,7 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
     _selectedDay = _focusedDay;
     
     // Fetch personal schedules
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       Provider.of<PersonalScheduleProvider>(context, listen: false)
           .fetchPersonalSchedules();
     });

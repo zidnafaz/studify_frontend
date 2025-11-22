@@ -8,9 +8,11 @@ import 'package:studify/presentation/screens/classroom/classroom_list_screen.dar
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'providers/personal_schedule_provider.dart';
+import 'providers/combined_schedule_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
+import 'presentation/screens/auth/splash_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'core/constants/app_color.dart';
 
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ClassroomProvider()),
         ChangeNotifierProvider(create: (_) => PersonalScheduleProvider()),
+        ChangeNotifierProvider(create: (_) => CombinedScheduleProvider()),
       ],
       child: MaterialApp(
         title: 'Studify',
@@ -42,12 +45,13 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           appBarTheme: const AppBarTheme(centerTitle: true),
         ),
-        home: const AuthWrapper(),
+        home: const SplashScreen(),
         routes: {
           '/welcome': (context) => const WelcomeScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const HomeScreen(),
+          '/splash': (context) => const SplashScreen(),
 
           // Classroom
           '/classroomList': (context) => const ClassroomScreen(),
@@ -63,46 +67,6 @@ class MyApp extends StatelessWidget {
           },
         },
       ),
-    );
-  }
-}
-
-class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends State<AuthWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    // Check auth status on app start
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthProvider>().checkAuthStatus();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
-      builder: (context, authProvider, child) {
-        switch (authProvider.status) {
-          case AuthStatus.initial:
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          case AuthStatus.authenticated:
-            return const HomeScreen();
-          case AuthStatus.unauthenticated:
-            return const WelcomeScreen();
-          case AuthStatus.loading:
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-        }
-      },
     );
   }
 }

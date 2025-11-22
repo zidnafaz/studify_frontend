@@ -19,7 +19,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       _loadClassrooms();
     });
   }

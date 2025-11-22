@@ -4,14 +4,14 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import '../../../providers/classroom_provider.dart';
 import '../../../providers/personal_schedule_provider.dart';
+import '../../../providers/combined_schedule_provider.dart';
 import '../../../core/constants/app_color.dart';
-import '../../../data/models/personal_schedule_model.dart';
+import '../../../data/models/combined_schedule_model.dart';
 import '../classroom/classroom_list_screen.dart';
-import '../../../features/profile/profile_screen.dart';
+import '../auth/profile_screen.dart';
 import '../../widgets/schedule_calendar.dart';
 import '../../widgets/sheets/add_personal_schedule_sheet.dart';
-import '../../widgets/sheets/personal_schedule_detail_sheet.dart';
-import '../classroom/classroom_detail_screen.dart';
+import '../../widgets/sheets/combined_schedule_detail_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,44 +99,30 @@ class _HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<_HomeTab> {
-  String _selectedFilter = 'Personal Schedule';
+  String? _selectedSourceId; // 'all', 'personal', or 'classroom:{id}'
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _showAllSchedules = true;
+  CalendarViewMode _calendarViewMode = CalendarViewMode.full;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
+    _selectedSourceId = 'all'; // Default to 'all'
     
     // Fetch data on init
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<PersonalScheduleProvider>(context, listen: false)
-          .fetchPersonalSchedules();
+    Future.microtask(() {
       Provider.of<ClassroomProvider>(context, listen: false)
           .fetchClassrooms();
+      Provider.of<CombinedScheduleProvider>(context, listen: false)
+          .fetchCombinedSchedules(source: _selectedSourceId);
     });
   }
 
-  List<String> _getFilterOptions() {
-    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
-    final classrooms = classroomProvider.classrooms;
-    
-    final options = <String>['Personal Schedule'];
-    
-    // Add classroom options
-    for (var classroom in classrooms) {
-      options.add(classroom.name);
-    }
-    
-    // Add "All Schedule" at the end
-    options.add('All Schedule');
-    
-    return options;
-  }
 
-  Map<String, List<PersonalSchedule>> _groupSchedulesByDate(List<PersonalSchedule> schedules) {
-    final Map<String, List<PersonalSchedule>> grouped = {};
+  Map<String, List<CombinedSchedule>> _groupSchedulesByDate(List<CombinedSchedule> schedules) {
+    final Map<String, List<CombinedSchedule>> grouped = {};
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
@@ -180,7 +166,7 @@ class _HomeTabState extends State<_HomeTab> {
     return grouped;
   }
 
-  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<PersonalSchedule> schedules) {
+  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<CombinedSchedule> schedules) {
     final Map<DateTime, List<ScheduleEvent>> events = {};
     
     for (var schedule in schedules) {
@@ -238,7 +224,7 @@ class _HomeTabState extends State<_HomeTab> {
     }
   }
 
-  Widget _buildScheduleList(List<PersonalSchedule> schedules) {
+  Widget _buildScheduleList(List<CombinedSchedule> schedules) {
     final groupedSchedules = _groupSchedulesByDate(schedules);
 
     if (groupedSchedules.isEmpty) {
@@ -307,14 +293,14 @@ class _HomeTabState extends State<_HomeTab> {
             
             Padding(
               padding: EdgeInsets.only(bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0),
-              child: _PersonalScheduleCard(
+              child: _CombinedScheduleCard(
                 schedules: schedulesForDate,
                 onScheduleTap: (schedule) {
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => PersonalScheduleDetailSheet(
+                    builder: (context) => CombinedScheduleDetailSheet(
                       schedule: schedule,
                     ),
                   );
@@ -343,39 +329,24 @@ class _HomeTabState extends State<_HomeTab> {
             description: data['description'],
             color: data['color'],
           );
+          // Refresh combined schedules
+          final combinedProvider = Provider.of<CombinedScheduleProvider>(context, listen: false);
+          await combinedProvider.refresh();
         },
       ),
     );
   }
 
-  void _handleFilterChange(String? value) {
-    if (value == null) return;
+  void _handleFilterChange(String? sourceId) {
+    if (sourceId == null) return;
     
     setState(() {
-      _selectedFilter = value;
+      _selectedSourceId = sourceId;
     });
 
-    // If a classroom is selected, navigate to classroom detail
-    if (value != 'Personal Schedule' && value != 'All Schedule') {
-      final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
-      final classroom = classroomProvider.classrooms.firstWhere(
-        (c) => c.name == value,
-      );
-      
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClassroomDetailScreen(classroom: classroom),
-        ),
-      );
-      
-      // Reset filter after navigation
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _selectedFilter = 'Personal Schedule';
-        });
-      });
-    }
+    // Fetch schedules with new filter
+    Provider.of<CombinedScheduleProvider>(context, listen: false)
+        .fetchCombinedSchedules(source: sourceId == 'all' ? null : sourceId);
   }
 
   @override
@@ -406,30 +377,52 @@ class _HomeTabState extends State<_HomeTab> {
                         ),
                       ),
                       const Spacer(),
-                      Consumer<ClassroomProvider>(
-                        builder: (context, classroomProvider, child) {
-                          final filterOptions = _getFilterOptions();
+                      Consumer<CombinedScheduleProvider>(
+                        builder: (context, combinedProvider, child) {
+                          final sources = combinedProvider.availableSources;
+                          
+                          if (sources.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
                           
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: DropdownButton<String>(
-                              value: _selectedFilter,
+                              value: _selectedSourceId ?? 'all',
                               dropdownColor: AppColor.backgroundSecondary,
                               underline: const SizedBox(),
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              items: filterOptions.map((String option) {
+                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 20),
+                              iconSize: 20,
+                              isDense: true,
+                              // Selected value style (di appbar) - putih
+                              selectedItemBuilder: (BuildContext context) {
+                                return sources.map<Widget>((ScheduleSource source) {
+                                  return Text(
+                                    source.name,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              // Dropdown items style (saat dibuka) - primary color
+                              items: sources.map((ScheduleSource source) {
                                 return DropdownMenuItem<String>(
-                                  value: option,
-                                  child: Text(option),
+                                  value: source.id,
+                                  child: Text(
+                                    source.name,
+                                    style: const TextStyle(
+                                      color: AppColor.primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 );
                               }).toList(),
                               onChanged: _handleFilterChange,
@@ -445,21 +438,11 @@ class _HomeTabState extends State<_HomeTab> {
           ),
         ),
       ),
-      body: Consumer<PersonalScheduleProvider>(
+      body: Consumer<CombinedScheduleProvider>(
         builder: (context, provider, child) {
           final schedules = provider.schedules;
           final isLoading = provider.isLoading;
           final calendarEvents = _getCalendarEvents(schedules);
-
-          // Show personal schedules only when filter is "Personal Schedule" or "All Schedule"
-          final shouldShowPersonalSchedules = 
-              _selectedFilter == 'Personal Schedule' || _selectedFilter == 'All Schedule';
-
-          if (!shouldShowPersonalSchedules) {
-            return const Center(
-              child: Text('Select a classroom to view its schedules'),
-            );
-          }
 
           return Column(
             children: [
@@ -476,6 +459,12 @@ class _HomeTabState extends State<_HomeTab> {
                 },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
+                viewMode: _calendarViewMode,
+                onViewModeChanged: (mode) {
+                  setState(() {
+                    _calendarViewMode = mode;
+                  });
+                },
               ),
               
               const SizedBox(height: 16),
@@ -527,7 +516,7 @@ class _HomeTabState extends State<_HomeTab> {
           );
         },
       ),
-      floatingActionButton: _selectedFilter == 'Personal Schedule' || _selectedFilter == 'All Schedule'
+      floatingActionButton: _selectedSourceId == 'personal' || _selectedSourceId == 'all' || _selectedSourceId == null
           ? FloatingActionButton(
               onPressed: _showAddScheduleSheet,
               backgroundColor: AppColor.primary,
@@ -539,12 +528,12 @@ class _HomeTabState extends State<_HomeTab> {
   }
 }
 
-// Custom ScheduleCard for PersonalSchedule
-class _PersonalScheduleCard extends StatelessWidget {
-  final List<PersonalSchedule> schedules;
-  final Function(PersonalSchedule)? onScheduleTap;
+// Custom ScheduleCard for CombinedSchedule
+class _CombinedScheduleCard extends StatelessWidget {
+  final List<CombinedSchedule> schedules;
+  final Function(CombinedSchedule)? onScheduleTap;
 
-  const _PersonalScheduleCard({
+  const _CombinedScheduleCard({
     required this.schedules,
     this.onScheduleTap,
   });
@@ -555,7 +544,7 @@ class _PersonalScheduleCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  Widget _buildScheduleItem(PersonalSchedule schedule, bool isLast) {
+  Widget _buildScheduleItem(CombinedSchedule schedule, bool isLast) {
     return Column(
       children: [
         Material(
@@ -598,16 +587,56 @@ class _PersonalScheduleCard extends StatelessWidget {
                             color: AppColor.textPrimary,
                           ),
                         ),
-                        if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                        // Source, Location, Lecturer in one line
+                        if (schedule.isClass || schedule.location != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            schedule.location!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColor.textSecondary,
-                            ),
+                          Row(
+                            children: [
+                              if (schedule.isClass) ...[
+                                Text(
+                                  schedule.sourceName,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.primary.withOpacity(0.8),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (schedule.location != null || schedule.lecturer != null)
+                                  Text(
+                                    ' | ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                    ),
+                                  ),
+                              ],
+                              if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                                Text(
+                                  schedule.location!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.textSecondary,
+                                  ),
+                                ),
+                                if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty)
+                                  Text(
+                                    ' | ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                    ),
+                                  ),
+                              ],
+                              if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty) ...[
+                                Text(
+                                  schedule.lecturer!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ],

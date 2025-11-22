@@ -3,16 +3,53 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_color.dart';
 import '../../../data/models/personal_schedule_model.dart';
+import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/personal_schedule_provider.dart';
+import '../../../providers/combined_schedule_provider.dart';
+import 'add_reminder_sheet.dart';
 import 'edit_personal_schedule_sheet.dart';
 
-class PersonalScheduleDetailSheet extends StatelessWidget {
+class PersonalScheduleDetailSheet extends StatefulWidget {
   final PersonalSchedule schedule;
 
-  const PersonalScheduleDetailSheet({
-    super.key,
-    required this.schedule,
-  });
+  const PersonalScheduleDetailSheet({super.key, required this.schedule});
+
+  @override
+  State<PersonalScheduleDetailSheet> createState() =>
+      _PersonalScheduleDetailSheetState();
+}
+
+class _PersonalScheduleDetailSheetState
+    extends State<PersonalScheduleDetailSheet> {
+  List<ScheduleReminder> _reminders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Load reminders from API
+  }
+
+  Future<void> _addReminder() async {
+    final result = await showModalBottomSheet<ScheduleReminder>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddReminderSheet(),
+    );
+    if (result != null && !_reminders.contains(result)) {
+      setState(() {
+        _reminders.add(result);
+      });
+      // TODO: Save reminder to API
+    }
+  }
+
+  void _removeReminder(ScheduleReminder reminder) {
+    setState(() {
+      _reminders.remove(reminder);
+    });
+    // TODO: Delete reminder from API
+  }
 
   Future<void> _showDeleteConfirmDialog(BuildContext context) async {
     final confirm = await showDialog<bool>(
@@ -25,7 +62,7 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
           style: TextStyle(color: AppColor.textPrimary),
         ),
         content: Text(
-          'Apakah Anda yakin ingin menghapus jadwal "${schedule.title}"? Tindakan ini tidak dapat dibatalkan.',
+          'Apakah Anda yakin ingin menghapus jadwal "${widget.schedule.title}"? Tindakan ini tidak dapat dibatalkan.',
           style: const TextStyle(color: AppColor.textSecondary),
         ),
         actions: [
@@ -54,18 +91,28 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
   }
 
   Future<void> _deleteSchedule(BuildContext context) async {
-    final provider = Provider.of<PersonalScheduleProvider>(context, listen: false);
+    final provider = Provider.of<PersonalScheduleProvider>(
+      context,
+      listen: false,
+    );
     // Store context and navigator before async operations
     final currentContext = context;
     final navigator = Navigator.of(currentContext);
 
     try {
-      await provider.deletePersonalSchedule(schedule.id);
+      await provider.deletePersonalSchedule(widget.schedule.id);
+
+      // Refresh combined schedules for home screen
+      final combinedProvider = Provider.of<CombinedScheduleProvider>(
+        currentContext,
+        listen: false,
+      );
+      await combinedProvider.refresh();
 
       if (context.mounted) {
         // Close detail sheet
         navigator.pop();
-        
+
         // Show success message after a short delay to ensure sheet is closed
         Future.delayed(const Duration(milliseconds: 100), () {
           if (context.mounted) {
@@ -103,12 +150,15 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => EditPersonalScheduleSheet(
-        schedule: schedule,
+        schedule: widget.schedule,
         onSave: (data) async {
-          final provider = Provider.of<PersonalScheduleProvider>(context, listen: false);
+          final provider = Provider.of<PersonalScheduleProvider>(
+            context,
+            listen: false,
+          );
           try {
             await provider.updatePersonalSchedule(
-              scheduleId: schedule.id,
+              scheduleId: widget.schedule.id,
               title: data['title'],
               startTime: DateTime.parse(data['start_time']),
               endTime: DateTime.parse(data['end_time']),
@@ -116,10 +166,17 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
               description: data['description'],
               color: data['color'],
             );
-            
+
             // Refresh schedules list
             await provider.fetchPersonalSchedules();
-            
+
+            // Refresh combined schedules for home screen
+            final combinedProvider = Provider.of<CombinedScheduleProvider>(
+              context,
+              listen: false,
+            );
+            await combinedProvider.refresh();
+
             if (context.mounted) {
               Navigator.pop(context); // Close edit sheet
               ScaffoldMessenger.of(context).showSnackBar(
@@ -153,6 +210,92 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
     return DateFormat('d MMM yyyy').format(date);
   }
 
+  Widget _buildReminderSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColor.backgroundSecondary,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColor.textSecondary.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          ..._reminders.map(
+            (reminder) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildReminderItem(reminder),
+            ),
+          ),
+          InkWell(
+            onTap: _addReminder,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.add, color: AppColor.primary, size: 20),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Add Reminder',
+                    style: TextStyle(
+                      color: AppColor.primary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReminderItem(ScheduleReminder reminder) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColor.backgroundPrimary,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: AppColor.textSecondary.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.access_time,
+            size: 20,
+            color: AppColor.textSecondary,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              reminder.displayText,
+              style: const TextStyle(fontSize: 14, color: AppColor.textPrimary),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.close,
+              size: 20,
+              color: AppColor.textSecondary,
+            ),
+            onPressed: () => _removeReminder(reminder),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoCard() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -171,14 +314,14 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
               Expanded(
                 child: _buildInfoItem(
                   Icons.access_time,
-                  '${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
+                  '${_formatTime(widget.schedule.startTime)} - ${_formatTime(widget.schedule.endTime)}',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoItem(
                   Icons.calendar_today,
-                  _formatDate(schedule.startTime),
+                  _formatDate(widget.schedule.startTime),
                 ),
               ),
               const SizedBox(width: 12),
@@ -192,7 +335,7 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Color(
                         int.parse(
-                          schedule.color.replaceFirst('#', '0xFF'),
+                          widget.schedule.color.replaceFirst('#', '0xFF'),
                         ),
                       ),
                       borderRadius: BorderRadius.circular(4),
@@ -202,11 +345,12 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
               ),
             ],
           ),
-          if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+          if (widget.schedule.location != null &&
+              widget.schedule.location!.isNotEmpty) ...[
             const SizedBox(height: 12),
             _buildFullWidthInfoItem(
               Icons.location_on,
-              schedule.location!,
+              widget.schedule.location!,
             ),
           ],
         ],
@@ -305,18 +449,18 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            schedule.title,
+                            widget.schedule.title,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: AppColor.textPrimary,
                             ),
                           ),
-                          if (schedule.description != null &&
-                              schedule.description!.isNotEmpty) ...[
+                          if (widget.schedule.description != null &&
+                              widget.schedule.description!.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             Text(
-                              schedule.description!,
+                              widget.schedule.description!,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: AppColor.textSecondary,
@@ -329,7 +473,10 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColor.textPrimary),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColor.textPrimary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -355,7 +502,9 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                               icon: const Icon(Icons.edit, size: 18),
                               label: const Text('Edit'),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 side: const BorderSide(color: AppColor.primary),
                                 foregroundColor: AppColor.primary,
                               ),
@@ -364,11 +513,14 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed: () => _showDeleteConfirmDialog(context),
+                              onPressed: () =>
+                                  _showDeleteConfirmDialog(context),
                               icon: const Icon(Icons.delete, size: 18),
                               label: const Text('Hapus'),
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
                               ),
@@ -376,6 +528,10 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 20),
+
+                      // Reminder section
+                      _buildReminderSection(),
                     ],
                   ),
                 ),
@@ -387,4 +543,3 @@ class PersonalScheduleDetailSheet extends StatelessWidget {
     );
   }
 }
-
