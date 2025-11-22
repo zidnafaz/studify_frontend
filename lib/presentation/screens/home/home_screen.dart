@@ -8,9 +8,10 @@ import '../../../providers/combined_schedule_provider.dart';
 import '../../../core/constants/app_color.dart';
 import '../../../data/models/combined_schedule_model.dart';
 import '../classroom/classroom_list_screen.dart';
-import '../../../features/profile/profile_screen.dart';
+import '../auth/profile_screen.dart';
 import '../../widgets/schedule_calendar.dart';
 import '../../widgets/sheets/add_personal_schedule_sheet.dart';
+import '../../widgets/sheets/combined_schedule_detail_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -102,6 +103,7 @@ class _HomeTabState extends State<_HomeTab> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _showAllSchedules = true;
+  CalendarViewMode _calendarViewMode = CalendarViewMode.full;
 
   @override
   void initState() {
@@ -110,7 +112,7 @@ class _HomeTabState extends State<_HomeTab> {
     _selectedSourceId = 'all'; // Default to 'all'
     
     // Fetch data on init
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       Provider.of<ClassroomProvider>(context, listen: false)
           .fetchClassrooms();
       Provider.of<CombinedScheduleProvider>(context, listen: false)
@@ -294,57 +296,14 @@ class _HomeTabState extends State<_HomeTab> {
               child: _CombinedScheduleCard(
                 schedules: schedulesForDate,
                 onScheduleTap: (schedule) {
-                  if (schedule.isPersonal) {
-                    // For personal schedules, show personal schedule detail
-                    // We need to convert CombinedSchedule to PersonalSchedule
-                    // For now, just show a simple dialog
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(schedule.title),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Time: ${DateFormat('HH:mm').format(schedule.startTime)} - ${DateFormat('HH:mm').format(schedule.endTime)}'),
-                            if (schedule.location != null) Text('Location: ${schedule.location}'),
-                            if (schedule.description != null) Text('Description: ${schedule.description}'),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    // For class schedules, show class schedule detail
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(schedule.title),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Time: ${DateFormat('HH:mm').format(schedule.startTime)} - ${DateFormat('HH:mm').format(schedule.endTime)}'),
-                            if (schedule.location != null) Text('Location: ${schedule.location}'),
-                            if (schedule.lecturer != null) Text('Lecturer: ${schedule.lecturer}'),
-                            if (schedule.description != null) Text('Description: ${schedule.description}'),
-                            Text('Source: ${schedule.sourceName}'),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => CombinedScheduleDetailSheet(
+                      schedule: schedule,
+                    ),
+                  );
                 },
               ),
             ),
@@ -427,7 +386,7 @@ class _HomeTabState extends State<_HomeTab> {
                           }
                           
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
@@ -436,16 +395,34 @@ class _HomeTabState extends State<_HomeTab> {
                               value: _selectedSourceId ?? 'all',
                               dropdownColor: AppColor.backgroundSecondary,
                               underline: const SizedBox(),
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 20),
+                              iconSize: 20,
+                              isDense: true,
+                              // Selected value style (di appbar) - putih
+                              selectedItemBuilder: (BuildContext context) {
+                                return sources.map<Widget>((ScheduleSource source) {
+                                  return Text(
+                                    source.name,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              // Dropdown items style (saat dibuka) - primary color
                               items: sources.map((ScheduleSource source) {
                                 return DropdownMenuItem<String>(
                                   value: source.id,
-                                  child: Text(source.name),
+                                  child: Text(
+                                    source.name,
+                                    style: const TextStyle(
+                                      color: AppColor.primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 );
                               }).toList(),
                               onChanged: _handleFilterChange,
@@ -482,6 +459,12 @@ class _HomeTabState extends State<_HomeTab> {
                 },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
+                viewMode: _calendarViewMode,
+                onViewModeChanged: (mode) {
+                  setState(() {
+                    _calendarViewMode = mode;
+                  });
+                },
               ),
               
               const SizedBox(height: 16),
@@ -604,41 +587,56 @@ class _CombinedScheduleCard extends StatelessWidget {
                             color: AppColor.textPrimary,
                           ),
                         ),
-                        if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                        // Source, Location, Lecturer in one line
+                        if (schedule.isClass || schedule.location != null) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            schedule.location!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: AppColor.textSecondary,
-                            ),
-                          ),
-                        ],
-                        if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            'Lecturer: ${schedule.lecturer}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColor.textSecondary,
-                            ),
-                          ),
-                        ],
-                        if (schedule.isClass) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            schedule.sourceName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColor.primary.withOpacity(0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Row(
+                            children: [
+                              if (schedule.isClass) ...[
+                                Text(
+                                  schedule.sourceName,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.primary.withOpacity(0.8),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (schedule.location != null || schedule.lecturer != null)
+                                  Text(
+                                    ' | ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                    ),
+                                  ),
+                              ],
+                              if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                                Text(
+                                  schedule.location!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.textSecondary,
+                                  ),
+                                ),
+                                if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty)
+                                  Text(
+                                    ' | ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                    ),
+                                  ),
+                              ],
+                              if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty) ...[
+                                Text(
+                                  schedule.lecturer!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColor.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ],

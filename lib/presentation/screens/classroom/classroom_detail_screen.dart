@@ -29,6 +29,7 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _showAllSchedules = true; // Default: tampilkan semua jadwal dari hari ini ke depan
+  CalendarViewMode _calendarViewMode = CalendarViewMode.full;
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
     _selectedDay = _focusedDay;
     
     // Fetch class schedules for this classroom
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       Provider.of<ClassroomProvider>(context, listen: false)
           .fetchClassSchedules(widget.classroom.id);
     });
@@ -431,6 +432,12 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                 },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
+                viewMode: _calendarViewMode,
+                onViewModeChanged: (mode) {
+                  setState(() {
+                    _calendarViewMode = mode;
+                  });
+                },
               ),
               
               const SizedBox(height: 16),

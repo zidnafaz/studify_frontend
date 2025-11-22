@@ -7,6 +7,7 @@ import '../../../data/models/classroom_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/classroom_provider.dart';
+import '../../../providers/combined_schedule_provider.dart';
 import 'add_reminder_sheet.dart';
 import 'edit_class_schedule_sheet.dart';
 
@@ -178,6 +179,13 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
             // Refresh schedules list
             await provider.fetchClassSchedules(widget.classroom.id);
             
+            // Refresh combined schedules for home screen
+            final combinedProvider = Provider.of<CombinedScheduleProvider>(
+              context,
+              listen: false,
+            );
+            await combinedProvider.refresh();
+            
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -255,6 +263,13 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
 
       // Refresh schedules list
       await provider.fetchClassSchedules(widget.classroom.id);
+
+      // Refresh combined schedules for home screen
+      final combinedProvider = Provider.of<CombinedScheduleProvider>(
+        currentContext,
+        listen: false,
+      );
+      await combinedProvider.refresh();
 
       if (mounted) {
         // Close detail sheet

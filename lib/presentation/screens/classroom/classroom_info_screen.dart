@@ -24,7 +24,10 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchClassroomDetail();
+    // Use Future.microtask to ensure build phase is complete
+    Future.microtask(() {
+      _fetchClassroomDetail();
+    });
   }
 
   Future<void> _fetchClassroomDetail() async {
