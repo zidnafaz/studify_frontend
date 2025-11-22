@@ -48,8 +48,31 @@ class ClassSchedule {
     this.coordinator2User,
   });
 
-  factory ClassSchedule.fromJson(Map<String, dynamic> json) =>
-      _$ClassScheduleFromJson(json);
+  factory ClassSchedule.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely convert to int
+    int? _toInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) {
+        try {
+          return int.parse(value);
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    }
+    
+    // Handle potential type mismatches from backend
+    // Convert string numbers to int for id fields
+    json['id'] = _toInt(json['id']) ?? json['id'];
+    json['classroom_id'] = _toInt(json['classroom_id']) ?? json['classroom_id'];
+    json['coordinator_1'] = _toInt(json['coordinator_1']);
+    json['coordinator_2'] = _toInt(json['coordinator_2']);
+    
+    return _$ClassScheduleFromJson(json);
+  }
 
   Map<String, dynamic> toJson() => _$ClassScheduleToJson(this);
 }

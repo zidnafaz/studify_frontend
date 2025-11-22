@@ -278,7 +278,26 @@ class ClassroomService {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
-        return ClassSchedule.fromJson(data['data']);
+        
+        try {
+          // Handle both single schedule and array of schedules (for repeat)
+          if (data['data'] is List) {
+            // If it's an array, return the first schedule
+            final schedules = data['data'] as List;
+            if (schedules.isNotEmpty) {
+              return ClassSchedule.fromJson(schedules.first as Map<String, dynamic>);
+            } else {
+              throw ApiException(message: 'No schedule created');
+            }
+          } else {
+            // Single schedule
+            return ClassSchedule.fromJson(data['data'] as Map<String, dynamic>);
+          }
+        } catch (e) {
+          print('❌ Error parsing schedule response: $e');
+          print('📄 Response data: ${data['data']}');
+          rethrow;
+        }
       } else if (response.statusCode == 401) {
         throw UnauthorizedException(message: 'Unauthorized');
       } else if (response.statusCode == 403) {
