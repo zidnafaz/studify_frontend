@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
 
 class ColorPickerSheet extends StatelessWidget {
   final Color? selectedColor;
 
-  const ColorPickerSheet({
-    super.key,
-    this.selectedColor,
-  });
+  const ColorPickerSheet({super.key, this.selectedColor});
+
+  static const List<Color> _scheduleColors = [
+    Color(0xFFFF6B6B), // scheduleRed
+    Color(0xFFFF9F43), // scheduleOrange
+    Color(0xFFFECA57), // scheduleYellow
+    Color(0xFF5CD9C1), // scheduleGreen
+    Color(0xFF4A90E2), // scheduleBlue
+    Color(0xFFB085CC), // schedulePurple
+    Color(0xFFFF6B9D), // schedulePink
+    Color(0xFF00D2D3), // scheduleTeal
+    Color(0xFF5F27CD), // scheduleIndigo
+    Color(0xFF48DBFB), // scheduleCyan
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
@@ -26,16 +36,16 @@ class ColorPickerSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Pilih Warna',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: AppColor.textPrimary,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Color Grid
               GridView.builder(
                 shrinkWrap: true,
@@ -45,11 +55,11 @@ class ColorPickerSheet extends StatelessWidget {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: AppColor.scheduleColors.length,
+                itemCount: _scheduleColors.length,
                 itemBuilder: (context, index) {
-                  final color = AppColor.scheduleColors[index];
+                  final color = _scheduleColors[index];
                   final isSelected = selectedColor == color;
-                  
+
                   return InkWell(
                     onTap: () {
                       Navigator.pop(context, color);
@@ -60,10 +70,7 @@ class ColorPickerSheet extends StatelessWidget {
                         color: color,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected
-                            ? Border.all(
-                                color: AppColor.primary,
-                                width: 3,
-                              )
+                            ? Border.all(color: colorScheme.primary, width: 3)
                             : null,
                         boxShadow: [
                           BoxShadow(

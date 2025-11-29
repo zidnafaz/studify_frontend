@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../providers/classroom_provider.dart';
 import '../../widgets/classroom/classroom_card.dart';
 import '../../widgets/classroom/empty_classroom_state.dart';
@@ -41,8 +41,10 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -50,16 +52,16 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'Classroom List',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -84,8 +86,10 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
 
   Widget _buildBody(ClassroomProvider provider) {
     if (provider.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColor.primary),
+      return Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).colorScheme.primary,
+        ),
       );
     }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/schedule_repeat_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
@@ -36,7 +36,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
   TimeOfDay _endTime = const TimeOfDay(hour: 10, minute: 0);
   DateTime _selectedDate = DateTime.now();
   ScheduleRepeat? _repeat;
-  Color _selectedColor = AppColor.scheduleGreen;
+  Color _selectedColor = const Color(0xFF4CAF50);
   User? _coordinator1;
   User? _coordinator2;
   List<ScheduleReminder> _reminders = [];
@@ -256,14 +256,17 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColor.backgroundSecondary,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -282,29 +285,31 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: _isLoading ? null : () => Navigator.pop(context),
-                        child: const Text(
+                        onPressed: _isLoading
+                            ? null
+                            : () => Navigator.pop(context),
+                        child: Text(
                           'Batal',
                           style: TextStyle(
-                            color: Colors.red,
+                            color: colorScheme.error,
                             fontSize: 16,
                           ),
                         ),
                       ),
-                      const Text(
+                      Text(
                         'Jadwal Kelas Baru',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.textPrimary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       TextButton(
                         onPressed: _isLoading ? null : _save,
-                        child: const Text(
+                        child: Text(
                           'Simpan',
                           style: TextStyle(
-                            color: AppColor.primary,
+                            color: colorScheme.primary,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -340,7 +345,10 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Date Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: DateFormat('dd MMMM yyyy', 'id_ID').format(_selectedDate),
+                      text: DateFormat(
+                        'dd MMMM yyyy',
+                        'id_ID',
+                      ).format(_selectedDate),
                     ),
                     prefixIcon: Icons.calendar_today,
                     readOnly: true,
@@ -373,7 +381,10 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Coordinator 1 Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _coordinator1?.name ?? widget.classroom.owner?.name ?? 'Koordinator 1',
+                      text:
+                          _coordinator1?.name ??
+                          widget.classroom.owner?.name ??
+                          'Koordinator 1',
                     ),
                     prefixIcon: Icons.person_outline,
                     readOnly: true,
@@ -385,7 +396,10 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Coordinator 2 Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _coordinator2?.name ?? widget.classroom.owner?.name ?? 'Koordinator 2',
+                      text:
+                          _coordinator2?.name ??
+                          widget.classroom.owner?.name ??
+                          'Koordinator 2',
                     ),
                     prefixIcon: Icons.person_outline,
                     readOnly: true,
@@ -411,23 +425,23 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppColor.textSecondary.withOpacity(0.3),
+                          color: colorScheme.onSurface.withOpacity(0.3),
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.palette,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                             size: 20,
                           ),
                           const SizedBox(width: 16),
-                          const Text(
+                          Text(
                             'Warna',
                             style: TextStyle(
                               fontSize: 16,
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           const Spacer(),
@@ -463,15 +477,15 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: AppColor.textSecondary.withOpacity(0.3),
+                              color: colorScheme.onSurface.withOpacity(0.3),
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.notifications,
-                                color: AppColor.textSecondary,
+                                color: colorScheme.onSurface.withOpacity(0.6),
                                 size: 20,
                               ),
                               const SizedBox(width: 16),
@@ -479,15 +493,15 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                                 _reminders.isEmpty
                                     ? 'Tambah Pengingat'
                                     : 'Pengingat (${_reminders.length})',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
-                                  color: AppColor.textPrimary,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                               const Spacer(),
-                              const Icon(
+                              Icon(
                                 Icons.add,
-                                color: AppColor.primary,
+                                color: colorScheme.primary,
                                 size: 20,
                               ),
                             ],
@@ -499,38 +513,45 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColor.backgroundPrimary,
+                            color: isDark
+                                ? colorScheme.surfaceVariant.withOpacity(0.3)
+                                : colorScheme.background,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
                             children: _reminders.map((reminder) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
                                 child: Row(
                                   children: [
-                                    const Icon(
+                                    Icon(
                                       Icons.access_time,
                                       size: 16,
-                                      color: AppColor.textSecondary,
+                                      color: colorScheme.onSurface.withOpacity(
+                                        0.6,
+                                      ),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
                                       reminder.displayText,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
-                                        color: AppColor.textPrimary,
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                     const Spacer(),
                                     IconButton(
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.close,
                                         size: 18,
-                                        color: Colors.red,
+                                        color: colorScheme.error,
                                       ),
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
-                                      onPressed: () => _removeReminder(reminder),
+                                      onPressed: () =>
+                                          _removeReminder(reminder),
                                     ),
                                   ],
                                 ),
@@ -574,8 +595,11 @@ class _UserSelectionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AlertDialog(
-      title: Text(title),
+      backgroundColor: colorScheme.surface,
+      title: Text(title, style: TextStyle(color: colorScheme.onSurface)),
       contentPadding: const EdgeInsets.symmetric(vertical: 16),
       content: SizedBox(
         width: double.maxFinite,
@@ -588,16 +612,22 @@ class _UserSelectionDialog extends StatelessWidget {
 
             return ListTile(
               leading: CircleAvatar(
-                backgroundColor: AppColor.primary,
+                backgroundColor: colorScheme.primary,
                 child: Text(
                   user.name[0].toUpperCase(),
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: colorScheme.onPrimary),
                 ),
               ),
-              title: Text(user.name),
-              subtitle: Text(user.email),
+              title: Text(
+                user.name,
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
+              subtitle: Text(
+                user.email,
+                style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+              ),
               trailing: isSelected
-                  ? const Icon(Icons.check_circle, color: AppColor.primary)
+                  ? Icon(Icons.check_circle, color: colorScheme.primary)
                   : null,
               onTap: () => Navigator.pop(context, user),
             );

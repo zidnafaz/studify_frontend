@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/class_schedule_model.dart';
 import '../../../providers/classroom_provider.dart';
@@ -16,10 +16,7 @@ import 'classroom_info_screen.dart';
 class ClassroomDetailScreen extends StatefulWidget {
   final Classroom classroom;
 
-  const ClassroomDetailScreen({
-    super.key,
-    required this.classroom,
-  });
+  const ClassroomDetailScreen({super.key, required this.classroom});
 
   @override
   State<ClassroomDetailScreen> createState() => _ClassroomDetailScreenState();
@@ -28,23 +25,28 @@ class ClassroomDetailScreen extends StatefulWidget {
 class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  bool _showAllSchedules = true; // Default: tampilkan semua jadwal dari hari ini ke depan
+  bool _showAllSchedules =
+      true; // Default: tampilkan semua jadwal dari hari ini ke depan
   CalendarViewMode _calendarViewMode = CalendarViewMode.full;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    
+
     // Fetch class schedules for this classroom
     Future.microtask(() {
-      Provider.of<ClassroomProvider>(context, listen: false)
-          .fetchClassSchedules(widget.classroom.id);
+      Provider.of<ClassroomProvider>(
+        context,
+        listen: false,
+      ).fetchClassSchedules(widget.classroom.id);
     });
   }
 
   // Group schedules by date
-  Map<String, List<ClassSchedule>> _groupSchedulesByDate(List<ClassSchedule> schedules) {
+  Map<String, List<ClassSchedule>> _groupSchedulesByDate(
+    List<ClassSchedule> schedules,
+  ) {
     final Map<String, List<ClassSchedule>> grouped = {};
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -95,26 +97,27 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   }
 
   // Convert schedules to calendar events dengan color
-  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<ClassSchedule> schedules) {
+  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(
+    List<ClassSchedule> schedules,
+  ) {
     final Map<DateTime, List<ScheduleEvent>> events = {};
-    
+
     for (var schedule in schedules) {
       final date = DateTime(
         schedule.startTime.year,
         schedule.startTime.month,
         schedule.startTime.day,
       );
-      
+
       if (!events.containsKey(date)) {
         events[date] = [];
       }
-      
-      events[date]!.add(ScheduleEvent(
-        color: schedule.color,
-        title: schedule.title,
-      ));
+
+      events[date]!.add(
+        ScheduleEvent(color: schedule.color, title: schedule.title),
+      );
     }
-    
+
     return events;
   }
 
@@ -143,7 +146,6 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
     }
   }
 
-
   IconData _getDateIcon(String dateKey) {
     if (dateKey == 'Today') {
       return Icons.today;
@@ -156,6 +158,7 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
 
   Widget _buildScheduleList(List<ClassSchedule> schedules) {
     final groupedSchedules = _groupSchedulesByDate(schedules);
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (groupedSchedules.isEmpty) {
       return Center(
@@ -165,15 +168,15 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
             Icon(
               Icons.event_busy,
               size: 64,
-              color: AppColor.textSecondary.withOpacity(0.5),
+              color: colorScheme.onSurface.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
-              _showAllSchedules 
-                  ? 'No upcoming schedules' 
+              _showAllSchedules
+                  ? 'No upcoming schedules'
                   : 'No schedule on this date',
-              style: const TextStyle(
-                color: AppColor.textSecondary,
+              style: TextStyle(
+                color: colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 14,
               ),
             ),
@@ -192,13 +195,18 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date header (hanya tampilkan jika show all schedules)
             if (_showAllSchedules) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 12, top: groupIndex > 0 ? 20 : 0),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: EdgeInsets.only(
+                  bottom: 12,
+                  top: groupIndex > 0 ? 20 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColor.secondary.withOpacity(0.8),
+                  color: colorScheme.secondary.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -206,25 +214,26 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                     Icon(
                       _getDateIcon(dateKey),
                       size: 16,
-                      color: AppColor.primary,
+                      color: colorScheme.onSecondaryContainer,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       dateKey,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSecondaryContainer,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
-            
-            // Single schedule card containing all schedules for this date
+
             Padding(
-              padding: EdgeInsets.only(bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0),
+              padding: EdgeInsets.only(
+                bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0,
+              ),
               child: ScheduleCard(
                 schedules: schedulesForDate,
                 onScheduleTap: (schedule) {
@@ -247,7 +256,10 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   }
 
   Future<void> _leaveClassroom() async {
-    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classroomProvider = Provider.of<ClassroomProvider>(
+      context,
+      listen: false,
+    );
     final classroom = widget.classroom;
     try {
       await classroomProvider.leaveClassroom(classroom.id);
@@ -275,9 +287,11 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   Widget build(BuildContext context) {
     final currentUser = Provider.of<AuthProvider>(context, listen: false).user;
     final isOwner = currentUser?.id == widget.classroom.ownerId;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -285,7 +299,7 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -296,7 +310,10 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                       top: 0,
                       bottom: 0,
                       child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: colorScheme.onPrimary,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
@@ -305,8 +322,8 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           widget.classroom.name,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
@@ -320,8 +337,11 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                       top: 0,
                       bottom: 0,
                       child: PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.white),
-                        color: Colors.white,
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: colorScheme.onPrimary,
+                        ),
+                        color: isDark ? const Color(0xFF1C1D29) : Colors.white,
                         offset: const Offset(0, 50),
                         onSelected: (value) async {
                           if (value == 'detail') {
@@ -337,26 +357,36 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (context) => AlertDialog(
-                                backgroundColor: AppColor.backgroundSecondary,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                title: const Text(
-                                  'Leave Classroom',
-                                  style: TextStyle(color: AppColor.textPrimary),
+                                backgroundColor: colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                content: const Text(
+                                title: Text(
+                                  'Leave Classroom',
+                                  style: TextStyle(
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                content: Text(
                                   'Are you sure you want to leave this classroom? You will need the classroom code to join again.',
-                                  style: TextStyle(color: AppColor.textSecondary),
+                                  style: TextStyle(
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.7,
+                                    ),
+                                  ),
                                 ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
                                     child: const Text('Cancel'),
                                   ),
                                   ElevatedButton(
-                                    onPressed: () => Navigator.pop(context, true),
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
+                                      backgroundColor: colorScheme.error,
+                                      foregroundColor: colorScheme.onError,
                                     ),
                                     child: const Text('Leave'),
                                   ),
@@ -375,26 +405,44 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                         },
                         itemBuilder: (BuildContext context) {
                           final items = <PopupMenuEntry<String>>[
-                            const PopupMenuItem<String>(
+                            PopupMenuItem<String>(
                               value: 'detail',
                               child: Row(
                                 children: [
-                                  Icon(Icons.info_outline, size: 20, color: AppColor.textPrimary),
-                                  SizedBox(width: 12),
-                                  Text('View Detail'),
+                                  Icon(
+                                    Icons.info_outline,
+                                    size: 20,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'View Detail',
+                                    style: TextStyle(
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ];
                           if (!isOwner) {
                             items.add(
-                              const PopupMenuItem<String>(
+                              PopupMenuItem<String>(
                                 value: 'leave',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.exit_to_app, size: 20, color: AppColor.textPrimary),
-                                    SizedBox(width: 12),
-                                    Text('Leave Classroom'),
+                                    Icon(
+                                      Icons.exit_to_app,
+                                      size: 20,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Leave Classroom',
+                                      style: TextStyle(
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -439,9 +487,9 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Schedule list header with show all button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -450,10 +498,10 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                   children: [
                     Text(
                       _getScheduleHeaderText(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     if (!_showAllSchedules)
@@ -464,10 +512,10 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                             _selectedDay = DateTime.now();
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           'View All',
                           style: TextStyle(
-                            color: AppColor.primary,
+                            color: colorScheme.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -476,9 +524,9 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Schedule list
               Expanded(
                 child: isLoading
@@ -493,14 +541,14 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
         builder: (context, authProvider, child) {
           final currentUser = authProvider.user;
           final isOwner = currentUser?.id == widget.classroom.ownerId;
-          
+
           if (!isOwner) return const SizedBox.shrink();
-          
+
           return FloatingActionButton(
             onPressed: _showAddScheduleSheet,
-            backgroundColor: AppColor.primary,
+            backgroundColor: colorScheme.primary,
             shape: const CircleBorder(),
-            child: const Icon(Icons.add, color: Colors.white),
+            child: Icon(Icons.add, color: colorScheme.onPrimary),
           );
         },
       ),
@@ -515,7 +563,10 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
       builder: (context) => AddClassScheduleSheet(
         classroom: widget.classroom,
         onSave: (data) async {
-          final provider = Provider.of<ClassroomProvider>(context, listen: false);
+          final provider = Provider.of<ClassroomProvider>(
+            context,
+            listen: false,
+          );
           await provider.createClassSchedule(
             classroomId: widget.classroom.id,
             title: data['title'],

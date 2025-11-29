@@ -63,17 +63,42 @@ class CombinedScheduleDetailSheet extends StatelessWidget {
   }
 
   Widget _buildClassDetailSheet(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     // We need to get classroom info
     return FutureBuilder<Classroom?>(
       future: _getClassroom(context),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          );
         }
 
         final classroom = snapshot.data;
         if (classroom == null) {
-          return const Center(child: Text('Classroom not found'));
+          return Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'Classroom not found',
+                style: TextStyle(color: colorScheme.onSurface),
+              ),
+            ),
+          );
         }
 
         // Convert CombinedSchedule to ClassSchedule

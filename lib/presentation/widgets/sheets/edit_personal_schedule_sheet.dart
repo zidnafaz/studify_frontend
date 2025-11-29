@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/personal_schedule_model.dart';
 import '../classroom/schedule_text_field.dart';
 import '../classroom/time_range_selector.dart';
@@ -17,7 +17,8 @@ class EditPersonalScheduleSheet extends StatefulWidget {
   });
 
   @override
-  State<EditPersonalScheduleSheet> createState() => _EditPersonalScheduleSheetState();
+  State<EditPersonalScheduleSheet> createState() =>
+      _EditPersonalScheduleSheetState();
 }
 
 class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
@@ -29,18 +30,22 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
   late TimeOfDay _startTime;
   late TimeOfDay _endTime;
   late DateTime _selectedDate;
-  Color _selectedColor = AppColor.scheduleGreen;
+  Color _selectedColor = const Color(0xFF5CD9C1); // scheduleGreen
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize controllers with existing schedule data
     _titleController = TextEditingController(text: widget.schedule.title);
-    _locationController = TextEditingController(text: widget.schedule.location ?? '');
-    _descriptionController = TextEditingController(text: widget.schedule.description ?? '');
-    
+    _locationController = TextEditingController(
+      text: widget.schedule.location ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.schedule.description ?? '',
+    );
+
     // Initialize time and date from schedule
     _startTime = TimeOfDay.fromDateTime(widget.schedule.startTime);
     _endTime = TimeOfDay.fromDateTime(widget.schedule.endTime);
@@ -49,7 +54,7 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
       widget.schedule.startTime.month,
       widget.schedule.startTime.day,
     );
-    
+
     // Initialize color from schedule
     _selectedColor = Color(
       int.parse(widget.schedule.color.replaceFirst('#', '0xFF')),
@@ -200,14 +205,15 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColor.backgroundSecondary,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -226,29 +232,28 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: _isLoading ? null : () => Navigator.pop(context),
+                        onPressed: _isLoading
+                            ? null
+                            : () => Navigator.pop(context),
                         child: const Text(
                           'Batal',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(color: Colors.red, fontSize: 16),
                         ),
                       ),
-                      const Text(
+                      Text(
                         'Edit Jadwal Pribadi',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.textPrimary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       TextButton(
                         onPressed: _isLoading ? null : _save,
-                        child: const Text(
+                        child: Text(
                           'Simpan',
                           style: TextStyle(
-                            color: AppColor.primary,
+                            color: colorScheme.primary,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -284,7 +289,10 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                   // Date Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: DateFormat('dd MMMM yyyy', 'id_ID').format(_selectedDate),
+                      text: DateFormat(
+                        'dd MMMM yyyy',
+                        'id_ID',
+                      ).format(_selectedDate),
                     ),
                     prefixIcon: Icons.calendar_today,
                     readOnly: true,
@@ -310,23 +318,23 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: AppColor.textSecondary.withOpacity(0.3),
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.palette,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                             size: 20,
                           ),
                           const SizedBox(width: 16),
-                          const Text(
+                          Text(
                             'Warna',
                             style: TextStyle(
                               fontSize: 16,
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           const Spacer(),
@@ -367,4 +375,3 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
     );
   }
 }
-

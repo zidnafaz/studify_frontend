@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 
@@ -53,8 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -69,13 +71,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: Container(
                       decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 20,
-                            offset: const Offset(4, 2),
-                          ),
-                        ],
+                        boxShadow: isDark
+                            ? []
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(4, 2),
+                                ),
+                              ],
                       ),
                       child: SvgPicture.asset(
                         'assets/logo/logo_app.svg',
@@ -87,22 +91,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 32),
 
                   // Title
-                  const Text(
+                  Text(
                     'Welcome Back!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppColor.textPrimary,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Login to continue your learning journey',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -112,9 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Email',
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.email_outlined,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurface.withOpacity(0.5),
                       size: 20,
                     ),
                     validator: (value) {
@@ -136,9 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Password',
                     controller: _passwordController,
                     isPassword: true,
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.lock_outline,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurface.withOpacity(0.5),
                       size: 20,
                     ),
                     validator: (value) {
@@ -159,10 +163,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         // TODO: Implement forgot password
                       },
-                      child: const Text(
+                      child: Text(
                         'Forgot Password?',
                         style: TextStyle(
-                          color: AppColor.secondary,
+                          color: colorScheme.secondary,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -188,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Expanded(
                         child: Divider(
-                          color: AppColor.textSecondary.withOpacity(0.3),
+                          color: colorScheme.onSurface.withOpacity(0.2),
                         ),
                       ),
                       Padding(
@@ -196,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'OR',
                           style: TextStyle(
-                            color: AppColor.textSecondary.withOpacity(0.7),
+                            color: colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -204,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Expanded(
                         child: Divider(
-                          color: AppColor.textSecondary.withOpacity(0.3),
+                          color: colorScheme.onSurface.withOpacity(0.2),
                         ),
                       ),
                     ],
@@ -215,10 +219,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Don\'t have an account? ',
                         style: TextStyle(
-                          color: AppColor.textSecondary,
+                          color: colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -226,10 +230,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         onTap: () {
                           Navigator.pushNamed(context, '/register');
                         },
-                        child: const Text(
+                        child: Text(
                           'Sign Up',
                           style: TextStyle(
-                            color: AppColor.secondary,
+                            color: colorScheme.secondary,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),

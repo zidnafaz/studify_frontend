@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../core/constants/app_color.dart';
 
 /// Model untuk menyimpan informasi schedule event pada calendar
 class ScheduleEvent {
@@ -70,18 +69,26 @@ class ScheduleCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
       ),
       child: Column(
         children: [
@@ -94,10 +101,10 @@ class ScheduleCalendar extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColor.backgroundPrimary,
+                      color: colorScheme.background,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColor.textSecondary.withOpacity(0.2),
+                        color: colorScheme.onSurface.withOpacity(0.1),
                         width: 1,
                       ),
                     ),
@@ -105,6 +112,7 @@ class ScheduleCalendar extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _buildViewModeButton(
+                          context,
                           CalendarViewMode.full,
                           Icons.calendar_view_week,
                           'Full',
@@ -112,9 +120,10 @@ class ScheduleCalendar extends StatelessWidget {
                         Container(
                           width: 1,
                           height: 12,
-                          color: AppColor.textSecondary.withOpacity(0.2),
+                          color: colorScheme.onSurface.withOpacity(0.1),
                         ),
                         _buildViewModeButton(
+                          context,
                           CalendarViewMode.minimal,
                           Icons.calendar_view_month,
                           'Minimal',
@@ -122,9 +131,10 @@ class ScheduleCalendar extends StatelessWidget {
                         Container(
                           width: 1,
                           height: 12,
-                          color: AppColor.textSecondary.withOpacity(0.2),
+                          color: colorScheme.onSurface.withOpacity(0.1),
                         ),
                         _buildViewModeButton(
+                          context,
                           CalendarViewMode.compact,
                           Icons.calendar_today,
                           'Compact',
@@ -153,42 +163,44 @@ class ScheduleCalendar extends StatelessWidget {
             headerStyle: HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle: const TextStyle(
+              titleTextStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColor.textPrimary,
+                color: colorScheme.onSurface,
               ),
-              leftChevronIcon: const Icon(
+              leftChevronIcon: Icon(
                 Icons.chevron_left,
-                color: AppColor.primary,
+                color: colorScheme.primary,
               ),
-              rightChevronIcon: const Icon(
+              rightChevronIcon: Icon(
                 Icons.chevron_right,
-                color: AppColor.primary,
+                color: colorScheme.primary,
               ),
             ),
             calendarStyle: CalendarStyle(
               todayDecoration: BoxDecoration(
-                color: AppColor.secondary.withOpacity(0.8),
+                color: colorScheme.secondary.withOpacity(0.8),
                 shape: BoxShape.circle,
               ),
-              selectedDecoration: const BoxDecoration(
-                color: AppColor.primary,
+              selectedDecoration: BoxDecoration(
+                color: colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              todayTextStyle: const TextStyle(
-                color: AppColor.primary,
+              todayTextStyle: TextStyle(
+                color: colorScheme.onSecondary,
                 fontWeight: FontWeight.w600,
               ),
-              selectedTextStyle: const TextStyle(
-                color: Colors.white,
+              selectedTextStyle: TextStyle(
+                color: colorScheme.onPrimary,
                 fontWeight: FontWeight.w600,
               ),
               // Marker styling - akan di-override oleh calendarBuilders
-              markerDecoration: const BoxDecoration(
-                color: AppColor.accent,
+              markerDecoration: BoxDecoration(
+                color: colorScheme.tertiary,
                 shape: BoxShape.circle,
               ),
+              defaultTextStyle: TextStyle(color: colorScheme.onSurface),
+              weekendTextStyle: TextStyle(color: colorScheme.error),
             ),
             // Custom builder untuk menampilkan markers dengan warna schedule
             calendarBuilders: CalendarBuilders<ScheduleEvent>(
@@ -210,7 +222,7 @@ class ScheduleCalendar extends StatelessWidget {
                           int.parse(event.color.replaceFirst('#', '0xFF')),
                         );
                       } catch (e) {
-                        color = AppColor.accent; // Fallback color
+                        color = colorScheme.tertiary; // Fallback color
                       }
 
                       return Container(
@@ -236,10 +248,12 @@ class ScheduleCalendar extends StatelessWidget {
   }
 
   Widget _buildViewModeButton(
+    BuildContext context,
     CalendarViewMode mode,
     IconData icon,
     String label,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isSelected = viewMode == mode;
     return InkWell(
       onTap: () => onViewModeChanged?.call(mode),
@@ -248,7 +262,7 @@ class ScheduleCalendar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColor.primary.withOpacity(0.1)
+              ? colorScheme.primary.withOpacity(0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -258,7 +272,9 @@ class ScheduleCalendar extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? AppColor.primary : AppColor.textSecondary,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withOpacity(0.6),
             ),
             const SizedBox(width: 4),
             Text(
@@ -266,7 +282,9 @@ class ScheduleCalendar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? AppColor.primary : AppColor.textSecondary,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
           ],

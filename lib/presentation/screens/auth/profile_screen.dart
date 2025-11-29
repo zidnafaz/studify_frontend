@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/constants/app_color.dart';
 import '../../../providers/auth_provider.dart';
 import '../../widgets/profile/profile_header.dart';
 import '../../widgets/profile/profile_menu_item.dart';
@@ -98,9 +97,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -108,16 +112,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'Profile',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -132,12 +136,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             ProfileHeader(user: user),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Account',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColor.textPrimary,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -152,12 +156,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Settings',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColor.textPrimary,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -177,12 +181,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Support',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColor.textPrimary,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -208,17 +212,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  side: const BorderSide(color: AppColor.primary),
+                  side: BorderSide(color: colorScheme.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
                 onPressed: _signOut,
-                icon: const Icon(Icons.logout, color: AppColor.primary),
-                label: const Text(
+                icon: Icon(Icons.logout, color: colorScheme.primary),
+                label: Text(
                   'Sign Out',
                   style: TextStyle(
-                    color: AppColor.primary,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

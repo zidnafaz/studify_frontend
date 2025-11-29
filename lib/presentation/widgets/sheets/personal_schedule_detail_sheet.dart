@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../data/models/personal_schedule_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/personal_schedule_provider.dart';
@@ -52,25 +51,26 @@ class _PersonalScheduleDetailSheetState
   }
 
   Future<void> _showDeleteConfirmDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Hapus Jadwal',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
         content: Text(
           'Apakah Anda yakin ingin menghapus jadwal "${widget.schedule.title}"? Tindakan ini tidak dapat dibatalkan.',
-          style: const TextStyle(color: AppColor.textSecondary),
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
+            child: Text(
               'Batal',
-              style: TextStyle(color: AppColor.textSecondary),
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           ),
           ElevatedButton(
@@ -211,13 +211,14 @@ class _PersonalScheduleDetailSheetState
   }
 
   Widget _buildReminderSection() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -237,12 +238,12 @@ class _PersonalScheduleDetailSheetState
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.add, color: AppColor.primary, size: 20),
+                  Icon(Icons.add, color: colorScheme.primary, size: 20),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Add Reminder',
                     style: TextStyle(
-                      color: AppColor.primary,
+                      color: colorScheme.primary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -257,35 +258,36 @@ class _PersonalScheduleDetailSheetState
   }
 
   Widget _buildReminderItem(ScheduleReminder reminder) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.access_time,
             size: 20,
-            color: AppColor.textSecondary,
+            color: colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               reminder.displayText,
-              style: const TextStyle(fontSize: 14, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.close,
               size: 20,
-              color: AppColor.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
             onPressed: () => _removeReminder(reminder),
             padding: EdgeInsets.zero,
@@ -297,13 +299,14 @@ class _PersonalScheduleDetailSheetState
   }
 
   Widget _buildInfoCard() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -359,26 +362,27 @@ class _PersonalScheduleDetailSheetState
   }
 
   Widget _buildInfoItem(IconData icon, String text, {Widget? colorBox}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 20, color: AppColor.textSecondary),
+          Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
           const SizedBox(height: 4),
           if (colorBox != null)
             colorBox
           else
             Text(
               text,
-              style: const TextStyle(fontSize: 12, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -389,24 +393,25 @@ class _PersonalScheduleDetailSheetState
   }
 
   Widget _buildFullWidthInfoItem(IconData icon, String text) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColor.textSecondary),
+          Icon(icon, size: 20, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -416,14 +421,15 @@ class _PersonalScheduleDetailSheetState
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColor.backgroundSecondary,
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
@@ -435,9 +441,9 @@ class _PersonalScheduleDetailSheetState
               // Header
               Container(
                 padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: AppColor.backgroundSecondary,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
                   ),
@@ -450,10 +456,10 @@ class _PersonalScheduleDetailSheetState
                         children: [
                           Text(
                             widget.schedule.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                           if (widget.schedule.description != null &&
@@ -461,9 +467,9 @@ class _PersonalScheduleDetailSheetState
                             const SizedBox(height: 4),
                             Text(
                               widget.schedule.description!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: AppColor.textSecondary,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -473,10 +479,7 @@ class _PersonalScheduleDetailSheetState
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: AppColor.textPrimary,
-                      ),
+                      icon: Icon(Icons.close, color: colorScheme.onSurface),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -505,8 +508,8 @@ class _PersonalScheduleDetailSheetState
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
-                                side: const BorderSide(color: AppColor.primary),
-                                foregroundColor: AppColor.primary,
+                                side: BorderSide(color: colorScheme.primary),
+                                foregroundColor: colorScheme.primary,
                               ),
                             ),
                           ),

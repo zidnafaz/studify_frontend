@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../providers/theme_provider.dart';
 
 class ThemeSheet extends StatelessWidget {
@@ -9,11 +8,12 @@ class ThemeSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -31,7 +31,7 @@ class ThemeSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColor.textSecondary.withOpacity(0.3),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -41,12 +41,12 @@ class ThemeSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Theme',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColor.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -97,6 +97,7 @@ class ThemeSheet extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -104,18 +105,20 @@ class ThemeSheet extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColor.primary.withOpacity(0.1)
-              : AppColor.backgroundPrimary,
+              ? colorScheme.primary.withOpacity(0.1)
+              : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: isSelected
-              ? Border.all(color: AppColor.primary)
+              ? Border.all(color: colorScheme.primary)
               : Border.all(color: Colors.transparent),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected ? AppColor.primary : AppColor.textSecondary,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 16),
             Text(
@@ -123,12 +126,12 @@ class ThemeSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColor.primary : AppColor.textPrimary,
+                color: isSelected ? colorScheme.primary : colorScheme.onSurface,
               ),
             ),
             const Spacer(),
             if (isSelected)
-              const Icon(Icons.check_circle, color: AppColor.primary),
+              Icon(Icons.check_circle, color: colorScheme.primary),
           ],
         ),
       ),

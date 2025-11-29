@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../data/models/schedule_repeat_model.dart';
 
 class RepeatSelectionSheet extends StatefulWidget {
   final ScheduleRepeat? initialRepeat;
 
-  const RepeatSelectionSheet({
-    super.key,
-    this.initialRepeat,
-  });
+  const RepeatSelectionSheet({super.key, this.initialRepeat});
 
   @override
   State<RepeatSelectionSheet> createState() => _RepeatSelectionSheetState();
@@ -56,10 +52,11 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
@@ -75,20 +72,20 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Tambah Pengulangan',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: AppColor.textPrimary,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   TextButton(
                     onPressed: _save,
-                    child: const Text(
+                    child: Text(
                       'Simpan',
                       style: TextStyle(
-                        color: AppColor.primary,
+                        color: colorScheme.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -97,23 +94,23 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                 ],
               ),
               const SizedBox(height: 24),
-              
+
               // Description
-              const Text(
+              Text(
                 'Ulangi pengingat ini setiap',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColor.textSecondary,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Days Selection
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: AppColor.textSecondary.withOpacity(0.3),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -121,7 +118,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                   children: List.generate(_dayNames.length, (index) {
                     final dayValue = index + 1;
                     final isSelected = _selectedDays.contains(dayValue);
-                    
+
                     return Column(
                       children: [
                         if (index > 0) const Divider(height: 1),
@@ -138,9 +135,9 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                               children: [
                                 Text(
                                   _dayNames[index],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    color: AppColor.textPrimary,
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
                                 Container(
@@ -150,13 +147,13 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       color: isSelected
-                                          ? AppColor.primary
-                                          : AppColor.textSecondary
-                                              .withOpacity(0.3),
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurfaceVariant
+                                                .withOpacity(0.3),
                                       width: 2,
                                     ),
                                     color: isSelected
-                                        ? AppColor.primary
+                                        ? colorScheme.primary
                                         : Colors.transparent,
                                   ),
                                   child: isSelected
@@ -177,22 +174,22 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Repeat Count
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Ulangi sebanyak berapa kali',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColor.textSecondary.withOpacity(0.3),
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                       ),
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -206,18 +203,20 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                                   });
                                 }
                               : null,
-                          icon: const Icon(Icons.remove),
-                          color: AppColor.textPrimary,
+                          icon: Icon(
+                            Icons.remove,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
                         SizedBox(
                           width: 40,
                           child: Text(
                             '$_repeatCount',
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -227,8 +226,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                               _repeatCount++;
                             });
                           },
-                          icon: const Icon(Icons.add),
-                          color: AppColor.textPrimary,
+                          icon: Icon(Icons.add, color: colorScheme.onSurface),
                         ),
                       ],
                     ),

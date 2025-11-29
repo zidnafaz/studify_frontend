@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../providers/classroom_provider.dart';
 
 class CreateClassroomScreen extends StatefulWidget {
@@ -30,11 +29,11 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
 
     try {
       await context.read<ClassroomProvider>().createClassroom(
-            name: _nameController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
-          );
+        name: _nameController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+      );
 
       if (mounted) {
         // Refresh classroom list
@@ -68,8 +67,9 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -77,7 +77,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Stack(
@@ -87,18 +87,15 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                     top: 0,
                     bottom: 0,
                     child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
+                      icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  const Center(
+                  Center(
                     child: Text(
                       'Create New Class',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -116,45 +113,42 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [              
+            children: [
               // Class Name Field
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   hintText: 'Class Name',
                   hintStyle: TextStyle(
-                    color: AppColor.textSecondary.withOpacity(0.5),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColor.primary,
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
                       width: 2,
                     ),
                   ),
                   filled: true,
-                  fillColor: AppColor.backgroundSecondary,
+                  fillColor: colorScheme.surface,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
                 ),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColor.textPrimary,
-                ),
+                style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
                 enabled: !_isLoading,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -163,73 +157,70 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Description Field
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
                   hintText: 'Description',
                   hintStyle: TextStyle(
-                    color: AppColor.textSecondary.withOpacity(0.5),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColor.primary,
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
                       width: 2,
                     ),
                   ),
                   filled: true,
-                  fillColor: AppColor.backgroundSecondary,
+                  fillColor: colorScheme.surface,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
                 ),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColor.textPrimary,
-                ),
+                style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
                 maxLines: 4,
                 enabled: !_isLoading,
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Create Class Button
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _createClassroom,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.textPrimary,
-                    foregroundColor: Colors.white,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: colorScheme.surface,
                           ),
                         )
                       : const Text(
@@ -248,4 +239,3 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
     );
   }
 }
-

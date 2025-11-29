@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
 
 class ScheduleTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -31,6 +30,7 @@ class ScheduleTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
@@ -43,36 +43,29 @@ class ScheduleTextField extends StatelessWidget {
         labelText: label,
         hintText: hintText,
         prefixIcon: prefixIcon != null
-            ? Icon(
-                prefixIcon,
-                color: AppColor.textSecondary,
-                size: 20,
-              )
+            ? Icon(prefixIcon, color: colorScheme.onSurfaceVariant, size: 20)
             : null,
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: AppColor.textSecondary.withOpacity(0.3),
+            color: colorScheme.onSurfaceVariant.withOpacity(0.3),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: AppColor.textSecondary.withOpacity(0.3),
+            color: colorScheme.onSurfaceVariant.withOpacity(0.3),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColor.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: AppColor.textSecondary.withOpacity(0.1),
+            color: colorScheme.onSurfaceVariant.withOpacity(0.1),
           ),
         ),
         contentPadding: const EdgeInsets.symmetric(

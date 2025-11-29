@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../providers/auth_provider.dart';
@@ -74,32 +74,31 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   Future<void> _showEditDescriptionDialog(BuildContext context) async {
     final classroom = _detailedClassroom ?? widget.classroom;
     final controller = TextEditingController(text: classroom.description);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Edit Description',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
         content: TextField(
           controller: controller,
           maxLines: 5,
           decoration: InputDecoration(
             hintText: 'Enter classroom description',
-            hintStyle: TextStyle(
-              color: AppColor.textSecondary.withOpacity(0.5),
-            ),
+            hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
             filled: true,
-            fillColor: AppColor.backgroundPrimary,
+            fillColor: colorScheme.background,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
           ),
-          style: const TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
         actions: [
           TextButton(
@@ -112,8 +111,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
               await _updateDescription(controller.text);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
             ),
             child: const Text('Save'),
           ),
@@ -159,18 +158,19 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   }
 
   Future<void> _showLeaveClassroomDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Leave Classroom',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to leave this classroom? You will need the classroom code to join again.',
-          style: TextStyle(color: AppColor.textSecondary),
+          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
         ),
         actions: [
           TextButton(
@@ -188,8 +188,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
               await _leaveClassroom();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
             ),
             child: const Text('Leave'),
           ),
@@ -231,9 +231,12 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppColor.backgroundPrimary,
+        backgroundColor: colorScheme.background,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(88),
           child: Padding(
@@ -241,7 +244,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
             child: SafeArea(
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColor.primary,
+                  color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Stack(
@@ -252,21 +255,21 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                       bottom: 0,
                       child: Center(
                         child: IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                           ),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
                     ),
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 48),
                         child: Text(
                           'Classroom Detail',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: colorScheme.onPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -280,8 +283,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
             ),
           ),
         ),
-        body: const Center(
-          child: CircularProgressIndicator(color: AppColor.primary),
+        body: Center(
+          child: CircularProgressIndicator(color: colorScheme.primary),
         ),
       );
     }
@@ -314,7 +317,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
         });
 
         return Scaffold(
-          backgroundColor: AppColor.backgroundPrimary,
+          backgroundColor: colorScheme.background,
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(88),
             child: Padding(
@@ -322,7 +325,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
               child: SafeArea(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColor.primary,
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Center(
@@ -333,18 +336,18 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                           top: 0,
                           bottom: 0,
                           child: IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back,
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                             ),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
-                        const Center(
+                        Center(
                           child: Text(
                             'Classroom Detail',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: colorScheme.onPrimary,
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                             ),
@@ -366,15 +369,20 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColor.backgroundSecondary,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                    border: isDark
+                        ? Border.all(color: Colors.white.withOpacity(0.1))
+                        : null,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,20 +394,22 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Classroom Code',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColor.textSecondary,
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.6,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   classroom.uniqueCode,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColor.primary,
+                                    color: colorScheme.primary,
                                     letterSpacing: 2,
                                   ),
                                 ),
@@ -409,10 +419,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                           IconButton(
                             onPressed: () =>
                                 _copyToClipboard(context, classroom.uniqueCode),
-                            icon: const Icon(
-                              Icons.copy,
-                              color: AppColor.primary,
-                            ),
+                            icon: Icon(Icons.copy, color: colorScheme.primary),
                             tooltip: 'Copy code',
                           ),
                         ],
@@ -422,7 +429,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Divider(
-                          color: AppColor.textSecondary.withOpacity(0.2),
+                          color: colorScheme.onSurface.withOpacity(0.1),
                           thickness: 1,
                           height: 1,
                         ),
@@ -432,11 +439,11 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Description',
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColor.textSecondary,
+                              color: colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                           if (isOwner)
@@ -444,7 +451,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                               onPressed: () =>
                                   _showEditDescriptionDialog(context),
                               icon: const Icon(Icons.edit, size: 20),
-                              color: AppColor.primary,
+                              color: colorScheme.primary,
                               tooltip: 'Edit description',
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -454,9 +461,9 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                       const SizedBox(height: 8),
                       Text(
                         classroom.description ?? 'No description',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColor.textPrimary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -466,12 +473,12 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                 const SizedBox(height: 24),
 
                 // List of Members Header
-                const Text(
+                Text(
                   'List of Members',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.textPrimary,
+                    color: colorScheme.onBackground,
                   ),
                 ),
 
@@ -480,15 +487,20 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                 // Members List
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColor.backgroundSecondary,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                    border: isDark
+                        ? Border.all(color: Colors.white.withOpacity(0.1))
+                        : null,
                   ),
                   child: ListView.separated(
                     shrinkWrap: true,
@@ -498,7 +510,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                     separatorBuilder: (context, index) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Divider(
-                        color: AppColor.textSecondary.withOpacity(0.2),
+                        color: colorScheme.onSurface.withOpacity(0.1),
                         thickness: 1,
                         height: 1,
                       ),
@@ -533,15 +545,14 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                               // Avatar
                               CircleAvatar(
                                 radius: 24,
-                                backgroundColor: AppColor.primary.withOpacity(
-                                  0.1,
-                                ),
+                                backgroundColor: colorScheme.primary
+                                    .withOpacity(0.1),
                                 child: Text(
                                   user.name[0].toUpperCase(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColor.primary,
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -554,10 +565,10 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                                   children: [
                                     Text(
                                       user.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColor.textPrimary,
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
@@ -566,10 +577,12 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: role == 'Owner'
-                                            ? AppColor.primary
+                                            ? colorScheme.primary
                                             : role == 'Coordinator'
-                                            ? AppColor.accent
-                                            : AppColor.textSecondary,
+                                            ? colorScheme.tertiary
+                                            : colorScheme.onSurface.withOpacity(
+                                                0.6,
+                                              ),
                                         fontWeight: role == 'Owner'
                                             ? FontWeight.w600
                                             : FontWeight.normal,
@@ -594,8 +607,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                     child: OutlinedButton(
                       onPressed: () => _showLeaveClassroomDialog(context),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red, width: 2),
+                        foregroundColor: colorScheme.error,
+                        side: BorderSide(color: colorScheme.error, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

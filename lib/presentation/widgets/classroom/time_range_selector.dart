@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
 
 class TimeRangeSelector extends StatelessWidget {
   final TimeOfDay? startTime;
@@ -24,11 +23,12 @@ class TimeRangeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.3),
+          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -46,24 +46,24 @@ class TimeRangeSelector extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: AppColor.textSecondary.withOpacity(0.3),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       _formatTime(startTime),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -77,12 +77,12 @@ class TimeRangeSelector extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColor.textSecondary.withOpacity(0.1),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_forward,
-              color: AppColor.textSecondary,
+              color: colorScheme.onSurfaceVariant,
               size: 20,
             ),
           ),
@@ -99,24 +99,24 @@ class TimeRangeSelector extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: AppColor.textSecondary.withOpacity(0.3),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       _formatTime(endTime),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

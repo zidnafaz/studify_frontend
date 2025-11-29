@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../providers/classroom_provider.dart';
@@ -22,41 +22,43 @@ class MemberDetailSheet extends StatelessWidget {
   });
 
   Future<void> _showTransferOwnershipDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Transfer Ownership',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Are you sure you want to transfer ownership to:',
-              style: TextStyle(color: AppColor.textSecondary),
+              style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColor.primary.withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: AppColor.primary.withOpacity(0.2),
+                    backgroundColor: colorScheme.primary.withOpacity(0.2),
                     child: Text(
                       user.name[0].toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.primary,
+                        color: colorScheme.primary,
                       ),
                     ),
                   ),
@@ -67,17 +69,17 @@ class MemberDetailSheet extends StatelessWidget {
                       children: [
                         Text(
                           user.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           user.email,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -108,8 +110,8 @@ class MemberDetailSheet extends StatelessWidget {
               await _transferOwnership(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.primary,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
             ),
             child: const Text('Transfer'),
           ),
@@ -119,7 +121,10 @@ class MemberDetailSheet extends StatelessWidget {
   }
 
   Future<void> _transferOwnership(BuildContext context) async {
-    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classroomProvider = Provider.of<ClassroomProvider>(
+      context,
+      listen: false,
+    );
 
     try {
       await classroomProvider.transferOwnership(
@@ -150,14 +155,19 @@ class MemberDetailSheet extends StatelessWidget {
   }
 
   Future<void> _showRemoveMemberDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Remove Member',
-          style: TextStyle(color: AppColor.textPrimary, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -165,26 +175,26 @@ class MemberDetailSheet extends StatelessWidget {
           children: [
             Text(
               'Are you sure you want to remove this member?',
-              style: TextStyle(color: AppColor.textSecondary),
+              style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: colorScheme.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: Colors.red.withOpacity(0.2),
+                    backgroundColor: colorScheme.error.withOpacity(0.2),
                     child: Text(
                       user.name[0].toUpperCase(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.red.shade700,
+                        color: colorScheme.error,
                       ),
                     ),
                   ),
@@ -195,17 +205,17 @@ class MemberDetailSheet extends StatelessWidget {
                       children: [
                         Text(
                           user.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           user.email,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -224,7 +234,11 @@ class MemberDetailSheet extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -251,8 +265,8 @@ class MemberDetailSheet extends StatelessWidget {
               await _removeMember(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
             ),
             child: const Text('Remove'),
           ),
@@ -262,7 +276,10 @@ class MemberDetailSheet extends StatelessWidget {
   }
 
   Future<void> _removeMember(BuildContext context) async {
-    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classroomProvider = Provider.of<ClassroomProvider>(
+      context,
+      listen: false,
+    );
 
     try {
       await classroomProvider.removeMember(
@@ -295,12 +312,13 @@ class MemberDetailSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUserOwner = user.id == classroom.ownerId;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -317,7 +335,7 @@ class MemberDetailSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColor.textSecondary.withOpacity(0.3),
+              color: colorScheme.onSurface.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -329,13 +347,13 @@ class MemberDetailSheet extends StatelessWidget {
                 // Avatar
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: AppColor.primary.withOpacity(0.1),
+                  backgroundColor: colorScheme.primary.withOpacity(0.1),
                   child: Text(
                     user.name[0].toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
-                      color: AppColor.primary,
+                      color: colorScheme.primary,
                     ),
                   ),
                 ),
@@ -345,10 +363,10 @@ class MemberDetailSheet extends StatelessWidget {
                 // Name
                 Text(
                   user.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -358,9 +376,9 @@ class MemberDetailSheet extends StatelessWidget {
                 // Email
                 Text(
                   user.email,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -369,13 +387,16 @@ class MemberDetailSheet extends StatelessWidget {
 
                 // Role badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: role == 'Owner'
-                        ? AppColor.primary.withOpacity(0.1)
+                        ? colorScheme.primary.withOpacity(0.1)
                         : role == 'Coordinator'
-                            ? AppColor.accent.withOpacity(0.1)
-                            : AppColor.textSecondary.withOpacity(0.1),
+                        ? colorScheme.secondary.withOpacity(0.1)
+                        : colorScheme.onSurface.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -384,10 +405,10 @@ class MemberDetailSheet extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: role == 'Owner'
-                          ? AppColor.primary
+                          ? colorScheme.primary
                           : role == 'Coordinator'
-                              ? AppColor.accent
-                              : AppColor.textSecondary,
+                          ? colorScheme.secondary
+                          : colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ),
@@ -395,17 +416,17 @@ class MemberDetailSheet extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 // Coordinator schedules
-                if (role == 'Coordinator' && 
-                    user.coordinatorSchedules != null && 
+                if (role == 'Coordinator' &&
+                    user.coordinatorSchedules != null &&
                     user.coordinatorSchedules!.isNotEmpty) ...[
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColor.accent.withOpacity(0.05),
+                      color: colorScheme.secondary.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColor.accent.withOpacity(0.2),
+                        color: colorScheme.secondary.withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -417,7 +438,7 @@ class MemberDetailSheet extends StatelessWidget {
                             Icon(
                               Icons.calendar_today,
                               size: 16,
-                              color: AppColor.accent,
+                              color: colorScheme.secondary,
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -425,7 +446,7 @@ class MemberDetailSheet extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: AppColor.accent,
+                                color: colorScheme.secondary,
                               ),
                             ),
                           ],
@@ -433,8 +454,10 @@ class MemberDetailSheet extends StatelessWidget {
                         const SizedBox(height: 12),
                         ...user.coordinatorSchedules!.map((schedule) {
                           // Parse color from hex string
-                          final colorValue = int.parse(schedule.color.replaceFirst('#', '0xFF'));
-                          
+                          final colorValue = int.parse(
+                            schedule.color.replaceFirst('#', '0xFF'),
+                          );
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Row(
@@ -451,10 +474,10 @@ class MemberDetailSheet extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     schedule.title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColor.textPrimary,
+                                      color: colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -476,8 +499,8 @@ class MemberDetailSheet extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () => _showRemoveMemberDialog(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                        backgroundColor: colorScheme.error,
+                        foregroundColor: colorScheme.onError,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -508,8 +531,8 @@ class MemberDetailSheet extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => _showTransferOwnershipDialog(context),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColor.primary,
-                        side: const BorderSide(color: AppColor.primary, width: 2),
+                        foregroundColor: colorScheme.primary,
+                        side: BorderSide(color: colorScheme.primary, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

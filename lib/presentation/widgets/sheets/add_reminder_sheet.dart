@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/schedule_reminder_model.dart';
 
 class AddReminderSheet extends StatefulWidget {
@@ -19,10 +19,11 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
@@ -38,20 +39,20 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Tambah Pengingat',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: AppColor.textPrimary,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   TextButton(
                     onPressed: _save,
-                    child: const Text(
+                    child: Text(
                       'Simpan',
                       style: TextStyle(
-                        color: AppColor.primary,
+                        color: colorScheme.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -71,7 +72,9 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: AppColor.textSecondary.withOpacity(0.3),
+                            color: colorScheme.onSurfaceVariant.withOpacity(
+                              0.3,
+                            ),
                           ),
                           borderRadius: BorderRadius.circular(24),
                         ),
@@ -93,17 +96,17 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                                     }
                                   : null,
                               icon: const Icon(Icons.remove),
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                             Container(
                               constraints: const BoxConstraints(minWidth: 40),
                               child: Text(
                                 '$_minutesBefore',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColor.textPrimary,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -120,7 +123,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                                 });
                               },
                               icon: const Icon(Icons.add),
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ],
                         ),
@@ -128,12 +131,12 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'menit sebelumnya',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

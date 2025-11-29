@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/class_schedule_model.dart';
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
@@ -56,18 +56,20 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
   }
 
   Future<void> _showLeaveClassroomDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Leave Classroom',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to leave this classroom? You will need the classroom code to join again.',
-          style: TextStyle(color: AppColor.textSecondary),
+          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
         ),
         actions: [
           TextButton(
@@ -85,8 +87,8 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               await _leaveClassroom();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
             ),
             child: const Text('Leave'),
           ),
@@ -151,7 +153,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
   void _showEditScheduleSheet(BuildContext context) {
     // Close detail sheet first
     Navigator.pop(context);
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -160,7 +162,10 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
         schedule: widget.schedule,
         classroom: widget.classroom,
         onSave: (data) async {
-          final provider = Provider.of<ClassroomProvider>(context, listen: false);
+          final provider = Provider.of<ClassroomProvider>(
+            context,
+            listen: false,
+          );
           try {
             await provider.updateClassSchedule(
               classroomId: widget.classroom.id,
@@ -175,17 +180,17 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               coordinator1: data['coordinator_1'],
               coordinator2: data['coordinator_2'],
             );
-            
+
             // Refresh schedules list
             await provider.fetchClassSchedules(widget.classroom.id);
-            
+
             // Refresh combined schedules for home screen
             final combinedProvider = Provider.of<CombinedScheduleProvider>(
               context,
               listen: false,
             );
             await combinedProvider.refresh();
-            
+
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -211,32 +216,34 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
   }
 
   Future<void> _showDeleteConfirmDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColor.backgroundSecondary,
+        backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Hapus Jadwal',
-          style: TextStyle(color: AppColor.textPrimary),
+          style: TextStyle(color: colorScheme.onSurface),
         ),
         content: Text(
           'Apakah Anda yakin ingin menghapus jadwal "${widget.schedule.title}"? Tindakan ini tidak dapat dibatalkan.',
-          style: const TextStyle(color: AppColor.textSecondary),
+          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(
+            child: Text(
               'Batal',
-              style: TextStyle(color: AppColor.textSecondary),
+              style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
             ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
             ),
             child: const Text('Hapus'),
           ),
@@ -274,7 +281,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
       if (mounted) {
         // Close detail sheet
         navigator.pop();
-        
+
         // Show success message after a short delay to ensure sheet is closed
         Future.delayed(const Duration(milliseconds: 100), () {
           if (mounted) {
@@ -314,14 +321,16 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     return DateFormat('d MMM yyyy').format(date);
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurface.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -331,6 +340,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
             children: [
               Expanded(
                 child: _buildInfoItem(
+                  context,
                   Icons.access_time,
                   '${_formatTime(widget.schedule.startTime)} - ${_formatTime(widget.schedule.endTime)}',
                 ),
@@ -338,6 +348,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoItem(
+                  context,
                   Icons.calendar_today,
                   _formatDate(widget.schedule.startTime),
                 ),
@@ -345,6 +356,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoItem(
+                  context,
                   Icons.palette,
                   '',
                   colorBox: Container(
@@ -365,11 +377,13 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
           ),
           const SizedBox(height: 12),
           _buildFullWidthInfoItem(
+            context,
             Icons.person,
             widget.schedule.lecturer ?? '-',
           ),
           const SizedBox(height: 12),
           _buildFullWidthInfoItem(
+            context,
             Icons.location_on,
             widget.schedule.location ?? '-',
           ),
@@ -378,27 +392,34 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     );
   }
 
-  Widget _buildInfoItem(IconData icon, String text, {Widget? colorBox}) {
+  Widget _buildInfoItem(
+    BuildContext context,
+    IconData icon,
+    String text, {
+    Widget? colorBox,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.background,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurface.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Column(
         children: [
-          Icon(icon, size: 20, color: AppColor.textSecondary),
+          Icon(icon, size: 20, color: colorScheme.onSurface.withOpacity(0.6)),
           const SizedBox(height: 4),
           if (colorBox != null)
             colorBox
           else
             Text(
               text,
-              style: const TextStyle(fontSize: 12, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -408,25 +429,31 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     );
   }
 
-  Widget _buildFullWidthInfoItem(IconData icon, String text) {
+  Widget _buildFullWidthInfoItem(
+    BuildContext context,
+    IconData icon,
+    String text,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.background,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurface.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColor.textSecondary),
+          Icon(icon, size: 20, color: colorScheme.onSurface.withOpacity(0.6)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
         ],
@@ -434,14 +461,16 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     );
   }
 
-  Widget _buildReminderSection() {
+  Widget _buildReminderSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurface.withOpacity(0.2),
           width: 1,
         ),
       ),
@@ -450,7 +479,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
           ..._reminders.map(
             (reminder) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildReminderItem(reminder),
+              child: _buildReminderItem(context, reminder),
             ),
           ),
           InkWell(
@@ -461,12 +490,12 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.add, color: AppColor.primary, size: 20),
+                  Icon(Icons.add, color: colorScheme.primary, size: 20),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'Add Reminder',
                     style: TextStyle(
-                      color: AppColor.primary,
+                      color: colorScheme.primary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -480,36 +509,38 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
     );
   }
 
-  Widget _buildReminderItem(ScheduleReminder reminder) {
+  Widget _buildReminderItem(BuildContext context, ScheduleReminder reminder) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColor.backgroundPrimary,
+        color: colorScheme.background,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
+          color: colorScheme.onSurface.withOpacity(0.2),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.access_time,
             size: 20,
-            color: AppColor.textSecondary,
+            color: colorScheme.onSurface.withOpacity(0.6),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               reminder.label,
-              style: const TextStyle(fontSize: 14, color: AppColor.textPrimary),
+              style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.close,
               size: 20,
-              color: AppColor.textSecondary,
+              color: colorScheme.onSurface.withOpacity(0.6),
             ),
             onPressed: () => _removeReminder(reminder),
             padding: EdgeInsets.zero,
@@ -522,14 +553,16 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         final canEdit = _canEdit(authProvider);
 
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColor.backgroundPrimary,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: colorScheme.background,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -540,7 +573,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColor.textSecondary.withOpacity(0.3),
+                  color: colorScheme.onSurface.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -553,10 +586,10 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                     Expanded(
                       child: Text(
                         widget.schedule.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.textPrimary,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -574,11 +607,11 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                       // Description
                       if (widget.schedule.description != null &&
                           widget.schedule.description!.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           'Description',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -589,16 +622,16 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
-                                color: AppColor.textSecondary.withOpacity(0.2),
+                                color: colorScheme.onSurface.withOpacity(0.2),
                                 width: 1,
                               ),
                             ),
                           ),
                           child: Text(
                             widget.schedule.description!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColor.textPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -606,7 +639,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                       ],
 
                       // Info card
-                      _buildInfoCard(),
+                      _buildInfoCard(context),
 
                       const SizedBox(height: 20),
 
@@ -616,26 +649,32 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                           children: [
                             Expanded(
                               child: OutlinedButton.icon(
-                                onPressed: () => _showEditScheduleSheet(context),
+                                onPressed: () =>
+                                    _showEditScheduleSheet(context),
                                 icon: const Icon(Icons.edit, size: 18),
                                 label: const Text('Edit'),
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  side: const BorderSide(color: AppColor.primary),
-                                  foregroundColor: AppColor.primary,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  side: BorderSide(color: colorScheme.primary),
+                                  foregroundColor: colorScheme.primary,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: ElevatedButton.icon(
-                                onPressed: () => _showDeleteConfirmDialog(context),
+                                onPressed: () =>
+                                    _showDeleteConfirmDialog(context),
                                 icon: const Icon(Icons.delete, size: 18),
                                 label: const Text('Hapus'),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  backgroundColor: colorScheme.error,
+                                  foregroundColor: colorScheme.onError,
                                 ),
                               ),
                             ),
@@ -645,7 +684,7 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                       ],
 
                       // Reminder section
-                      _buildReminderSection(),
+                      _buildReminderSection(context),
 
                       const SizedBox(height: 20),
                     ],

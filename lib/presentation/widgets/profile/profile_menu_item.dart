@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:studify/core/constants/app_color.dart';
 
 class ProfileMenuItem {
   final IconData icon;
@@ -23,11 +22,12 @@ class ProfileMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1D29) : AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: isDark
             ? []
@@ -50,22 +50,22 @@ class ProfileMenuSection extends StatelessWidget {
                   ListTile(
                     leading: CircleAvatar(
                       radius: 20,
-                      backgroundColor: AppColor.primary.withOpacity(0.1),
-                      child: Icon(item.icon, color: AppColor.primary),
+                      backgroundColor: colorScheme.primary.withOpacity(0.1),
+                      child: Icon(item.icon, color: colorScheme.primary),
                     ),
                     title: Text(
                       item.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     subtitle: item.subtitle is Widget
                         ? item.subtitle
                         : Text(
                             item.subtitle,
-                            style: const TextStyle(
-                              color: AppColor.textSecondary,
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                     trailing: const Icon(Icons.chevron_right),
@@ -81,7 +81,7 @@ class ProfileMenuSection extends StatelessWidget {
                     Divider(
                       indent: 72,
                       height: 0,
-                      color: AppColor.textSecondary.withOpacity(0.2),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.2),
                     ),
                 ],
               ),

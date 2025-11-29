@@ -48,13 +48,15 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(20),
       // Supaya form naik kalau keyboard muncul
-      height: MediaQuery.of(context).size.height * 0.9, 
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      height: MediaQuery.of(context).size.height * 0.9,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -64,22 +66,40 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
             children: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel", style: TextStyle(color: Colors.red)),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: colorScheme.error),
+                ),
               ),
-              const Text("New Personal Event", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                "New Personal Event",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: colorScheme.onSurface,
+                ),
+              ),
               TextButton(
                 onPressed: () {
-                   // LOGIKA SIMPAN SEMENTARA (Nanti disambung ke Backend)
-                   print("Judul: ${_titleController.text}");
-                   print("Waktu: ${_startTime.format(context)} - ${_endTime.format(context)}");
-                   Navigator.pop(context); // Tutup form setelah simpan
+                  // LOGIKA SIMPAN SEMENTARA (Nanti disambung ke Backend)
+                  print("Judul: ${_titleController.text}");
+                  print(
+                    "Waktu: ${_startTime.format(context)} - ${_endTime.format(context)}",
+                  );
+                  Navigator.pop(context); // Tutup form setelah simpan
                 },
-                child: const Text("Save", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                child: Text(
+                  "Save",
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
-          const Divider(),
-          
+          Divider(color: colorScheme.onSurfaceVariant.withOpacity(0.2)),
+
           // ISI FORM: Bisa di-scroll
           Expanded(
             child: SingleChildScrollView(
@@ -88,9 +108,28 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
                   // 1. INPUT JUDUL
                   TextField(
                     controller: _titleController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: "Title",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      hintStyle: TextStyle(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -99,14 +138,25 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTimeButton("Start", _startTime, () => _pickTime(true)),
+                        child: _buildTimeButton(
+                          "Start",
+                          _startTime,
+                          () => _pickTime(true),
+                        ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Icon(Icons.arrow_forward, color: Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       Expanded(
-                        child: _buildTimeButton("End", _endTime, () => _pickTime(false)),
+                        child: _buildTimeButton(
+                          "End",
+                          _endTime,
+                          () => _pickTime(false),
+                        ),
                       ),
                     ],
                   ),
@@ -115,15 +165,23 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
                   // 3. INPUT TANGGAL
                   OutlinedButton.icon(
                     onPressed: _pickDate,
-                    icon: const Icon(Icons.calendar_today, color: Colors.black),
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: colorScheme.onSurface,
+                    ),
                     label: Text(
                       "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}",
-                      style: const TextStyle(color: Colors.black),
+                      style: TextStyle(color: colorScheme.onSurface),
                     ),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                       alignment: Alignment.centerLeft,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -131,10 +189,32 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
                   // 4. INPUT LOKASI
                   TextField(
                     controller: _locationController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      prefixIcon: Icon(
+                        Icons.location_on_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       hintText: "Location",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      hintStyle: TextStyle(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -143,9 +223,28 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
                   TextField(
                     controller: _descriptionController,
                     maxLines: 3,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: "Description",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      hintStyle: TextStyle(
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
                     ),
                   ),
                 ],
@@ -159,16 +258,18 @@ class _PersonalScheduleFormState extends State<PersonalScheduleForm> {
 
   // Widget kecil untuk tombol Jam biar rapi
   Widget _buildTimeButton(String label, TimeOfDay time, VoidCallback onTap) {
+    final colorScheme = Theme.of(context).colorScheme;
     return OutlinedButton.icon(
       onPressed: onTap,
-      icon: const Icon(Icons.access_time, color: Colors.black),
+      icon: Icon(Icons.access_time, color: colorScheme.onSurface),
       label: Text(
         time.format(context),
-        style: const TextStyle(color: Colors.black),
+        style: TextStyle(color: colorScheme.onSurface),
       ),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 15),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        side: BorderSide(color: colorScheme.onSurfaceVariant.withOpacity(0.3)),
       ),
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
 
 class EmptyClassroomState extends StatelessWidget {
   const EmptyClassroomState({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -13,14 +13,14 @@ class EmptyClassroomState extends StatelessWidget {
           Icon(
             Icons.class_outlined,
             size: 80,
-            color: AppColor.textSecondary.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
           ),
           const SizedBox(height: 16),
           Text(
             'Belum ada classroom',
             style: TextStyle(
               fontSize: 16,
-              color: AppColor.textSecondary,
+              color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -29,7 +29,7 @@ class EmptyClassroomState extends StatelessWidget {
             'Tap tombol + untuk membuat classroom baru',
             style: TextStyle(
               fontSize: 14,
-              color: AppColor.textSecondary.withOpacity(0.7),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.7),
             ),
           ),
         ],

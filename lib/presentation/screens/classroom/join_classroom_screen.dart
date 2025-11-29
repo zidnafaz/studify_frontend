@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../providers/classroom_provider.dart';
 
 class JoinClassroomScreen extends StatefulWidget {
@@ -28,8 +27,8 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
 
     try {
       final classroom = await context.read<ClassroomProvider>().joinClassroom(
-            _codeController.text.trim().toUpperCase(),
-          );
+        _codeController.text.trim().toUpperCase(),
+      );
 
       if (mounted) {
         // Refresh classroom list
@@ -63,8 +62,9 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -72,7 +72,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Stack(
@@ -82,18 +82,15 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                     top: 0,
                     bottom: 0,
                     child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
+                      icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  const Center(
+                  Center(
                     child: Text(
                       'Join New Class',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -117,37 +114,37 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Code',
                   hintStyle: TextStyle(
-                    color: AppColor.textSecondary.withOpacity(0.5),
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: AppColor.textSecondary.withOpacity(0.3),
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColor.primary,
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
                       width: 2,
                     ),
                   ),
                   filled: true,
-                  fillColor: AppColor.backgroundSecondary,
+                  fillColor: colorScheme.surface,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
                 ),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: AppColor.textPrimary,
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 2,
                 ),
@@ -171,20 +168,20 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _joinClassroom,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.textPrimary,
-                    foregroundColor: Colors.white,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: colorScheme.surface,
                           ),
                         )
                       : const Text(
@@ -203,4 +200,3 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
     );
   }
 }
-

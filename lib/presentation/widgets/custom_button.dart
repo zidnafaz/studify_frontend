@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:studify/core/constants/app_color.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -27,6 +26,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: width ?? double.infinity,
       height: height,
@@ -35,7 +36,7 @@ class CustomButton extends StatelessWidget {
               onPressed: isLoading ? null : onPressed,
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: backgroundColor ?? AppColor.primary,
+                  color: backgroundColor ?? colorScheme.primary,
                   width: 2,
                 ),
                 shape: RoundedRectangleBorder(
@@ -48,13 +49,13 @@ class CustomButton extends StatelessWidget {
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: backgroundColor ?? AppColor.primary,
+                        color: backgroundColor ?? colorScheme.primary,
                       ),
                     )
                   : Text(
                       text,
                       style: TextStyle(
-                        color: textColor ?? AppColor.primary,
+                        color: textColor ?? colorScheme.primary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -63,25 +64,25 @@ class CustomButton extends StatelessWidget {
           : ElevatedButton(
               onPressed: isLoading ? null : onPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: backgroundColor ?? AppColor.primary,
+                backgroundColor: backgroundColor ?? colorScheme.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(borderRadius),
                 ),
                 elevation: 0,
               ),
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        color: colorScheme.onPrimary,
                       ),
                     )
                   : Text(
                       text,
                       style: TextStyle(
-                        color: textColor ?? Colors.white,
+                        color: textColor ?? colorScheme.onPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:studify/core/constants/app_color.dart';
 import '../../../data/models/user_model.dart';
 
 class ProfileHeader extends StatelessWidget {
@@ -20,11 +19,12 @@ class ProfileHeader extends StatelessWidget {
               .toUpperCase()
         : '?';
 
+    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1D29) : AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: isDark
             ? []
@@ -45,11 +45,11 @@ class ProfileHeader extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundColor: AppColor.primary.withOpacity(0.1),
+              backgroundColor: colorScheme.primary.withOpacity(0.1),
               child: Text(
                 initials,
-                style: const TextStyle(
-                  color: AppColor.primary,
+                style: TextStyle(
+                  color: colorScheme.primary,
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
                 ),
@@ -62,18 +62,18 @@ class ProfileHeader extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: AppColor.textPrimary,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     email,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColor.textSecondary,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

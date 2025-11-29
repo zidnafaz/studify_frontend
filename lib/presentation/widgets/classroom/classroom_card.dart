@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/classroom_model.dart';
 
 class ClassroomCard extends StatelessWidget {
@@ -10,21 +10,28 @@ class ClassroomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColor.textSecondary.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : Border.all(
+                color: colorScheme.onSurface.withOpacity(0.1),
+                width: 1,
+              ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -38,16 +45,19 @@ class ClassroomCard extends StatelessWidget {
               children: [
                 Text(
                   classroom.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   classroom.description ?? 'Tidak ada deskripsi',
-                  style: TextStyle(fontSize: 14, color: AppColor.textSecondary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: colorScheme.onSurface.withOpacity(0.6),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

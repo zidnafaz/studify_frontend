@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 
@@ -31,7 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = context.read<AuthProvider>();
-      
+
       final success = await authProvider.register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
@@ -58,13 +58,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColor.textPrimary),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,20 +79,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Header
-                const Text(
+                Text(
                   'Create Account',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: AppColor.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Sign up to get started',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -100,9 +102,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintText: 'Full Name',
                   controller: _nameController,
                   keyboardType: TextInputType.name,
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.person_outline,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.5),
                     size: 20,
                   ),
                   validator: (value) {
@@ -122,17 +124,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintText: 'Email',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.email_outlined,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.5),
                     size: 20,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Email tidak valid';
                     }
                     return null;
@@ -145,9 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintText: 'Password',
                   controller: _passwordController,
                   isPassword: true,
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.lock_outline,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.5),
                     size: 20,
                   ),
                   validator: (value) {
@@ -167,9 +170,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   hintText: 'Confirm Password',
                   controller: _confirmPasswordController,
                   isPassword: true,
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.lock_outline,
-                    color: AppColor.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.5),
                     size: 20,
                   ),
                   validator: (value) {
@@ -201,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Expanded(
                       child: Divider(
-                        color: AppColor.textSecondary.withOpacity(0.3),
+                        color: colorScheme.onSurface.withOpacity(0.2),
                       ),
                     ),
                     Padding(
@@ -209,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Text(
                         'OR',
                         style: TextStyle(
-                          color: AppColor.textSecondary.withOpacity(0.7),
+                          color: colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -217,7 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     Expanded(
                       child: Divider(
-                        color: AppColor.textSecondary.withOpacity(0.3),
+                        color: colorScheme.onSurface.withOpacity(0.2),
                       ),
                     ),
                   ],
@@ -228,10 +231,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Already have an account? ',
                       style: TextStyle(
-                        color: AppColor.textSecondary,
+                        color: colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -239,10 +242,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: const Text(
+                      child: Text(
                         'Login',
                         style: TextStyle(
-                          color: AppColor.secondary,
+                          color: colorScheme.secondary,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),

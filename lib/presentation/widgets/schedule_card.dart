@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/class_schedule_model.dart';
 
 class ScheduleCard extends StatelessWidget {
@@ -15,7 +15,13 @@ class ScheduleCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  Widget _buildScheduleItem(ClassSchedule schedule, bool isLast) {
+  Widget _buildScheduleItem(
+    BuildContext context,
+    ClassSchedule schedule,
+    bool isLast,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Material(
@@ -50,9 +56,9 @@ class ScheduleCard extends StatelessWidget {
                         // Time range
                         Text(
                           '${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -60,10 +66,10 @@ class ScheduleCard extends StatelessWidget {
                         // Title
                         Text(
                           schedule.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -73,9 +79,9 @@ class ScheduleCard extends StatelessWidget {
                           '${schedule.location} | ${schedule.lecturer}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                       ],
@@ -90,7 +96,7 @@ class ScheduleCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Divider(
-              color: AppColor.textSecondary.withOpacity(0.2),
+              color: colorScheme.onSurface.withOpacity(0.1),
               thickness: 1,
               height: 1,
             ),
@@ -101,8 +107,26 @@ class ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -110,7 +134,7 @@ class ScheduleCard extends StatelessWidget {
             final index = entry.key;
             final schedule = entry.value;
             final isLast = index == schedules.length - 1;
-            return _buildScheduleItem(schedule, isLast);
+            return _buildScheduleItem(context, schedule, isLast);
           }).toList(),
         ),
       ),

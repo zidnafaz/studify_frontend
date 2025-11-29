@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../providers/classroom_provider.dart';
 import '../../../providers/personal_schedule_provider.dart';
 import '../../../providers/combined_schedule_provider.dart';
-import '../../../core/constants/app_color.dart';
+
 import '../../../data/models/combined_schedule_model.dart';
 import '../classroom/classroom_list_screen.dart';
 import '../auth/profile_screen.dart';
@@ -31,15 +31,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: colorScheme.background,
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColor.backgroundSecondary,
+          color: isDark ? const Color(0xFF1C1D29) : colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
           ),
+          border: isDark
+              ? Border(top: BorderSide(color: Colors.white.withOpacity(0.1)))
+              : null,
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
@@ -55,9 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             type: BottomNavigationBarType.fixed,
             elevation: 0,
-            backgroundColor: AppColor.backgroundSecondary,
-            selectedItemColor: AppColor.primary,
-            unselectedItemColor: AppColor.textSecondary,
+            backgroundColor: isDark
+                ? const Color(0xFF1C1D29)
+                : colorScheme.surface,
+            selectedItemColor: colorScheme.primary,
+            unselectedItemColor: colorScheme.onSurface.withOpacity(0.6),
             selectedLabelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 12,
@@ -229,6 +238,7 @@ class _HomeTabState extends State<_HomeTab> {
 
   Widget _buildScheduleList(List<CombinedSchedule> schedules) {
     final groupedSchedules = _groupSchedulesByDate(schedules);
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (groupedSchedules.isEmpty) {
       return Center(
@@ -238,15 +248,15 @@ class _HomeTabState extends State<_HomeTab> {
             Icon(
               Icons.event_busy,
               size: 64,
-              color: AppColor.textSecondary.withOpacity(0.5),
+              color: colorScheme.onSurface.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
               _showAllSchedules
                   ? 'No upcoming schedules'
                   : 'No schedule on this date',
-              style: const TextStyle(
-                color: AppColor.textSecondary,
+              style: TextStyle(
+                color: colorScheme.onSurface.withOpacity(0.7),
                 fontSize: 14,
               ),
             ),
@@ -276,7 +286,7 @@ class _HomeTabState extends State<_HomeTab> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.secondary.withOpacity(0.8),
+                  color: colorScheme.secondary.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -284,15 +294,15 @@ class _HomeTabState extends State<_HomeTab> {
                     Icon(
                       _getDateIcon(dateKey),
                       size: 16,
-                      color: AppColor.primary,
+                      color: colorScheme.onSecondaryContainer,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       dateKey,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSecondaryContainer,
                       ),
                     ),
                   ],
@@ -369,8 +379,11 @@ class _HomeTabState extends State<_HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -378,7 +391,7 @@ class _HomeTabState extends State<_HomeTab> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -386,10 +399,10 @@ class _HomeTabState extends State<_HomeTab> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      const Text(
+                      Text(
                         'Studify',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
@@ -414,11 +427,13 @@ class _HomeTabState extends State<_HomeTab> {
                             ),
                             child: DropdownButton<String>(
                               value: _selectedSourceId ?? 'all',
-                              dropdownColor: AppColor.backgroundSecondary,
+                              dropdownColor: isDark
+                                  ? const Color(0xFF1C1D29)
+                                  : colorScheme.surface,
                               underline: const SizedBox(),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_drop_down,
-                                color: Colors.white,
+                                color: colorScheme.onPrimary,
                                 size: 20,
                               ),
                               iconSize: 20,
@@ -430,8 +445,8 @@ class _HomeTabState extends State<_HomeTab> {
                                 ) {
                                   return Text(
                                     source.name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -444,8 +459,8 @@ class _HomeTabState extends State<_HomeTab> {
                                   value: source.id,
                                   child: Text(
                                     source.name,
-                                    style: const TextStyle(
-                                      color: AppColor.primary,
+                                    style: TextStyle(
+                                      color: colorScheme.primary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -504,10 +519,10 @@ class _HomeTabState extends State<_HomeTab> {
                   children: [
                     Text(
                       _getScheduleHeaderText(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     if (!_showAllSchedules)
@@ -518,10 +533,10 @@ class _HomeTabState extends State<_HomeTab> {
                             _selectedDay = DateTime.now();
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           'View All',
                           style: TextStyle(
-                            color: AppColor.primary,
+                            color: colorScheme.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -549,9 +564,9 @@ class _HomeTabState extends State<_HomeTab> {
               _selectedSourceId == null
           ? FloatingActionButton(
               onPressed: _showAddScheduleSheet,
-              backgroundColor: AppColor.primary,
+              backgroundColor: colorScheme.primary,
               shape: const CircleBorder(),
-              child: const Icon(Icons.add, color: Colors.white),
+              child: Icon(Icons.add, color: colorScheme.onPrimary),
             )
           : null,
     );
@@ -571,7 +586,13 @@ class _CombinedScheduleCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  Widget _buildScheduleItem(CombinedSchedule schedule, bool isLast) {
+  Widget _buildScheduleItem(
+    BuildContext context,
+    CombinedSchedule schedule,
+    bool isLast,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Material(
@@ -603,19 +624,19 @@ class _CombinedScheduleCard extends StatelessWidget {
                       children: [
                         Text(
                           '${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(height: 4),
 
                         Text(
                           schedule.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         // Source, Location, Lecturer in one line
@@ -628,7 +649,7 @@ class _CombinedScheduleCard extends StatelessWidget {
                                   schedule.sourceName,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColor.primary.withOpacity(0.8),
+                                    color: colorScheme.primary.withOpacity(0.8),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -638,7 +659,7 @@ class _CombinedScheduleCard extends StatelessWidget {
                                     ' | ',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColor.textSecondary.withOpacity(
+                                      color: colorScheme.onSurface.withOpacity(
                                         0.5,
                                       ),
                                     ),
@@ -648,9 +669,11 @@ class _CombinedScheduleCard extends StatelessWidget {
                                   schedule.location!.isNotEmpty) ...[
                                 Text(
                                   schedule.location!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColor.textSecondary,
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.6,
+                                    ),
                                   ),
                                 ),
                                 if (schedule.isClass &&
@@ -660,7 +683,7 @@ class _CombinedScheduleCard extends StatelessWidget {
                                     ' | ',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColor.textSecondary.withOpacity(
+                                      color: colorScheme.onSurface.withOpacity(
                                         0.5,
                                       ),
                                     ),
@@ -671,9 +694,11 @@ class _CombinedScheduleCard extends StatelessWidget {
                                   schedule.lecturer!.isNotEmpty) ...[
                                 Text(
                                   schedule.lecturer!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColor.textSecondary,
+                                    color: colorScheme.onSurface.withOpacity(
+                                      0.6,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -692,7 +717,7 @@ class _CombinedScheduleCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Divider(
-              color: AppColor.textSecondary.withOpacity(0.2),
+              color: colorScheme.onSurface.withOpacity(0.1),
               thickness: 1,
               height: 1,
             ),
@@ -703,17 +728,25 @@ class _CombinedScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: isDark ? const Color(0xFF1C1D29) : colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -722,7 +755,7 @@ class _CombinedScheduleCard extends StatelessWidget {
             final index = entry.key;
             final schedule = entry.value;
             final isLast = index == schedules.length - 1;
-            return _buildScheduleItem(schedule, isLast);
+            return _buildScheduleItem(context, schedule, isLast);
           }).toList(),
         ),
       ),

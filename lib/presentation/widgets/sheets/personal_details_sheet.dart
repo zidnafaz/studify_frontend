@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../providers/auth_provider.dart';
 
 class PersonalDetailsSheet extends StatefulWidget {
@@ -78,11 +77,12 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -99,7 +99,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColor.textSecondary.withOpacity(0.3),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -111,12 +111,12 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Personal Details',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColor.textPrimary,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -127,7 +127,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                     decoration: InputDecoration(
                       labelText: 'Full Name',
                       filled: true,
-                      fillColor: AppColor.backgroundPrimary,
+                      fillColor: colorScheme.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -138,7 +138,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColor.primary),
+                        borderSide: BorderSide(color: colorScheme.primary),
                       ),
                     ),
                     validator: (value) {
@@ -156,7 +156,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                     decoration: InputDecoration(
                       labelText: 'Email',
                       filled: true,
-                      fillColor: AppColor.backgroundPrimary,
+                      fillColor: colorScheme.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -167,7 +167,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColor.primary),
+                        borderSide: BorderSide(color: colorScheme.primary),
                       ),
                     ),
                     keyboardType: TextInputType.emailAddress,
@@ -189,7 +189,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveDetails,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.primary,
+                        backgroundColor: colorScheme.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

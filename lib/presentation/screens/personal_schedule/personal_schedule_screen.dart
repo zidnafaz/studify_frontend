@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../../../core/constants/app_color.dart';
 import '../../../data/models/personal_schedule_model.dart';
 import '../../../providers/personal_schedule_provider.dart';
 import '../../widgets/schedule_calendar.dart';
@@ -19,22 +18,27 @@ class PersonalScheduleScreen extends StatefulWidget {
 class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  bool _showAllSchedules = true; // Default: tampilkan semua jadwal dari hari ini ke depan
+  bool _showAllSchedules =
+      true; // Default: tampilkan semua jadwal dari hari ini ke depan
 
   @override
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    
+
     // Fetch personal schedules
     Future.microtask(() {
-      Provider.of<PersonalScheduleProvider>(context, listen: false)
-          .fetchPersonalSchedules();
+      Provider.of<PersonalScheduleProvider>(
+        context,
+        listen: false,
+      ).fetchPersonalSchedules();
     });
   }
 
   // Group schedules by date
-  Map<String, List<PersonalSchedule>> _groupSchedulesByDate(List<PersonalSchedule> schedules) {
+  Map<String, List<PersonalSchedule>> _groupSchedulesByDate(
+    List<PersonalSchedule> schedules,
+  ) {
     final Map<String, List<PersonalSchedule>> grouped = {};
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -85,26 +89,27 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
   }
 
   // Convert schedules to calendar events dengan color
-  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<PersonalSchedule> schedules) {
+  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(
+    List<PersonalSchedule> schedules,
+  ) {
     final Map<DateTime, List<ScheduleEvent>> events = {};
-    
+
     for (var schedule in schedules) {
       final date = DateTime(
         schedule.startTime.year,
         schedule.startTime.month,
         schedule.startTime.day,
       );
-      
+
       if (!events.containsKey(date)) {
         events[date] = [];
       }
-      
-      events[date]!.add(ScheduleEvent(
-        color: schedule.color,
-        title: schedule.title,
-      ));
+
+      events[date]!.add(
+        ScheduleEvent(color: schedule.color, title: schedule.title),
+      );
     }
-    
+
     return events;
   }
 
@@ -144,6 +149,7 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
   }
 
   Widget _buildScheduleList(List<PersonalSchedule> schedules) {
+    final colorScheme = Theme.of(context).colorScheme;
     final groupedSchedules = _groupSchedulesByDate(schedules);
 
     if (groupedSchedules.isEmpty) {
@@ -154,15 +160,15 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
             Icon(
               Icons.event_busy,
               size: 64,
-              color: AppColor.textSecondary.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
-              _showAllSchedules 
-                  ? 'No upcoming schedules' 
+              _showAllSchedules
+                  ? 'No upcoming schedules'
                   : 'No schedule on this date',
-              style: const TextStyle(
-                color: AppColor.textSecondary,
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -184,10 +190,16 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
             // Date header (hanya tampilkan jika show all schedules)
             if (_showAllSchedules) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 12, top: groupIndex > 0 ? 20 : 0),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: EdgeInsets.only(
+                  bottom: 12,
+                  top: groupIndex > 0 ? 20 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColor.secondary.withOpacity(0.8),
+                  color: colorScheme.secondaryContainer.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -195,25 +207,27 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                     Icon(
                       _getDateIcon(dateKey),
                       size: 16,
-                      color: AppColor.primary,
+                      color: colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       dateKey,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
-            
+
             // Single schedule card containing all schedules for this date
             Padding(
-              padding: EdgeInsets.only(bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0),
+              padding: EdgeInsets.only(
+                bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0,
+              ),
               child: _PersonalScheduleCard(
                 schedules: schedulesForDate,
                 onScheduleTap: (schedule) {
@@ -221,9 +235,8 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => PersonalScheduleDetailSheet(
-                      schedule: schedule,
-                    ),
+                    builder: (context) =>
+                        PersonalScheduleDetailSheet(schedule: schedule),
                   );
                 },
               ),
@@ -236,8 +249,9 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColor.backgroundPrimary,
+      backgroundColor: colorScheme.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -245,7 +259,7 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
           child: SafeArea(
             child: Container(
               decoration: BoxDecoration(
-                color: AppColor.primary,
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
@@ -260,10 +274,10 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    Center(
+                    const Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 48),
-                        child: const Text(
+                        padding: EdgeInsets.symmetric(horizontal: 48),
+                        child: Text(
                           'Jadwal Pribadi',
                           style: TextStyle(
                             color: Colors.white,
@@ -302,9 +316,9 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Schedule list header with show all button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -313,10 +327,10 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                   children: [
                     Text(
                       _getScheduleHeaderText(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.textPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     if (!_showAllSchedules)
@@ -327,10 +341,10 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                             _selectedDay = DateTime.now();
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           'View All',
                           style: TextStyle(
-                            color: AppColor.primary,
+                            color: colorScheme.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -339,9 +353,9 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Schedule list
               Expanded(
                 child: isLoading
@@ -354,7 +368,7 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddScheduleSheet,
-        backgroundColor: AppColor.primary,
+        backgroundColor: colorScheme.primary,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -368,7 +382,10 @@ class _PersonalScheduleScreenState extends State<PersonalScheduleScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => AddPersonalScheduleSheet(
         onSave: (data) async {
-          final provider = Provider.of<PersonalScheduleProvider>(context, listen: false);
+          final provider = Provider.of<PersonalScheduleProvider>(
+            context,
+            listen: false,
+          );
           await provider.createPersonalSchedule(
             title: data['title'],
             startTime: DateTime.parse(data['start_time']),
@@ -388,10 +405,7 @@ class _PersonalScheduleCard extends StatelessWidget {
   final List<PersonalSchedule> schedules;
   final Function(PersonalSchedule)? onScheduleTap;
 
-  const _PersonalScheduleCard({
-    required this.schedules,
-    this.onScheduleTap,
-  });
+  const _PersonalScheduleCard({required this.schedules, this.onScheduleTap});
 
   String _formatTime(DateTime time) {
     final hour = time.hour.toString().padLeft(2, '0');
@@ -399,13 +413,20 @@ class _PersonalScheduleCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  Widget _buildScheduleItem(PersonalSchedule schedule, bool isLast) {
+  Widget _buildScheduleItem(
+    BuildContext context,
+    PersonalSchedule schedule,
+    bool isLast,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onScheduleTap != null ? () => onScheduleTap!(schedule) : null,
+            onTap: onScheduleTap != null
+                ? () => onScheduleTap!(schedule)
+                : null,
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -416,12 +437,14 @@ class _PersonalScheduleCard extends StatelessWidget {
                     width: 4,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Color(int.parse(schedule.color.replaceFirst('#', '0xFF'))),
+                      color: Color(
+                        int.parse(schedule.color.replaceFirst('#', '0xFF')),
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  
+
                   // Schedule details
                   Expanded(
                     child: Column(
@@ -430,32 +453,33 @@ class _PersonalScheduleCard extends StatelessWidget {
                         // Time range
                         Text(
                           '${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColor.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        
+
                         // Title
                         Text(
                           schedule.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
-                        if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                        if (schedule.location != null &&
+                            schedule.location!.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           // Location
                           Text(
                             schedule.location!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColor.textSecondary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -471,7 +495,7 @@ class _PersonalScheduleCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Divider(
-              color: AppColor.textSecondary.withOpacity(0.2),
+              color: colorScheme.onSurfaceVariant.withOpacity(0.2),
               thickness: 1,
               height: 1,
             ),
@@ -482,17 +506,25 @@ class _PersonalScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -501,7 +533,7 @@ class _PersonalScheduleCard extends StatelessWidget {
             final index = entry.key;
             final schedule = entry.value;
             final isLast = index == schedules.length - 1;
-            return _buildScheduleItem(schedule, isLast);
+            return _buildScheduleItem(context, schedule, isLast);
           }).toList(),
         ),
       ),

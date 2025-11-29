@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_color.dart';
 
 class PrimaryFloatingActionButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -15,12 +14,14 @@ class PrimaryFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return FloatingActionButton(
       onPressed: onPressed,
-      backgroundColor: AppColor.primary,
+      backgroundColor: colorScheme.primary,
       tooltip: tooltip,
       shape: const CircleBorder(),
-      child: Icon(icon, color: AppColor.backgroundSecondary),
+      child: Icon(icon, color: colorScheme.onPrimary),
     );
   }
 }

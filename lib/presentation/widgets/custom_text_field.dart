@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:studify/core/constants/app_color.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
@@ -36,6 +35,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
@@ -44,12 +46,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
       maxLines: widget.maxLines,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
-      style: const TextStyle(color: AppColor.textPrimary, fontSize: 15),
+      style: TextStyle(color: colorScheme.onSurface, fontSize: 15),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
+        hintStyle: TextStyle(
+          color: colorScheme.onSurface.withOpacity(0.5),
+          fontSize: 15,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade100,
+        fillColor: isDark
+            ? colorScheme.surface
+            : colorScheme.surfaceVariant.withOpacity(0.3),
         prefixIcon: widget.prefixIcon != null
             ? Padding(
                 padding: const EdgeInsets.all(14.0),
@@ -60,7 +67,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ? IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: AppColor.primary.withOpacity(0.7),
+                  color: colorScheme.primary.withOpacity(0.7),
                 ),
                 onPressed: () {
                   setState(() {
@@ -75,23 +82,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColor.primary, width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 1),
+          borderSide: BorderSide(color: colorScheme.error, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
       ),
     );
