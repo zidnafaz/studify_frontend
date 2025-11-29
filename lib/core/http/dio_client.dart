@@ -9,7 +9,8 @@ class DioClient {
   late Dio _dio;
   final AuthService _authService = AuthService();
   bool _isRefreshing = false;
-  final List<({Completer completer, RequestOptions options})> _pendingRequests = [];
+  final List<({Completer completer, RequestOptions options})> _pendingRequests =
+      [];
 
   DioClient._internal() {
     _dio = Dio(
@@ -45,10 +46,20 @@ class DioClient {
               return handler.next(error);
             }
 
+            // Check if this request was already a retry
+            if (error.requestOptions.extra['is_retry'] == true) {
+              // If a retry fails with 401, it means the new token is also invalid or something else is wrong.
+              // Don't try to refresh again to avoid infinite loop.
+              return handler.next(error);
+            }
+
             // If already refreshing, queue this request
             if (_isRefreshing) {
               final completer = Completer<Response>();
-              _pendingRequests.add((completer: completer, options: error.requestOptions));
+              _pendingRequests.add((
+                completer: completer,
+                options: error.requestOptions,
+              ));
               try {
                 final response = await completer.future;
                 return handler.resolve(response);
@@ -64,12 +75,14 @@ class DioClient {
               final newToken = authResponse.accessToken;
 
               // Update the failed request with new token
-              error.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              error.requestOptions.headers['Authorization'] =
+                  'Bearer $newToken';
 
               // Retry the original request
               final opts = Options(
                 method: error.requestOptions.method,
                 headers: error.requestOptions.headers,
+                extra: {...error.requestOptions.extra, 'is_retry': true},
               );
               final response = await _dio.request(
                 error.requestOptions.path,
@@ -88,6 +101,7 @@ class DioClient {
                     options: Options(
                       method: pending.options.method,
                       headers: pending.options.headers,
+                      extra: {...pending.options.extra, 'is_retry': true},
                     ),
                     data: pending.options.data,
                     queryParameters: pending.options.queryParameters,
@@ -255,7 +269,8 @@ class DioClient {
       }
     }
 
-    return ApiException(message: error.message ?? 'An unexpected error occurred');
+    return ApiException(
+      message: error.message ?? 'An unexpected error occurred',
+    );
   }
 }
-
