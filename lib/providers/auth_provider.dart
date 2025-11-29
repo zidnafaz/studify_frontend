@@ -3,16 +3,11 @@ import '../data/models/user_model.dart';
 import '../data/services/auth_service.dart';
 import '../core/errors/api_exception.dart';
 
-enum AuthStatus {
-  initial,
-  authenticated,
-  unauthenticated,
-  loading,
-}
+enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   AuthStatus _status = AuthStatus.initial;
   User? _user;
   String? _errorMessage;
@@ -87,7 +82,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> checkAuthStatus() async {
     try {
       final isAuth = await _authService.isAuthenticated();
-      
+
       if (isAuth) {
         final userData = await _authService.getUserData();
         if (userData != null) {
@@ -99,7 +94,7 @@ class AuthProvider with ChangeNotifier {
       } else {
         _setStatus(AuthStatus.unauthenticated);
       }
-      
+
       notifyListeners();
     } catch (e) {
       _setStatus(AuthStatus.unauthenticated);
@@ -125,6 +120,7 @@ class AuthProvider with ChangeNotifier {
 
         _setUser(authResponse.user);
         _setStatus(AuthStatus.authenticated);
+        notifyListeners();
         return true;
       }, initialStatus: AuthStatus.loading);
     } on ValidationException {
@@ -137,10 +133,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Login
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     try {
       return await _withStatus(() async {
         final authResponse = await _authService.login(
@@ -150,6 +143,7 @@ class AuthProvider with ChangeNotifier {
 
         _setUser(authResponse.user);
         _setStatus(AuthStatus.authenticated);
+        notifyListeners();
         return true;
       }, initialStatus: AuthStatus.loading);
     } on ValidationException {
@@ -178,6 +172,32 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Update Profile
+  Future<bool> updateProfile({
+    required String name,
+    required String email,
+  }) async {
+    try {
+      return await _withStatus(() async {
+        final updatedUser = await _authService.updateProfile(
+          name: name,
+          email: email,
+        );
+
+        _setUser(updatedUser);
+        _setStatus(AuthStatus.authenticated);
+        notifyListeners();
+        return true;
+      }, initialStatus: AuthStatus.loading);
+    } on ValidationException {
+      return false;
+    } on ApiException {
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Refresh Token
   Future<void> refreshToken() async {
     try {
@@ -199,7 +219,7 @@ class AuthProvider with ChangeNotifier {
   // Format Validation Errors
   String _formatValidationErrors(dynamic errors) {
     if (errors == null) return 'Validation failed';
-    
+
     if (errors is Map) {
       final errorMessages = <String>[];
       errors.forEach((key, value) {
@@ -211,7 +231,7 @@ class AuthProvider with ChangeNotifier {
       });
       return errorMessages.join('\n');
     }
-    
+
     return errors.toString();
   }
 }

@@ -6,11 +6,7 @@ class ClassroomCard extends StatelessWidget {
   final Classroom classroom;
   final VoidCallback? onTap;
 
-  const ClassroomCard({
-    super.key,
-    required this.classroom,
-    this.onTap,
-  });
+  const ClassroomCard({super.key, required this.classroom, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +47,7 @@ class ClassroomCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   classroom.description ?? 'Tidak ada deskripsi',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColor.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: AppColor.textSecondary),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -85,9 +85,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
   Widget _buildBody(ClassroomProvider provider) {
     if (provider.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: AppColor.primary,
-        ),
+        child: CircularProgressIndicator(color: AppColor.primary),
       );
     }
 
@@ -108,9 +106,8 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ClassroomDetailScreen(
-                    classroom: classroom,
-                  ),
+                  builder: (context) =>
+                      ClassroomDetailScreen(classroom: classroom),
                 ),
               );
             },

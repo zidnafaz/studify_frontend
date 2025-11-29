@@ -69,7 +69,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.4.1  
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -96,13 +96,7 @@ flutter_launcher_icons:
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/logo/launcher_icon.png"
 
-# Configuration for flutter_native_splash
-flutter_native_splash:
-  color: "#ffffff"
-  image: "assets/logo/splash.png"
-  android: true
-  ios: true
-  web: false
+
 
 # The following section is specific to Flutter packages.
 flutter:

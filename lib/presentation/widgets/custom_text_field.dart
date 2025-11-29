@@ -44,16 +44,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
       maxLines: widget.maxLines,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
-      style: const TextStyle(
-        color: AppColor.textPrimary,
-        fontSize: 15,
-      ),
+      style: const TextStyle(color: AppColor.textPrimary, fontSize: 15),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[400],
-          fontSize: 15,
-        ),
+        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
         filled: true,
         fillColor: Colors.grey.shade100,
         prefixIcon: widget.prefixIcon != null
@@ -93,17 +87,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
       ),
     );

@@ -110,18 +110,20 @@ class _HomeTabState extends State<_HomeTab> {
     super.initState();
     _selectedDay = _focusedDay;
     _selectedSourceId = 'all'; // Default to 'all'
-    
+
     // Fetch data on init
     Future.microtask(() {
-      Provider.of<ClassroomProvider>(context, listen: false)
-          .fetchClassrooms();
-      Provider.of<CombinedScheduleProvider>(context, listen: false)
-          .fetchCombinedSchedules(source: _selectedSourceId);
+      Provider.of<ClassroomProvider>(context, listen: false).fetchClassrooms();
+      Provider.of<CombinedScheduleProvider>(
+        context,
+        listen: false,
+      ).fetchCombinedSchedules(source: _selectedSourceId);
     });
   }
 
-
-  Map<String, List<CombinedSchedule>> _groupSchedulesByDate(List<CombinedSchedule> schedules) {
+  Map<String, List<CombinedSchedule>> _groupSchedulesByDate(
+    List<CombinedSchedule> schedules,
+  ) {
     final Map<String, List<CombinedSchedule>> grouped = {};
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -166,26 +168,27 @@ class _HomeTabState extends State<_HomeTab> {
     return grouped;
   }
 
-  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(List<CombinedSchedule> schedules) {
+  Map<DateTime, List<ScheduleEvent>> _getCalendarEvents(
+    List<CombinedSchedule> schedules,
+  ) {
     final Map<DateTime, List<ScheduleEvent>> events = {};
-    
+
     for (var schedule in schedules) {
       final date = DateTime(
         schedule.startTime.year,
         schedule.startTime.month,
         schedule.startTime.day,
       );
-      
+
       if (!events.containsKey(date)) {
         events[date] = [];
       }
-      
-      events[date]!.add(ScheduleEvent(
-        color: schedule.color,
-        title: schedule.title,
-      ));
+
+      events[date]!.add(
+        ScheduleEvent(color: schedule.color, title: schedule.title),
+      );
     }
-    
+
     return events;
   }
 
@@ -239,8 +242,8 @@ class _HomeTabState extends State<_HomeTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              _showAllSchedules 
-                  ? 'No upcoming schedules' 
+              _showAllSchedules
+                  ? 'No upcoming schedules'
                   : 'No schedule on this date',
               style: const TextStyle(
                 color: AppColor.textSecondary,
@@ -264,8 +267,14 @@ class _HomeTabState extends State<_HomeTab> {
           children: [
             if (_showAllSchedules) ...[
               Container(
-                margin: EdgeInsets.only(bottom: 12, top: groupIndex > 0 ? 20 : 0),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                margin: EdgeInsets.only(
+                  bottom: 12,
+                  top: groupIndex > 0 ? 20 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColor.secondary.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(8),
@@ -290,9 +299,11 @@ class _HomeTabState extends State<_HomeTab> {
                 ),
               ),
             ],
-            
+
             Padding(
-              padding: EdgeInsets.only(bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0),
+              padding: EdgeInsets.only(
+                bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0,
+              ),
               child: _CombinedScheduleCard(
                 schedules: schedulesForDate,
                 onScheduleTap: (schedule) {
@@ -300,9 +311,8 @@ class _HomeTabState extends State<_HomeTab> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => CombinedScheduleDetailSheet(
-                      schedule: schedule,
-                    ),
+                    builder: (context) =>
+                        CombinedScheduleDetailSheet(schedule: schedule),
                   );
                 },
               ),
@@ -320,7 +330,10 @@ class _HomeTabState extends State<_HomeTab> {
       backgroundColor: Colors.transparent,
       builder: (context) => AddPersonalScheduleSheet(
         onSave: (data) async {
-          final provider = Provider.of<PersonalScheduleProvider>(context, listen: false);
+          final provider = Provider.of<PersonalScheduleProvider>(
+            context,
+            listen: false,
+          );
           await provider.createPersonalSchedule(
             title: data['title'],
             startTime: DateTime.parse(data['start_time']),
@@ -330,7 +343,10 @@ class _HomeTabState extends State<_HomeTab> {
             color: data['color'],
           );
           // Refresh combined schedules
-          final combinedProvider = Provider.of<CombinedScheduleProvider>(context, listen: false);
+          final combinedProvider = Provider.of<CombinedScheduleProvider>(
+            context,
+            listen: false,
+          );
           await combinedProvider.refresh();
         },
       ),
@@ -339,14 +355,16 @@ class _HomeTabState extends State<_HomeTab> {
 
   void _handleFilterChange(String? sourceId) {
     if (sourceId == null) return;
-    
+
     setState(() {
       _selectedSourceId = sourceId;
     });
 
     // Fetch schedules with new filter
-    Provider.of<CombinedScheduleProvider>(context, listen: false)
-        .fetchCombinedSchedules(source: sourceId == 'all' ? null : sourceId);
+    Provider.of<CombinedScheduleProvider>(
+      context,
+      listen: false,
+    ).fetchCombinedSchedules(source: sourceId == 'all' ? null : sourceId);
   }
 
   @override
@@ -380,13 +398,16 @@ class _HomeTabState extends State<_HomeTab> {
                       Consumer<CombinedScheduleProvider>(
                         builder: (context, combinedProvider, child) {
                           final sources = combinedProvider.availableSources;
-                          
+
                           if (sources.isEmpty) {
                             return const SizedBox.shrink();
                           }
-                          
+
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
@@ -395,12 +416,18 @@ class _HomeTabState extends State<_HomeTab> {
                               value: _selectedSourceId ?? 'all',
                               dropdownColor: AppColor.backgroundSecondary,
                               underline: const SizedBox(),
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 20),
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                               iconSize: 20,
                               isDense: true,
                               // Selected value style (di appbar) - putih
                               selectedItemBuilder: (BuildContext context) {
-                                return sources.map<Widget>((ScheduleSource source) {
+                                return sources.map<Widget>((
+                                  ScheduleSource source,
+                                ) {
                                   return Text(
                                     source.name,
                                     style: const TextStyle(
@@ -466,9 +493,9 @@ class _HomeTabState extends State<_HomeTab> {
                   });
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Schedule list header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -503,9 +530,9 @@ class _HomeTabState extends State<_HomeTab> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Schedule list
               Expanded(
                 child: isLoading
@@ -516,7 +543,10 @@ class _HomeTabState extends State<_HomeTab> {
           );
         },
       ),
-      floatingActionButton: _selectedSourceId == 'personal' || _selectedSourceId == 'all' || _selectedSourceId == null
+      floatingActionButton:
+          _selectedSourceId == 'personal' ||
+              _selectedSourceId == 'all' ||
+              _selectedSourceId == null
           ? FloatingActionButton(
               onPressed: _showAddScheduleSheet,
               backgroundColor: AppColor.primary,
@@ -533,10 +563,7 @@ class _CombinedScheduleCard extends StatelessWidget {
   final List<CombinedSchedule> schedules;
   final Function(CombinedSchedule)? onScheduleTap;
 
-  const _CombinedScheduleCard({
-    required this.schedules,
-    this.onScheduleTap,
-  });
+  const _CombinedScheduleCard({required this.schedules, this.onScheduleTap});
 
   String _formatTime(DateTime time) {
     final hour = time.hour.toString().padLeft(2, '0');
@@ -550,7 +577,9 @@ class _CombinedScheduleCard extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onScheduleTap != null ? () => onScheduleTap!(schedule) : null,
+            onTap: onScheduleTap != null
+                ? () => onScheduleTap!(schedule)
+                : null,
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -560,12 +589,14 @@ class _CombinedScheduleCard extends StatelessWidget {
                     width: 4,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Color(int.parse(schedule.color.replaceFirst('#', '0xFF'))),
+                      color: Color(
+                        int.parse(schedule.color.replaceFirst('#', '0xFF')),
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -578,7 +609,7 @@ class _CombinedScheduleCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        
+
                         Text(
                           schedule.title,
                           style: const TextStyle(
@@ -601,16 +632,20 @@ class _CombinedScheduleCard extends StatelessWidget {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                if (schedule.location != null || schedule.lecturer != null)
+                                if (schedule.location != null ||
+                                    schedule.lecturer != null)
                                   Text(
                                     ' | ',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                      color: AppColor.textSecondary.withOpacity(
+                                        0.5,
+                                      ),
                                     ),
                                   ),
                               ],
-                              if (schedule.location != null && schedule.location!.isNotEmpty) ...[
+                              if (schedule.location != null &&
+                                  schedule.location!.isNotEmpty) ...[
                                 Text(
                                   schedule.location!,
                                   style: const TextStyle(
@@ -618,16 +653,22 @@ class _CombinedScheduleCard extends StatelessWidget {
                                     color: AppColor.textSecondary,
                                   ),
                                 ),
-                                if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty)
+                                if (schedule.isClass &&
+                                    schedule.lecturer != null &&
+                                    schedule.lecturer!.isNotEmpty)
                                   Text(
                                     ' | ',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColor.textSecondary.withOpacity(0.5),
+                                      color: AppColor.textSecondary.withOpacity(
+                                        0.5,
+                                      ),
                                     ),
                                   ),
                               ],
-                              if (schedule.isClass && schedule.lecturer != null && schedule.lecturer!.isNotEmpty) ...[
+                              if (schedule.isClass &&
+                                  schedule.lecturer != null &&
+                                  schedule.lecturer!.isNotEmpty) ...[
                                 Text(
                                   schedule.lecturer!,
                                   style: const TextStyle(

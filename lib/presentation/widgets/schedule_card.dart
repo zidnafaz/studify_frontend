@@ -6,11 +6,7 @@ class ScheduleCard extends StatelessWidget {
   final List<ClassSchedule> schedules;
   final Function(ClassSchedule)? onScheduleTap;
 
-  const ScheduleCard({
-    super.key,
-    required this.schedules,
-    this.onScheduleTap,
-  });
+  const ScheduleCard({super.key, required this.schedules, this.onScheduleTap});
 
   String _formatTime(DateTime time) {
     // Format time to HH:MM
@@ -25,7 +21,9 @@ class ScheduleCard extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onScheduleTap != null ? () => onScheduleTap!(schedule) : null,
+            onTap: onScheduleTap != null
+                ? () => onScheduleTap!(schedule)
+                : null,
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -36,12 +34,14 @@ class ScheduleCard extends StatelessWidget {
                     width: 4,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Color(int.parse(schedule.color.replaceFirst('#', '0xFF'))),
+                      color: Color(
+                        int.parse(schedule.color.replaceFirst('#', '0xFF')),
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  
+
                   // Schedule details
                   Expanded(
                     child: Column(
@@ -56,7 +56,7 @@ class ScheduleCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        
+
                         // Title
                         Text(
                           schedule.title,
@@ -67,7 +67,7 @@ class ScheduleCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        
+
                         // Location | Lecturer
                         Text(
                           '${schedule.location} | ${schedule.lecturer}',
@@ -101,18 +101,8 @@ class ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColor.backgroundSecondary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

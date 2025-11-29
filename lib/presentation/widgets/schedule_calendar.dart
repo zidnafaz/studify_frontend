@@ -106,7 +106,7 @@ class ScheduleCalendar extends StatelessWidget {
                       children: [
                         _buildViewModeButton(
                           CalendarViewMode.full,
-                          Icons.calendar_view_month,
+                          Icons.calendar_view_week,
                           'Full',
                         ),
                         Container(
@@ -116,7 +116,7 @@ class ScheduleCalendar extends StatelessWidget {
                         ),
                         _buildViewModeButton(
                           CalendarViewMode.minimal,
-                          Icons.calendar_view_week,
+                          Icons.calendar_view_month,
                           'Minimal',
                         ),
                         Container(

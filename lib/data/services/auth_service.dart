@@ -10,10 +10,10 @@ class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userKey = 'user_data';
-  
+
   // Separate Dio instance for auth endpoints (no interceptors)
   late final Dio _authDio;
-  
+
   AuthService() {
     _authDio = Dio(
       BaseOptions(
@@ -38,7 +38,7 @@ class AuthService {
     try {
       print('🔵 Register request to: ${ApiConstants.register}');
       print('📝 Data: name=$name, email=$email');
-      
+
       final response = await _authDio.post(
         '/api/users',
         data: {
@@ -51,7 +51,7 @@ class AuthService {
 
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
-      
+
       return _handleAuthResponse(response);
     } on DioException catch (e) {
       print('❌ Register error: $e');
@@ -77,18 +77,15 @@ class AuthService {
     try {
       print('🔵 Login request to: ${ApiConstants.login}');
       print('📝 Email: $email');
-      
+
       final response = await _authDio.post(
         '/api/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
 
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
-      
+
       return _handleAuthResponse(response);
     } on DioException catch (e) {
       print('❌ Login error: $e');
@@ -110,16 +107,14 @@ class AuthService {
   Future<void> logout() async {
     try {
       final token = await getToken();
-      
+
       if (token != null) {
         await _authDio.delete(
           '/api/auth/login',
-          options: Options(
-            headers: {'Authorization': 'Bearer $token'},
-          ),
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
       }
-      
+
       await clearAuthData();
     } catch (e) {
       // Even if API call fails, clear local data
@@ -129,20 +124,52 @@ class AuthService {
     }
   }
 
+  // Update Profile
+  Future<User> updateProfile({
+    required String name,
+    required String email,
+  }) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        throw UnauthorizedException(message: 'No token found');
+      }
+
+      final response = await _authDio.post(
+        '/api/auth/profile',
+        data: {'name': name, 'email': email},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        final userData = User.fromJson(response.data['data']);
+        await saveUserData(userData);
+        return userData;
+      } else {
+        throw ApiException(
+          message: 'Failed to update profile',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   // Get Current User
   Future<User> getCurrentUser() async {
     try {
       final token = await getToken();
-      
+
       if (token == null) {
         throw UnauthorizedException(message: 'No token found');
       }
 
       final response = await _authDio.get(
         '/api/auth/user',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       if (response.statusCode == 200) {
@@ -168,16 +195,14 @@ class AuthService {
       if (token == null) {
         token = await getToken();
       }
-      
+
       if (token == null) {
         throw UnauthorizedException(message: 'No token found');
       }
 
       final response = await _authDio.post(
         '/api/auth/refresh',
-        options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       return _handleAuthResponse(response);
@@ -222,11 +247,11 @@ class AuthService {
   Future<User?> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString(_userKey);
-    
+
     if (userData != null) {
       return User.fromJson(json.decode(userData));
     }
-    
+
     return null;
   }
 
@@ -247,12 +272,13 @@ class AuthService {
   // Handle Auth Response
   AuthResponse _handleAuthResponse(Response response) {
     print('🔍 Parsing response...');
-    
+
     // Check if response is empty
     if (response.data == null) {
       print('❌ Response body is empty');
       throw ApiException(
-        message: 'Server returned empty response. Backend mungkin belum siap atau URL salah.',
+        message:
+            'Server returned empty response. Backend mungkin belum siap atau URL salah.',
       );
     }
 
@@ -262,14 +288,14 @@ class AuthService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final authResponse = AuthResponse.fromJson(jsonData['data']);
-        
+
         // Save token, refresh token, and user data
         saveToken(authResponse.accessToken);
         if (authResponse.refreshToken != null) {
           saveRefreshToken(authResponse.refreshToken!);
         }
         saveUserData(authResponse.user);
-        
+
         return authResponse;
       } else if (response.statusCode == 401) {
         throw UnauthorizedException(
@@ -302,7 +328,8 @@ class AuthService {
       print('❌ JSON parse error: $e');
       print('📄 Raw response: ${response.data}');
       throw ApiException(
-        message: 'Invalid response format dari server. Kemungkinan backend belum deploy dengan benar atau URL salah.',
+        message:
+            'Invalid response format dari server. Kemungkinan backend belum deploy dengan benar atau URL salah.',
       );
     }
   }
@@ -362,7 +389,9 @@ class AuthService {
       }
     }
 
-    return ApiException(message: error.message ?? 'An unexpected error occurred');
+    return ApiException(
+      message: error.message ?? 'An unexpected error occurred',
+    );
   }
 
   // Handle Error

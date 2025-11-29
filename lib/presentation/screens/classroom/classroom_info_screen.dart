@@ -24,8 +24,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   @override
   void initState() {
     super.initState();
-    // Use Future.microtask to ensure build phase is complete
-    Future.microtask(() {
+    // Use addPostFrameCallback to ensure build phase is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchClassroomDetail();
     });
   }

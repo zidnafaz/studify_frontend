@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import '../data/models/classroom_model.dart';
 import '../data/models/class_schedule_model.dart';
 import '../data/services/classroom_service.dart';
@@ -24,6 +25,16 @@ class ClassroomProvider with ChangeNotifier {
   // PRIVATE HELPERS
   // -------------------------
 
+  void _safeNotifyListeners() {
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      notifyListeners();
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
+  }
+
   void _setLoading(bool value) {
     _isLoading = value;
   }
@@ -41,7 +52,7 @@ class ClassroomProvider with ChangeNotifier {
   }) async {
     _setLoading(true);
     _setError(null);
-    if (notifyOnce) notifyListeners();
+    if (notifyOnce) _safeNotifyListeners();
 
     try {
       final res = await operation();
@@ -54,7 +65,7 @@ class ClassroomProvider with ChangeNotifier {
       rethrow;
     } finally {
       _setLoading(false);
-      if (notifyOnce) notifyListeners();
+      if (notifyOnce) _safeNotifyListeners();
     }
   }
 
@@ -104,7 +115,10 @@ class ClassroomProvider with ChangeNotifier {
 
   /// [notify] controls whether this call triggers notifyListeners().
   /// Use notify: false when calling internally then notify once at outer operation.
-  Future<void> fetchClassSchedules(int classroomId, {bool notify = true}) async {
+  Future<void> fetchClassSchedules(
+    int classroomId, {
+    bool notify = true,
+  }) async {
     // If notify == false, we manage loading/error without notify; otherwise use wrapper
     if (!notify) {
       try {
@@ -265,10 +279,11 @@ class ClassroomProvider with ChangeNotifier {
     String? description,
   }) async {
     await _withLoading(() async {
-      final updatedClassroom = await _classroomService.updateClassroomDescription(
-        classroomId: classroomId,
-        description: description,
-      );
+      final updatedClassroom = await _classroomService
+          .updateClassroomDescription(
+            classroomId: classroomId,
+            description: description,
+          );
 
       final idx = _classrooms.indexWhere((c) => c.id == classroomId);
       if (idx != -1) _classrooms[idx] = updatedClassroom;
@@ -283,11 +298,11 @@ class ClassroomProvider with ChangeNotifier {
 
   void clearError() {
     _setError(null);
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   void clearSchedules() {
     _schedules = [];
-    notifyListeners();
+    _safeNotifyListeners();
   }
 }

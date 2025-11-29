@@ -15,7 +15,7 @@ import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/auth/splash_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
-import 'core/constants/app_color.dart';
+import 'core/constants/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,23 +42,9 @@ class MyApp extends StatelessWidget {
             title: 'Studify',
             debugShowCheckedModeBanner: false,
             themeMode: themeProvider.themeMode,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: AppColor.primary,
-                brightness: Brightness.light,
-              ),
-              useMaterial3: true,
-              appBarTheme: const AppBarTheme(centerTitle: true),
-            ),
-            darkTheme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: AppColor.primary,
-                brightness: Brightness.dark,
-              ),
-              useMaterial3: true,
-              appBarTheme: const AppBarTheme(centerTitle: true),
-            ),
-            home: const AuthWrapper(),
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            home: const SplashScreen(),
             routes: {
               '/welcome': (context) => const WelcomeScreen(),
               '/login': (context) => const LoginScreen(),
