@@ -7,6 +7,7 @@ import 'package:studify/presentation/screens/classroom/classroom_info_screen.dar
 import 'package:studify/presentation/screens/classroom/classroom_list_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/personal_schedule_provider.dart';
 import 'providers/combined_schedule_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
@@ -31,40 +32,53 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ClassroomProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
         ChangeNotifierProvider(create: (_) => PersonalScheduleProvider()),
         ChangeNotifierProvider(create: (_) => CombinedScheduleProvider()),
       ],
-      child: MaterialApp(
-        title: 'Studify',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: AppColor.primary,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: true),
-        ),
-        home: const SplashScreen(),
-        routes: {
-          '/welcome': (context) => const WelcomeScreen(),
-          '/login': (context) => const LoginScreen(),
-          '/register': (context) => const RegisterScreen(),
-          '/home': (context) => const HomeScreen(),
-          '/splash': (context) => const SplashScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'Studify',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeProvider.themeMode,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppColor.primary,
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              appBarTheme: const AppBarTheme(centerTitle: true),
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: AppColor.primary,
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+              appBarTheme: const AppBarTheme(centerTitle: true),
+            ),
+            home: const AuthWrapper(),
+            routes: {
+              '/welcome': (context) => const WelcomeScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/register': (context) => const RegisterScreen(),
+              '/home': (context) => const HomeScreen(),
 
-          // Classroom
-          '/classroomList': (context) => const ClassroomScreen(),
-          '/classroomDetail': (context) {
-            final args =
-                ModalRoute.of(context)!.settings.arguments as Classroom;
-            return ClassroomDetailScreen(classroom: args);
-          },
-          '/classroomInfo': (context) {
-            final args =
-                ModalRoute.of(context)!.settings.arguments as Classroom;
-            return ClassroomInfoScreen(classroom: args);
-          },
+              // Classroom
+              '/classroomList': (context) => const ClassroomScreen(),
+              '/classroomDetail': (context) {
+                final args =
+                    ModalRoute.of(context)!.settings.arguments as Classroom;
+                return ClassroomDetailScreen(classroom: args);
+              },
+              '/classroomInfo': (context) {
+                final args =
+                    ModalRoute.of(context)!.settings.arguments as Classroom;
+                return ClassroomInfoScreen(classroom: args);
+              },
+            },
+          );
         },
       ),
     );
