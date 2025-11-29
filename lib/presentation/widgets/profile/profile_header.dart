@@ -20,12 +20,24 @@ class ProfileHeader extends StatelessWidget {
               .toUpperCase()
         : '?';
 
-    return Card(
-      elevation: 0,
-      color: AppColor.backgroundSecondary,
-      shape: RoundedRectangleBorder(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1D29) : AppColor.backgroundSecondary,
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.1))
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
