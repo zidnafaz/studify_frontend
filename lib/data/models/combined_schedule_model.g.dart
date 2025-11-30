@@ -27,6 +27,9 @@ CombinedSchedule _$CombinedScheduleFromJson(Map<String, dynamic> json) =>
       coordinator2User: json['coordinator2'] == null
           ? null
           : User.fromJson(json['coordinator2'] as Map<String, dynamic>),
+      reminders: (json['reminders'] as List<dynamic>?)
+          ?.map((e) => Reminder.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$CombinedScheduleToJson(CombinedSchedule instance) =>
@@ -46,6 +49,7 @@ Map<String, dynamic> _$CombinedScheduleToJson(CombinedSchedule instance) =>
       'coordinator_2': instance.coordinator2,
       'coordinator1': instance.coordinator1User,
       'coordinator2': instance.coordinator2User,
+      'reminders': instance.reminders,
     };
 
 ScheduleSource _$ScheduleSourceFromJson(Map<String, dynamic> json) =>

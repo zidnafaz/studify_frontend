@@ -542,6 +542,11 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
           final currentUser = authProvider.user;
           final isOwner = currentUser?.id == widget.classroom.ownerId;
 
+          print(
+            'Current User: ${currentUser?.id}, Owner: ${widget.classroom.ownerId}',
+          );
+          print('Is Owner: $isOwner');
+
           if (!isOwner) return const SizedBox.shrink();
 
           return FloatingActionButton(
@@ -580,6 +585,9 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
             coordinator2: data['coordinator_2'],
             repeatDays: data['repeat_days'],
             repeatCount: data['repeat_count'],
+            reminders: data['reminders'] != null
+                ? List<int>.from(data['reminders'])
+                : null,
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'user_model.dart';
+import 'reminder_model.dart';
 
 part 'combined_schedule_model.g.dart';
 
@@ -21,7 +22,7 @@ class CombinedSchedule {
   final int? sourceId; // Classroom ID for class schedules, null for personal
   @JsonKey(name: 'source_name')
   final String sourceName; // Classroom name or 'Personal Schedule'
-  
+
   // Class schedule specific fields
   @JsonKey(name: 'coordinator_1')
   final int? coordinator1;
@@ -31,6 +32,8 @@ class CombinedSchedule {
   final User? coordinator1User;
   @JsonKey(name: 'coordinator2')
   final User? coordinator2User;
+
+  final List<Reminder>? reminders;
 
   CombinedSchedule({
     required this.id,
@@ -48,6 +51,7 @@ class CombinedSchedule {
     this.coordinator2,
     this.coordinator1User,
     this.coordinator2User,
+    this.reminders,
   });
 
   factory CombinedSchedule.fromJson(Map<String, dynamic> json) {
@@ -67,10 +71,14 @@ class CombinedSchedule {
 
     // Handle potential type mismatches from backend
     if (json['start_time'] != null) {
-      json['start_time'] = _parseDateTime(json['start_time'])?.toIso8601String() ?? json['start_time'];
+      json['start_time'] =
+          _parseDateTime(json['start_time'])?.toIso8601String() ??
+          json['start_time'];
     }
     if (json['end_time'] != null) {
-      json['end_time'] = _parseDateTime(json['end_time'])?.toIso8601String() ?? json['end_time'];
+      json['end_time'] =
+          _parseDateTime(json['end_time'])?.toIso8601String() ??
+          json['end_time'];
     }
 
     return _$CombinedScheduleFromJson(json);
@@ -112,10 +120,7 @@ class CombinedScheduleResponse {
   final List<CombinedSchedule> data;
   final CombinedScheduleMeta meta;
 
-  CombinedScheduleResponse({
-    required this.data,
-    required this.meta,
-  });
+  CombinedScheduleResponse({required this.data, required this.meta});
 
   factory CombinedScheduleResponse.fromJson(Map<String, dynamic> json) =>
       _$CombinedScheduleResponseFromJson(json);
@@ -143,4 +148,3 @@ class CombinedScheduleMeta {
 
   Map<String, dynamic> toJson() => _$CombinedScheduleMetaToJson(this);
 }
-

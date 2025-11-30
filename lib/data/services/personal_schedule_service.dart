@@ -9,7 +9,7 @@ class PersonalScheduleService {
   Future<List<PersonalSchedule>> getPersonalSchedules() async {
     try {
       print('🔵 Get personal schedules request');
-      
+
       final response = await _dioClient.get('/api/personal-schedules');
 
       print('📡 Response status: ${response.statusCode}');
@@ -37,8 +37,10 @@ class PersonalScheduleService {
   Future<PersonalSchedule> getPersonalSchedule(int scheduleId) async {
     try {
       print('🔵 Get personal schedule request: $scheduleId');
-      
-      final response = await _dioClient.get('/api/personal-schedules/$scheduleId');
+
+      final response = await _dioClient.get(
+        '/api/personal-schedules/$scheduleId',
+      );
 
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
@@ -66,21 +68,31 @@ class PersonalScheduleService {
     String? location,
     String? description,
     String? color,
+    List<int>? reminders,
+    List<int>? repeatDays,
+    int? repeatCount,
   }) async {
     try {
       print('🔵 Create personal schedule request');
       print('📝 Data: title=$title');
-      
+
+      final requestData = {
+        'title': title,
+        'start_time': startTime.toIso8601String(),
+        'end_time': endTime.toIso8601String(),
+        if (location != null) 'location': location,
+        if (description != null) 'description': description,
+        if (color != null) 'color': color,
+        if (reminders != null && reminders.isNotEmpty) 'reminders': reminders,
+        if (repeatDays != null) 'repeat_days': repeatDays,
+        if (repeatCount != null) 'repeat_count': repeatCount,
+      };
+
+      print('📝 Request Data: $requestData');
+
       final response = await _dioClient.post(
         '/api/personal-schedules',
-        data: {
-          'title': title,
-          'start_time': startTime.toIso8601String(),
-          'end_time': endTime.toIso8601String(),
-          if (location != null) 'location': location,
-          if (description != null) 'description': description,
-          if (color != null) 'color': color,
-        },
+        data: requestData,
       );
 
       print('📡 Response status: ${response.statusCode}');
@@ -110,17 +122,20 @@ class PersonalScheduleService {
     String? location,
     String? description,
     String? color,
+    List<int>? reminders,
   }) async {
     try {
       print('🔵 Update personal schedule request: $scheduleId');
-      
+
       final requestBody = <String, dynamic>{};
       if (title != null) requestBody['title'] = title;
-      if (startTime != null) requestBody['start_time'] = startTime.toIso8601String();
+      if (startTime != null)
+        requestBody['start_time'] = startTime.toIso8601String();
       if (endTime != null) requestBody['end_time'] = endTime.toIso8601String();
       if (location != null) requestBody['location'] = location;
       if (description != null) requestBody['description'] = description;
       if (color != null) requestBody['color'] = color;
+      if (reminders != null) requestBody['reminders'] = reminders;
 
       final response = await _dioClient.put(
         '/api/personal-schedules/$scheduleId',
@@ -149,8 +164,10 @@ class PersonalScheduleService {
   Future<void> deletePersonalSchedule(int scheduleId) async {
     try {
       print('🔵 Delete personal schedule request: $scheduleId');
-      
-      final response = await _dioClient.delete('/api/personal-schedules/$scheduleId');
+
+      final response = await _dioClient.delete(
+        '/api/personal-schedules/$scheduleId',
+      );
 
       print('📡 Response status: ${response.statusCode}');
 
@@ -169,4 +186,3 @@ class PersonalScheduleService {
     }
   }
 }
-

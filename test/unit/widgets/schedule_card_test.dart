@@ -36,111 +36,107 @@ void main() {
     ];
   });
 
-  group('ScheduleCard Widget Tests', () {
-    testWidgets('displays all schedules correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
+  Widget createWidgetUnderTest({
+    required List<ClassSchedule> schedules,
+    Function(ClassSchedule)? onScheduleTap,
+    double? width,
+  }) {
+    return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColor.primary,
+          surface: AppColor.backgroundSecondary,
         ),
-      );
+        useMaterial3: true,
+      ),
+      home: Scaffold(
+        body: width != null
+            ? SizedBox(
+                width: width,
+                child: ScheduleCard(
+                  schedules: schedules,
+                  onScheduleTap: onScheduleTap,
+                ),
+              )
+            : ScheduleCard(schedules: schedules, onScheduleTap: onScheduleTap),
+      ),
+    );
+  }
+
+  group('ScheduleCard Widget Tests', () {
+    testWidgets('displays all schedules correctly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       expect(find.text('Pemrograman Web'), findsOneWidget);
       expect(find.text('Basis Data'), findsOneWidget);
     });
 
-    testWidgets('displays schedule times correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+    testWidgets('displays schedule times correctly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       expect(find.text('08:00 - 10:00'), findsOneWidget);
       expect(find.text('10:30 - 12:30'), findsOneWidget);
     });
 
     testWidgets('displays location and lecturer', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       expect(find.text('Ruang 301 | Dr. John Doe'), findsOneWidget);
       expect(find.text('Ruang 302 | Prof. Jane Smith'), findsOneWidget);
     });
 
-    testWidgets('displays color indicators for each schedule',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+    testWidgets('displays color indicators for each schedule', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       // Find containers with specific constraints
       final colorIndicators = find.byWidgetPredicate(
         (widget) =>
             widget is Container &&
-            widget.constraints == const BoxConstraints.tightFor(width: 4, height: 60),
+            widget.constraints ==
+                const BoxConstraints.tightFor(width: 4, height: 60),
       );
 
       // At least should have color indicator containers
       expect(find.byType(Container), findsWidgets);
     });
 
-    testWidgets('displays separator between schedules',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+    testWidgets('displays separator between schedules', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       // Should have 1 divider between 2 schedules
       expect(find.byType(Divider), findsOneWidget);
     });
 
-    testWidgets('does not display separator after last schedule',
-        (WidgetTester tester) async {
+    testWidgets('does not display separator after last schedule', (
+      WidgetTester tester,
+    ) async {
       final singleSchedule = [testSchedules.first];
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: singleSchedule),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(schedules: singleSchedule));
 
       // No divider for single schedule
       expect(find.byType(Divider), findsNothing);
     });
 
-    testWidgets('calls onScheduleTap when schedule item is tapped',
-        (WidgetTester tester) async {
+    testWidgets('calls onScheduleTap when schedule item is tapped', (
+      WidgetTester tester,
+    ) async {
       ClassSchedule? tappedSchedule;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(
-              schedules: testSchedules,
-              onScheduleTap: (schedule) {
-                tappedSchedule = schedule;
-              },
-            ),
-          ),
+        createWidgetUnderTest(
+          schedules: testSchedules,
+          onScheduleTap: (schedule) {
+            tappedSchedule = schedule;
+          },
         ),
       );
 
@@ -153,20 +149,17 @@ void main() {
       expect(tappedSchedule?.title, equals('Pemrograman Web'));
     });
 
-    testWidgets('each schedule can be tapped independently',
-        (WidgetTester tester) async {
+    testWidgets('each schedule can be tapped independently', (
+      WidgetTester tester,
+    ) async {
       final tappedSchedules = <ClassSchedule>[];
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(
-              schedules: testSchedules,
-              onScheduleTap: (schedule) {
-                tappedSchedules.add(schedule);
-              },
-            ),
-          ),
+        createWidgetUnderTest(
+          schedules: testSchedules,
+          onScheduleTap: (schedule) {
+            tappedSchedules.add(schedule);
+          },
         ),
       );
 
@@ -183,17 +176,11 @@ void main() {
       expect(tappedSchedules[1].title, equals('Basis Data'));
     });
 
-    testWidgets('does not call onScheduleTap when null',
-        (WidgetTester tester) async {
+    testWidgets('does not call onScheduleTap when null', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(
-              schedules: testSchedules,
-              onScheduleTap: null,
-            ),
-          ),
-        ),
+        createWidgetUnderTest(schedules: testSchedules, onScheduleTap: null),
       );
 
       // Should not throw error when tapping
@@ -204,74 +191,58 @@ void main() {
     });
 
     testWidgets('has correct background color', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       final container = tester.widget<Container>(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).color ==
-                  AppColor.backgroundSecondary,
-        ).first,
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is Container &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).color ==
+                      AppColor.backgroundSecondary,
+            )
+            .first,
       );
 
       expect(container, isNotNull);
     });
 
     testWidgets('has rounded corners', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       final container = tester.widget<Container>(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).borderRadius ==
-                  BorderRadius.circular(16),
-        ).first,
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is Container &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).borderRadius ==
+                      BorderRadius.circular(16),
+            )
+            .first,
       );
 
       expect(container, isNotNull);
     });
 
-    testWidgets('displays correct number of schedules',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: testSchedules),
-          ),
-        ),
-      );
+    testWidgets('displays correct number of schedules', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(schedules: testSchedules));
 
       // Each schedule should have a time text
       expect(find.text('08:00 - 10:00'), findsOneWidget);
       expect(find.text('10:30 - 12:30'), findsOneWidget);
     });
 
-    testWidgets('schedule items have InkWell for tap effect',
-        (WidgetTester tester) async {
+    testWidgets('schedule items have InkWell for tap effect', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(
-              schedules: testSchedules,
-              onScheduleTap: (schedule) {},
-            ),
-          ),
+        createWidgetUnderTest(
+          schedules: testSchedules,
+          onScheduleTap: (schedule) {},
         ),
       );
 
@@ -282,20 +253,15 @@ void main() {
 
   group('ScheduleCard Edge Cases', () {
     testWidgets('handles empty schedule list', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: const []),
-          ),
-        ),
-      );
+      await tester.pumpWidget(createWidgetUnderTest(schedules: const []));
 
       // Should render without error
       expect(find.byType(ScheduleCard), findsOneWidget);
     });
 
-    testWidgets('handles schedule with null location and lecturer',
-        (WidgetTester tester) async {
+    testWidgets('handles schedule with null location and lecturer', (
+      WidgetTester tester,
+    ) async {
       final scheduleWithNulls = [
         ClassSchedule(
           id: 1,
@@ -310,18 +276,15 @@ void main() {
       ];
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ScheduleCard(schedules: scheduleWithNulls),
-          ),
-        ),
+        createWidgetUnderTest(schedules: scheduleWithNulls),
       );
 
       expect(find.text('null | null'), findsOneWidget);
     });
 
-    testWidgets('handles long schedule titles with ellipsis',
-        (WidgetTester tester) async {
+    testWidgets('handles long schedule titles with ellipsis', (
+      WidgetTester tester,
+    ) async {
       final longTitleSchedule = [
         ClassSchedule(
           id: 1,
@@ -336,19 +299,13 @@ void main() {
       ];
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: ScheduleCard(schedules: longTitleSchedule),
-            ),
-          ),
-        ),
+        createWidgetUnderTest(schedules: longTitleSchedule, width: 300),
       );
 
       expect(
-          find.text('Very Long Schedule Title That Should Be Truncated'),
-          findsOneWidget);
+        find.text('Very Long Schedule Title That Should Be Truncated'),
+        findsOneWidget,
+      );
     });
   });
 }

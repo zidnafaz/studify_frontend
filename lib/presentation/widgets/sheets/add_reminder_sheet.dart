@@ -11,6 +11,19 @@ class AddReminderSheet extends StatefulWidget {
 
 class _AddReminderSheetState extends State<AddReminderSheet> {
   int _minutesBefore = 15;
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: _minutesBefore.toString());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _save() {
     final reminder = ScheduleReminder(minutesBefore: _minutesBefore);
@@ -71,11 +84,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: colorScheme.onSurfaceVariant.withOpacity(
-                              0.3,
-                            ),
-                          ),
+                          color: colorScheme.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Row(
@@ -92,6 +101,8 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                                         } else {
                                           _minutesBefore -= 30;
                                         }
+                                        _controller.text = _minutesBefore
+                                            .toString();
                                       });
                                     }
                                   : null,
@@ -99,15 +110,28 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                               color: colorScheme.onSurface,
                             ),
                             Container(
-                              constraints: const BoxConstraints(minWidth: 40),
-                              child: Text(
-                                '$_minutesBefore',
+                              width: 60,
+                              child: TextField(
+                                controller: _controller,
                                 textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface,
                                 ),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onChanged: (value) {
+                                  final minutes = int.tryParse(value);
+                                  if (minutes != null && minutes > 0) {
+                                    setState(() {
+                                      _minutesBefore = minutes;
+                                    });
+                                  }
+                                },
                               ),
                             ),
                             IconButton(
@@ -120,6 +144,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                                   } else {
                                     _minutesBefore += 30;
                                   }
+                                  _controller.text = _minutesBefore.toString();
                                 });
                               },
                               icon: const Icon(Icons.add),

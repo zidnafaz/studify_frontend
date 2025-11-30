@@ -27,6 +27,9 @@ ClassSchedule _$ClassScheduleFromJson(Map<String, dynamic> json) =>
       coordinator2User: json['coordinator2'] == null
           ? null
           : User.fromJson(json['coordinator2'] as Map<String, dynamic>),
+      reminders: (json['reminders'] as List<dynamic>?)
+          ?.map((e) => Reminder.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$ClassScheduleToJson(ClassSchedule instance) =>
@@ -46,4 +49,5 @@ Map<String, dynamic> _$ClassScheduleToJson(ClassSchedule instance) =>
       'updated_at': instance.updatedAt.toIso8601String(),
       'coordinator1': instance.coordinator1User,
       'coordinator2': instance.coordinator2User,
+      'reminders': instance.reminders,
     };

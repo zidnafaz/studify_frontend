@@ -351,6 +351,13 @@ class _HomeTabState extends State<_HomeTab> {
             location: data['location'],
             description: data['description'],
             color: data['color'],
+            reminders: data['reminders'] != null
+                ? List<int>.from(data['reminders'])
+                : null,
+            repeatDays: data['repeat_days'] != null
+                ? List<int>.from(data['repeat_days'])
+                : null,
+            repeatCount: data['repeat_count'],
           );
           // Refresh combined schedules
           final combinedProvider = Provider.of<CombinedScheduleProvider>(

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'user_model.dart';
+import 'reminder_model.dart';
 
 part 'class_schedule_model.g.dart';
 
@@ -29,6 +30,7 @@ class ClassSchedule {
   final User? coordinator1User;
   @JsonKey(name: 'coordinator2')
   final User? coordinator2User;
+  final List<Reminder>? reminders;
 
   ClassSchedule({
     required this.id,
@@ -46,6 +48,7 @@ class ClassSchedule {
     required this.updatedAt,
     this.coordinator1User,
     this.coordinator2User,
+    this.reminders,
   });
 
   factory ClassSchedule.fromJson(Map<String, dynamic> json) =>

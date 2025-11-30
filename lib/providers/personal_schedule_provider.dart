@@ -4,7 +4,8 @@ import '../data/services/personal_schedule_service.dart';
 import '../core/errors/api_exception.dart';
 
 class PersonalScheduleProvider with ChangeNotifier {
-  final PersonalScheduleService _personalScheduleService = PersonalScheduleService();
+  final PersonalScheduleService _personalScheduleService =
+      PersonalScheduleService();
 
   List<PersonalSchedule> _schedules = [];
   bool _isLoading = false;
@@ -72,7 +73,10 @@ class PersonalScheduleProvider with ChangeNotifier {
     required DateTime endTime,
     String? location,
     String? description,
-    String? color,
+    required String color,
+    List<int>? reminders,
+    List<int>? repeatDays,
+    int? repeatCount,
   }) async {
     return await _withLoading(() async {
       final schedule = await _personalScheduleService.createPersonalSchedule(
@@ -82,6 +86,9 @@ class PersonalScheduleProvider with ChangeNotifier {
         location: location,
         description: description,
         color: color,
+        reminders: reminders,
+        repeatDays: repeatDays,
+        repeatCount: repeatCount,
       );
       _schedules = List.from(_schedules)..add(schedule);
       _schedules.sort((a, b) => a.startTime.compareTo(b.startTime));
@@ -97,6 +104,7 @@ class PersonalScheduleProvider with ChangeNotifier {
     String? location,
     String? description,
     String? color,
+    List<int>? reminders,
   }) async {
     return await _withLoading(() async {
       final schedule = await _personalScheduleService.updatePersonalSchedule(
@@ -107,6 +115,7 @@ class PersonalScheduleProvider with ChangeNotifier {
         location: location,
         description: description,
         color: color,
+        reminders: reminders,
       );
       final index = _schedules.indexWhere((s) => s.id == scheduleId);
       if (index != -1) {
@@ -125,4 +134,3 @@ class PersonalScheduleProvider with ChangeNotifier {
     });
   }
 }
-

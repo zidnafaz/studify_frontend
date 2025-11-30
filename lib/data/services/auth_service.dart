@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/errors/api_exception.dart';
+import '../../core/http/dio_client.dart';
 import '../models/user_model.dart';
 import '../models/auth_response.dart';
 
@@ -26,6 +27,62 @@ class AuthService {
         },
       ),
     );
+  }
+
+  // ... (register, login, logout remain same)
+
+  // Update Profile
+  Future<User> updateProfile({
+    required String name,
+    required String email,
+  }) async {
+    try {
+      // Use DioClient to get interceptor support (auto-refresh)
+      final response = await DioClient().post(
+        '/api/auth/profile',
+        data: {'name': name, 'email': email},
+      );
+
+      if (response.statusCode == 200) {
+        final userData = User.fromJson(response.data['data']);
+        await saveUserData(userData);
+        return userData;
+      } else {
+        throw ApiException(
+          message: 'Failed to update profile',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      // DioClient already handles DioError conversion, but we might need to rethrow or handle specific cases
+      throw _handleDioError(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw _handleError(e);
+    }
+  }
+
+  // Get Current User
+  Future<User> getCurrentUser() async {
+    try {
+      // Use DioClient to get interceptor support (auto-refresh)
+      final response = await DioClient().get('/api/auth/user');
+
+      if (response.statusCode == 200) {
+        return User.fromJson(response.data['data']);
+      } else {
+        throw ApiException(
+          message: 'Failed to get user data',
+          statusCode: response.statusCode,
+        );
+      }
+    } on DioException catch (e) {
+      // DioClient already handles DioError conversion
+      throw _handleDioError(e);
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw _handleError(e);
+    }
   }
 
   // Register
@@ -52,7 +109,7 @@ class AuthService {
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
 
-      return _handleAuthResponse(response);
+      return await _handleAuthResponse(response);
     } on DioException catch (e) {
       print('❌ Register error: $e');
       final exception = _handleDioError(e);
@@ -86,7 +143,7 @@ class AuthService {
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
 
-      return _handleAuthResponse(response);
+      return await _handleAuthResponse(response);
     } on DioException catch (e) {
       print('❌ Login error: $e');
       final exception = _handleDioError(e);
@@ -124,72 +181,10 @@ class AuthService {
     }
   }
 
-  // Update Profile
-  Future<User> updateProfile({
-    required String name,
-    required String email,
-  }) async {
-    try {
-      final token = await getToken();
-      if (token == null) {
-        throw UnauthorizedException(message: 'No token found');
-      }
-
-      final response = await _authDio.post(
-        '/api/auth/profile',
-        data: {'name': name, 'email': email},
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-
-      if (response.statusCode == 200) {
-        final userData = User.fromJson(response.data['data']);
-        await saveUserData(userData);
-        return userData;
-      } else {
-        throw ApiException(
-          message: 'Failed to update profile',
-          statusCode: response.statusCode,
-        );
-      }
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      throw _handleError(e);
-    }
-  }
-
-  // Get Current User
-  Future<User> getCurrentUser() async {
-    try {
-      final token = await getToken();
-
-      if (token == null) {
-        throw UnauthorizedException(message: 'No token found');
-      }
-
-      final response = await _authDio.get(
-        '/api/auth/user',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-
-      if (response.statusCode == 200) {
-        return User.fromJson(response.data['data']);
-      } else {
-        throw ApiException(
-          message: 'Failed to get user data',
-          statusCode: response.statusCode,
-        );
-      }
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    } catch (e) {
-      throw _handleError(e);
-    }
-  }
-
   // Refresh Token
   Future<AuthResponse> refreshToken() async {
     try {
+      print('🔵 Refresh token request');
       // Try to use refresh_token first, fallback to access_token
       String? token = await getRefreshToken();
       if (token == null) {
@@ -205,7 +200,8 @@ class AuthService {
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      return _handleAuthResponse(response);
+      print('📡 Refresh Response status: ${response.statusCode}');
+      return await _handleAuthResponse(response);
     } on DioException catch (e) {
       throw _handleDioError(e);
     } catch (e) {
@@ -270,7 +266,7 @@ class AuthService {
   }
 
   // Handle Auth Response
-  AuthResponse _handleAuthResponse(Response response) {
+  Future<AuthResponse> _handleAuthResponse(Response response) async {
     print('🔍 Parsing response...');
 
     // Check if response is empty
@@ -290,11 +286,11 @@ class AuthService {
         final authResponse = AuthResponse.fromJson(jsonData['data']);
 
         // Save token, refresh token, and user data
-        saveToken(authResponse.accessToken);
+        await saveToken(authResponse.accessToken);
         if (authResponse.refreshToken != null) {
-          saveRefreshToken(authResponse.refreshToken!);
+          await saveRefreshToken(authResponse.refreshToken!);
         }
-        saveUserData(authResponse.user);
+        await saveUserData(authResponse.user);
 
         return authResponse;
       } else if (response.statusCode == 401) {

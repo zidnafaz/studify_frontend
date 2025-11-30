@@ -8,6 +8,7 @@ import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/classroom_provider.dart';
 import '../../../providers/combined_schedule_provider.dart';
+import '../../../data/services/reminder_service.dart';
 import 'add_reminder_sheet.dart';
 import 'edit_class_schedule_sheet.dart';
 
@@ -33,7 +34,11 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
   @override
   void initState() {
     super.initState();
-    // TODO: Load reminders from API
+    if (widget.schedule.reminders != null) {
+      _reminders = widget.schedule.reminders!
+          .map((r) => ScheduleReminder(minutesBefore: r.minutesBeforeStart))
+          .toList();
+    }
   }
 
   bool _canEdit(AuthProvider authProvider) {
@@ -136,18 +141,57 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
       builder: (context) => const AddReminderSheet(),
     );
     if (result != null && !_reminders.contains(result)) {
-      setState(() {
-        _reminders.add(result);
-      });
-      // TODO: Save reminder to API
+      try {
+        final reminderService = ReminderService();
+        await reminderService.createReminder(
+          remindableId: widget.schedule.id,
+          remindableType: 'class_schedule',
+          minutesBeforeStart: result.minutesBefore,
+        );
+
+        // Refresh
+        final provider = Provider.of<ClassroomProvider>(context, listen: false);
+        await provider.fetchClassSchedules(widget.classroom.id);
+
+        setState(() {
+          _reminders.add(result);
+        });
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to add reminder: $e')));
+        }
+      }
     }
   }
 
-  void _removeReminder(ScheduleReminder reminder) {
-    setState(() {
-      _reminders.remove(reminder);
-    });
-    // TODO: Delete reminder from API
+  Future<void> _removeReminder(ScheduleReminder reminder) async {
+    try {
+      final reminderService = ReminderService();
+      // Find the reminder ID
+      final reminderModel = widget.schedule.reminders?.firstWhere(
+        (r) => r.minutesBeforeStart == reminder.minutesBefore,
+      );
+
+      if (reminderModel != null) {
+        await reminderService.deleteReminder(reminderModel.id);
+
+        // Refresh
+        final provider = Provider.of<ClassroomProvider>(context, listen: false);
+        await provider.fetchClassSchedules(widget.classroom.id);
+
+        setState(() {
+          _reminders.remove(reminder);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove reminder: $e')),
+        );
+      }
+    }
   }
 
   void _showEditScheduleSheet(BuildContext context) {
@@ -179,6 +223,9 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
               color: data['color'],
               coordinator1: data['coordinator_1'],
               coordinator2: data['coordinator_2'],
+              reminders: data['reminders'] != null
+                  ? List<int>.from(data['reminders'])
+                  : null,
             );
 
             // Refresh schedules list
@@ -463,6 +510,8 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
 
   Widget _buildReminderSection(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final canEdit = _canEdit(authProvider);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -476,40 +525,58 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
       ),
       child: Column(
         children: [
+          if (_reminders.isEmpty && !canEdit)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'No reminders',
+                style: TextStyle(
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
           ..._reminders.map(
             (reminder) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildReminderItem(context, reminder),
+              child: _buildReminderItem(context, reminder, canEdit),
             ),
           ),
-          InkWell(
-            onTap: _addReminder,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add, color: colorScheme.primary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Add Reminder',
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+          if (canEdit)
+            InkWell(
+              onTap: _addReminder,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, color: colorScheme.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Add Reminder',
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildReminderItem(BuildContext context, ScheduleReminder reminder) {
+  Widget _buildReminderItem(
+    BuildContext context,
+    ScheduleReminder reminder,
+    bool canEdit,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -532,20 +599,21 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              reminder.label,
+              reminder.displayText,
               style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
             ),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.close,
-              size: 20,
-              color: colorScheme.onSurface.withOpacity(0.6),
+          if (canEdit)
+            IconButton(
+              icon: Icon(
+                Icons.close,
+                size: 20,
+                color: colorScheme.onSurface.withOpacity(0.6),
+              ),
+              onPressed: () => _removeReminder(reminder),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
             ),
-            onPressed: () => _removeReminder(reminder),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
         ],
       ),
     );
@@ -659,6 +727,9 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                                   ),
                                   side: BorderSide(color: colorScheme.primary),
                                   foregroundColor: colorScheme.primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
                               ),
                             ),
@@ -675,6 +746,10 @@ class _ClassScheduleDetailSheetState extends State<ClassScheduleDetailSheet> {
                                   ),
                                   backgroundColor: colorScheme.error,
                                   foregroundColor: colorScheme.onError,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
                               ),
                             ),

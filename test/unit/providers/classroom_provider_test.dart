@@ -5,6 +5,7 @@ import 'package:studify/data/models/class_schedule_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late ClassroomProvider classroomProvider;
 
   setUp(() {
@@ -197,6 +198,38 @@ void main() {
       // Assert
       expect(schedule.coordinator1, 1);
       expect(schedule.coordinator2, 2);
+    });
+
+    test('ClassSchedule with reminders should work correctly', () {
+      // Arrange
+      final json = {
+        'id': 1,
+        'classroom_id': 1,
+        'title': 'Math Class',
+        'start_time': '2024-01-01T09:00:00.000000Z',
+        'end_time': '2024-01-01T10:30:00.000000Z',
+        'color': '#5CD9C1',
+        'created_at': '2024-01-01T00:00:00.000000Z',
+        'updated_at': '2024-01-01T00:00:00.000000Z',
+        'reminders': [
+          {
+            'id': 1,
+            'remindable_type': 'class_schedule',
+            'remindable_id': 1,
+            'minutes_before_start': 15,
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+        ],
+      };
+
+      // Act
+      final schedule = ClassSchedule.fromJson(json);
+
+      // Assert
+      expect(schedule.reminders, hasLength(1));
+      expect(schedule.reminders![0].minutesBeforeStart, 15);
     });
   });
 

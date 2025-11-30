@@ -5,6 +5,7 @@ import '../../../data/models/personal_schedule_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/personal_schedule_provider.dart';
 import '../../../providers/combined_schedule_provider.dart';
+import '../../../data/services/reminder_service.dart';
 import 'add_reminder_sheet.dart';
 import 'edit_personal_schedule_sheet.dart';
 
@@ -25,7 +26,11 @@ class _PersonalScheduleDetailSheetState
   @override
   void initState() {
     super.initState();
-    // TODO: Load reminders from API
+    if (widget.schedule.reminders != null) {
+      _reminders = widget.schedule.reminders!
+          .map((r) => ScheduleReminder(minutesBefore: r.minutesBeforeStart))
+          .toList();
+    }
   }
 
   Future<void> _addReminder() async {
@@ -36,18 +41,63 @@ class _PersonalScheduleDetailSheetState
       builder: (context) => const AddReminderSheet(),
     );
     if (result != null && !_reminders.contains(result)) {
-      setState(() {
-        _reminders.add(result);
-      });
-      // TODO: Save reminder to API
+      try {
+        final reminderService = ReminderService();
+        await reminderService.createReminder(
+          remindableId: widget.schedule.id,
+          remindableType: 'personal_schedule',
+          minutesBeforeStart: result.minutesBefore,
+        );
+
+        // Refresh
+        final provider = Provider.of<PersonalScheduleProvider>(
+          context,
+          listen: false,
+        );
+        await provider.fetchPersonalSchedules();
+
+        setState(() {
+          _reminders.add(result);
+        });
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to add reminder: $e')));
+        }
+      }
     }
   }
 
-  void _removeReminder(ScheduleReminder reminder) {
-    setState(() {
-      _reminders.remove(reminder);
-    });
-    // TODO: Delete reminder from API
+  Future<void> _removeReminder(ScheduleReminder reminder) async {
+    try {
+      final reminderService = ReminderService();
+      // Find the reminder ID
+      final reminderModel = widget.schedule.reminders?.firstWhere(
+        (r) => r.minutesBeforeStart == reminder.minutesBefore,
+      );
+
+      if (reminderModel != null) {
+        await reminderService.deleteReminder(reminderModel.id);
+
+        // Refresh
+        final provider = Provider.of<PersonalScheduleProvider>(
+          context,
+          listen: false,
+        );
+        await provider.fetchPersonalSchedules();
+
+        setState(() {
+          _reminders.remove(reminder);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove reminder: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _showDeleteConfirmDialog(BuildContext context) async {
@@ -165,6 +215,9 @@ class _PersonalScheduleDetailSheetState
               location: data['location'],
               description: data['description'],
               color: data['color'],
+              reminders: data['reminders'] != null
+                  ? List<int>.from(data['reminders'])
+                  : null,
             );
 
             // Refresh schedules list
@@ -510,6 +563,9 @@ class _PersonalScheduleDetailSheetState
                                 ),
                                 side: BorderSide(color: colorScheme.primary),
                                 foregroundColor: colorScheme.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
                               ),
                             ),
                           ),
@@ -526,6 +582,10 @@ class _PersonalScheduleDetailSheetState
                                 ),
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
                               ),
                             ),
                           ),

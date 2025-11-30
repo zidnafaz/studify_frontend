@@ -10,7 +10,7 @@ class ClassroomService {
   Future<List<Classroom>> getClassrooms() async {
     try {
       print('🔵 Get classrooms request');
-      
+
       final response = await _dioClient.get('/api/classrooms');
 
       print('📡 Response status: ${response.statusCode}');
@@ -18,9 +18,7 @@ class ClassroomService {
 
       if (response.statusCode == 200) {
         final List<dynamic> classroomsJson = response.data['data'];
-        return classroomsJson
-            .map((json) => Classroom.fromJson(json))
-            .toList();
+        return classroomsJson.map((json) => Classroom.fromJson(json)).toList();
       } else {
         throw ApiException(
           message: 'Failed to get classrooms',
@@ -38,7 +36,7 @@ class ClassroomService {
   Future<Classroom> getClassroom(int classroomId) async {
     try {
       print('🔵 Get classroom request: $classroomId');
-      
+
       final response = await _dioClient.get('/api/classrooms/$classroomId');
 
       print('📡 Response status: ${response.statusCode}');
@@ -67,7 +65,7 @@ class ClassroomService {
     try {
       print('🔵 Create classroom request');
       print('📝 Data: name=$name');
-      
+
       final response = await _dioClient.post(
         '/api/classrooms',
         data: {
@@ -98,12 +96,10 @@ class ClassroomService {
   Future<Classroom> joinClassroom(String uniqueCode) async {
     try {
       print('🔵 Join classroom request: $uniqueCode');
-      
+
       final response = await _dioClient.post(
         '/api/classrooms/join',
-        data: {
-          'unique_code': uniqueCode,
-        },
+        data: {'unique_code': uniqueCode},
       );
 
       print('📡 Response status: ${response.statusCode}');
@@ -128,8 +124,10 @@ class ClassroomService {
   Future<List<ClassSchedule>> getClassSchedules(int classroomId) async {
     try {
       print('🔵 Get schedules request for classroom: $classroomId');
-      
-      final response = await _dioClient.get('/api/classrooms/$classroomId/schedules');
+
+      final response = await _dioClient.get(
+        '/api/classrooms/$classroomId/schedules',
+      );
 
       print('📡 Response status: ${response.statusCode}');
       print('📄 Response body: ${response.data}');
@@ -166,11 +164,12 @@ class ClassroomService {
     int? coordinator2,
     List<int>? repeatDays,
     int? repeatCount,
+    List<int>? reminders,
   }) async {
     try {
       print('🔵 Create schedule request for classroom: $classroomId');
       print('📝 Data: title=$title');
-      
+
       final response = await _dioClient.post(
         '/api/classrooms/$classroomId/schedules',
         data: {
@@ -183,8 +182,10 @@ class ClassroomService {
           if (color != null) 'color': color,
           if (coordinator1 != null) 'coordinator_1': coordinator1,
           if (coordinator2 != null) 'coordinator_2': coordinator2,
-          if (repeatDays != null && repeatDays.isNotEmpty) 'repeat_days': repeatDays,
+          if (repeatDays != null && repeatDays.isNotEmpty)
+            'repeat_days': repeatDays,
           if (repeatCount != null) 'repeat_count': repeatCount,
+          if (reminders != null && reminders.isNotEmpty) 'reminders': reminders,
         },
       );
 
@@ -192,7 +193,13 @@ class ClassroomService {
       print('📄 Response body: ${response.data}');
 
       if (response.statusCode == 201) {
-        return ClassSchedule.fromJson(response.data['data']);
+        final data = response.data['data'];
+        if (data is List) {
+          // If it's a list (repeating schedule), return the first one
+          // The provider will refresh the list anyway
+          return ClassSchedule.fromJson(data.first);
+        }
+        return ClassSchedule.fromJson(data);
       } else {
         throw ApiException(
           message: 'Failed to create schedule',
@@ -219,22 +226,25 @@ class ClassroomService {
     String? color,
     int? coordinator1,
     int? coordinator2,
+    List<int>? reminders,
   }) async {
     try {
       print('🔵 Update schedule request: $scheduleId');
-      
+
       // Build request body
       // Note: coordinator1 and coordinator2 are always included (even if null)
       // to allow clearing coordinators when editing
       final requestBody = <String, dynamic>{};
       if (title != null) requestBody['title'] = title;
-      if (startTime != null) requestBody['start_time'] = startTime.toIso8601String();
+      if (startTime != null)
+        requestBody['start_time'] = startTime.toIso8601String();
       if (endTime != null) requestBody['end_time'] = endTime.toIso8601String();
       if (location != null) requestBody['location'] = location;
       if (lecturer != null) requestBody['lecturer'] = lecturer;
       if (description != null) requestBody['description'] = description;
       if (color != null) requestBody['color'] = color;
-      
+      if (reminders != null) requestBody['reminders'] = reminders;
+
       // Always include coordinator fields to allow setting them to null
       // This is needed for edit functionality where user can clear coordinators
       requestBody['coordinator_1'] = coordinator1;
@@ -270,7 +280,7 @@ class ClassroomService {
   }) async {
     try {
       print('🔵 Delete schedule request: $scheduleId');
-      
+
       final response = await _dioClient.delete(
         '/api/classrooms/$classroomId/schedules/$scheduleId',
       );
@@ -296,7 +306,7 @@ class ClassroomService {
   Future<void> leaveClassroom(int classroomId) async {
     try {
       print('🔵 Leave classroom request: $classroomId');
-      
+
       final response = await _dioClient.post(
         '/api/classrooms/$classroomId/leave',
       );
@@ -326,12 +336,10 @@ class ClassroomService {
   }) async {
     try {
       print('🔵 Remove member request: classroom=$classroomId, user=$userId');
-      
+
       final response = await _dioClient.post(
         '/api/classrooms/$classroomId/remove-member',
-        data: {
-          'user_id': userId,
-        },
+        data: {'user_id': userId},
       );
 
       print('📡 Response status: ${response.statusCode}');
@@ -358,13 +366,13 @@ class ClassroomService {
     required int newOwnerId,
   }) async {
     try {
-      print('🔵 Transfer ownership request: classroom=$classroomId, newOwner=$newOwnerId');
-      
+      print(
+        '🔵 Transfer ownership request: classroom=$classroomId, newOwner=$newOwnerId',
+      );
+
       final response = await _dioClient.post(
         '/api/classrooms/$classroomId/transfer-ownership',
-        data: {
-          'new_owner_id': newOwnerId,
-        },
+        data: {'new_owner_id': newOwnerId},
       );
 
       print('📡 Response status: ${response.statusCode}');
@@ -392,12 +400,10 @@ class ClassroomService {
   }) async {
     try {
       print('🔵 Update classroom description request: $classroomId');
-      
+
       final response = await _dioClient.put(
         '/api/classrooms/$classroomId',
-        data: {
-          'description': description,
-        },
+        data: {'description': description},
       );
 
       print('📡 Response status: ${response.statusCode}');

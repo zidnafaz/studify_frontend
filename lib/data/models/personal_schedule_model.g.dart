@@ -18,6 +18,9 @@ PersonalSchedule _$PersonalScheduleFromJson(Map<String, dynamic> json) =>
       color: json['color'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      reminders: (json['reminders'] as List<dynamic>?)
+          ?.map((e) => Reminder.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$PersonalScheduleToJson(PersonalSchedule instance) =>
@@ -32,4 +35,5 @@ Map<String, dynamic> _$PersonalScheduleToJson(PersonalSchedule instance) =>
       'color': instance.color,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),
+      'reminders': instance.reminders,
     };

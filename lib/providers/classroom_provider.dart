@@ -154,6 +154,7 @@ class ClassroomProvider with ChangeNotifier {
     int? coordinator2,
     List<int>? repeatDays,
     int? repeatCount,
+    List<int>? reminders,
   }) async {
     return await _withLoading(() async {
       final schedule = await _classroomService.createClassSchedule(
@@ -169,6 +170,7 @@ class ClassroomProvider with ChangeNotifier {
         coordinator2: coordinator2,
         repeatDays: repeatDays,
         repeatCount: repeatCount,
+        reminders: reminders,
       );
 
       // Refresh schedules internally without firing notify twice.
@@ -191,6 +193,7 @@ class ClassroomProvider with ChangeNotifier {
     String? color,
     int? coordinator1,
     int? coordinator2,
+    List<int>? reminders,
   }) async {
     return await _withLoading(() async {
       final schedule = await _classroomService.updateClassSchedule(
@@ -205,6 +208,7 @@ class ClassroomProvider with ChangeNotifier {
         color: color,
         coordinator1: coordinator1,
         coordinator2: coordinator2,
+        reminders: reminders,
       );
 
       final idx = _schedules.indexWhere((s) => s.id == scheduleId);
