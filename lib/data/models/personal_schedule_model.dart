@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'reminder_model.dart';
 
 part 'personal_schedule_model.g.dart';
 
@@ -19,6 +20,7 @@ class PersonalSchedule {
   final DateTime createdAt;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  final List<Reminder>? reminders;
 
   PersonalSchedule({
     required this.id,
@@ -31,6 +33,7 @@ class PersonalSchedule {
     required this.color,
     required this.createdAt,
     required this.updatedAt,
+    this.reminders,
   });
 
   factory PersonalSchedule.fromJson(Map<String, dynamic> json) {
@@ -48,14 +51,13 @@ class PersonalSchedule {
       }
       return null;
     }
-    
+
     // Handle potential type mismatches from backend
     json['id'] = _toInt(json['id']) ?? json['id'];
     json['user_id'] = _toInt(json['user_id']) ?? json['user_id'];
-    
+
     return _$PersonalScheduleFromJson(json);
   }
 
   Map<String, dynamic> toJson() => _$PersonalScheduleToJson(this);
 }
-

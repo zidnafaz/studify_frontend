@@ -5,6 +5,8 @@ import '../../../data/models/personal_schedule_model.dart';
 import '../classroom/schedule_text_field.dart';
 import '../classroom/time_range_selector.dart';
 import 'color_picker_sheet.dart';
+import '../../../data/models/schedule_reminder_model.dart';
+import 'add_reminder_sheet.dart';
 
 class EditPersonalScheduleSheet extends StatefulWidget {
   final PersonalSchedule schedule;
@@ -31,6 +33,7 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
   late TimeOfDay _endTime;
   late DateTime _selectedDate;
   Color _selectedColor = const Color(0xFF5CD9C1); // scheduleGreen
+  List<ScheduleReminder> _reminders = [];
   bool _isLoading = false;
 
   @override
@@ -59,6 +62,13 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
     _selectedColor = Color(
       int.parse(widget.schedule.color.replaceFirst('#', '0xFF')),
     );
+
+    // Initialize reminders from schedule
+    if (widget.schedule.reminders != null) {
+      _reminders = widget.schedule.reminders!
+          .map((r) => ScheduleReminder(minutesBefore: r.minutesBeforeStart))
+          .toList();
+    }
   }
 
   @override
@@ -119,6 +129,26 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
     }
   }
 
+  Future<void> _addReminder() async {
+    final result = await showModalBottomSheet<ScheduleReminder>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddReminderSheet(),
+    );
+    if (result != null && !_reminders.contains(result)) {
+      setState(() {
+        _reminders.add(result);
+      });
+    }
+  }
+
+  void _removeReminder(ScheduleReminder reminder) {
+    setState(() {
+      _reminders.remove(reminder);
+    });
+  }
+
   Future<void> _selectColor() async {
     final result = await showModalBottomSheet<Color>(
       context: context,
@@ -172,6 +202,8 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
         if (_descriptionController.text.trim().isNotEmpty)
           'description': _descriptionController.text.trim(),
         'color': _colorToHex(_selectedColor),
+        if (_reminders.isNotEmpty)
+          'reminders': _reminders.map((r) => r.minutesBefore).toList(),
       };
 
       await widget.onSave(data);
@@ -356,6 +388,102 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Reminder Section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: _isLoading ? null : _addReminder,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: colorScheme.onSurfaceVariant.withOpacity(
+                                0.3,
+                              ),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.notifications,
+                                color: colorScheme.onSurfaceVariant,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 16),
+                              Text(
+                                _reminders.isEmpty
+                                    ? 'Tambah Pengingat'
+                                    : 'Pengingat (${_reminders.length})',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                Icons.add,
+                                color: colorScheme.primary,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (_reminders.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: _reminders.map((reminder) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 16,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      reminder.displayText,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.close,
+                                        size: 18,
+                                        color: Colors.red,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                      onPressed: () =>
+                                          _removeReminder(reminder),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 16),
 

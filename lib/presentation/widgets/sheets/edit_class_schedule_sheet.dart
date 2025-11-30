@@ -88,7 +88,12 @@ class _EditClassScheduleSheetState extends State<EditClassScheduleSheet> {
       _coordinator2 = null; // Will show owner name in UI, but save as owner_id
     }
 
-    // TODO: Load reminders from API
+    // Initialize reminders from schedule
+    if (widget.schedule.reminders != null) {
+      _reminders = widget.schedule.reminders!
+          .map((r) => ScheduleReminder(minutesBefore: r.minutesBeforeStart))
+          .toList();
+    }
   }
 
   @override
@@ -264,6 +269,8 @@ class _EditClassScheduleSheetState extends State<EditClassScheduleSheet> {
         'color': _colorToHex(_selectedColor),
         'coordinator_1': coordinator1Id,
         'coordinator_2': coordinator2Id,
+        if (_reminders.isNotEmpty)
+          'reminders': _reminders.map((r) => r.minutesBefore).toList(),
       };
 
       await widget.onSave(data);

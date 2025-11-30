@@ -56,6 +56,7 @@ class CombinedScheduleDetailSheet extends StatelessWidget {
         color: schedule.color,
         createdAt: schedule.startTime, // Approximate
         updatedAt: schedule.startTime, // Approximate
+        reminders: schedule.reminders,
       );
     }
 
@@ -118,6 +119,7 @@ class CombinedScheduleDetailSheet extends StatelessWidget {
           updatedAt: schedule.startTime, // Approximate
           coordinator1User: schedule.coordinator1User,
           coordinator2User: schedule.coordinator2User,
+          reminders: schedule.reminders,
         );
 
         return ClassScheduleDetailSheet(

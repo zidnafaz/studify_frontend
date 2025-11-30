@@ -39,7 +39,7 @@ void main() {
             'created_at': '2024-01-01T00:00:00.000000Z',
             'updated_at': '2024-01-01T00:00:00.000000Z',
           },
-        ]
+        ],
       };
 
       // Note: This test requires mocking http client which needs mockito
@@ -59,12 +59,9 @@ void main() {
     test('getClassrooms should throw UnauthorizedException on 401', () async {
       // This test demonstrates the expected behavior
       // In actual implementation, you would mock the HTTP client
-      expect(
-        () async {
-          throw UnauthorizedException(message: 'Unauthorized');
-        },
-        throwsA(isA<UnauthorizedException>()),
-      );
+      expect(() async {
+        throw UnauthorizedException(message: 'Unauthorized');
+      }, throwsA(isA<UnauthorizedException>()));
     });
   });
 
@@ -92,12 +89,9 @@ void main() {
     });
 
     test('should throw NotFoundException on 404', () {
-      expect(
-        () async {
-          throw NotFoundException(message: 'Classroom not found');
-        },
-        throwsA(isA<NotFoundException>()),
-      );
+      expect(() async {
+        throw NotFoundException(message: 'Classroom not found');
+      }, throwsA(isA<NotFoundException>()));
     });
   });
 
@@ -124,15 +118,14 @@ void main() {
     });
 
     test('should throw ValidationException on 422', () {
-      expect(
-        () async {
-          throw ValidationException(
-            message: 'Validation failed',
-            errors: {'name': ['The name field is required.']},
-          );
-        },
-        throwsA(isA<ValidationException>()),
-      );
+      expect(() async {
+        throw ValidationException(
+          message: 'Validation failed',
+          errors: {
+            'name': ['The name field is required.'],
+          },
+        );
+      }, throwsA(isA<ValidationException>()));
     });
   });
 
@@ -190,6 +183,38 @@ void main() {
       expect(schedule.color, '#5CD9C1');
     });
 
+    test('should parse class schedule with reminders correctly', () {
+      // Arrange
+      final json = {
+        'id': 1,
+        'classroom_id': 1,
+        'title': 'Math Class',
+        'start_time': '2024-01-01T09:00:00.000000Z',
+        'end_time': '2024-01-01T10:30:00.000000Z',
+        'color': '#5CD9C1',
+        'created_at': '2024-01-01T00:00:00.000000Z',
+        'updated_at': '2024-01-01T00:00:00.000000Z',
+        'reminders': [
+          {
+            'id': 1,
+            'remindable_type': 'class_schedule',
+            'remindable_id': 1,
+            'minutes_before_start': 15,
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+        ],
+      };
+
+      // Act
+      final schedule = ClassSchedule.fromJson(json);
+
+      // Assert
+      expect(schedule.reminders, hasLength(1));
+      expect(schedule.reminders![0].minutesBeforeStart, 15);
+    });
+
     test('should parse list of schedules correctly', () {
       // Arrange
       final mockResponse = {
@@ -224,7 +249,7 @@ void main() {
             'created_at': '2024-01-01T00:00:00.000000Z',
             'updated_at': '2024-01-01T00:00:00.000000Z',
           },
-        ]
+        ],
       };
 
       // Act
@@ -242,14 +267,11 @@ void main() {
     });
 
     test('should throw ForbiddenException on 403', () {
-      expect(
-        () async {
-          throw ForbiddenException(
-            message: 'You are not authorized to create schedules',
-          );
-        },
-        throwsA(isA<ForbiddenException>()),
-      );
+      expect(() async {
+        throw ForbiddenException(
+          message: 'You are not authorized to create schedules',
+        );
+      }, throwsA(isA<ForbiddenException>()));
     });
   });
 
@@ -275,7 +297,9 @@ void main() {
     test('ValidationException should have correct status code and errors', () {
       final exception = ValidationException(
         message: 'Validation failed',
-        errors: {'name': ['Required field']},
+        errors: {
+          'name': ['Required field'],
+        },
       );
       expect(exception.statusCode, 422);
       expect(exception.message, 'Validation failed');

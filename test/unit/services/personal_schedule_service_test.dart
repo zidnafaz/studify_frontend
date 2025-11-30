@@ -9,61 +9,64 @@ void main() {
   });
 
   group('PersonalScheduleService - Get Personal Schedules', () {
-    test('getPersonalSchedules should return list of schedules on success', () async {
-      // Arrange
-      final mockResponse = {
-        'data': [
-          {
-            'id': 1,
-            'user_id': 1,
-            'title': 'Meeting with Team',
-            'start_time': '2024-01-01T09:00:00.000000Z',
-            'end_time': '2024-01-01T10:30:00.000000Z',
-            'location': 'Office Room A',
-            'description': 'Team discussion',
-            'color': '#5CD9C1',
-            'created_at': '2024-01-01T00:00:00.000000Z',
-            'updated_at': '2024-01-01T00:00:00.000000Z',
-          },
-          {
-            'id': 2,
-            'user_id': 1,
-            'title': 'Personal Task',
-            'start_time': '2024-01-01T11:00:00.000000Z',
-            'end_time': '2024-01-01T12:00:00.000000Z',
-            'location': null,
-            'description': null,
-            'color': '#B085CC',
-            'created_at': '2024-01-01T00:00:00.000000Z',
-            'updated_at': '2024-01-01T00:00:00.000000Z',
-          },
-        ]
-      };
+    test(
+      'getPersonalSchedules should return list of schedules on success',
+      () async {
+        // Arrange
+        final mockResponse = {
+          'data': [
+            {
+              'id': 1,
+              'user_id': 1,
+              'title': 'Meeting with Team',
+              'start_time': '2024-01-01T09:00:00.000000Z',
+              'end_time': '2024-01-01T10:30:00.000000Z',
+              'location': 'Office Room A',
+              'description': 'Team discussion',
+              'color': '#5CD9C1',
+              'created_at': '2024-01-01T00:00:00.000000Z',
+              'updated_at': '2024-01-01T00:00:00.000000Z',
+            },
+            {
+              'id': 2,
+              'user_id': 1,
+              'title': 'Personal Task',
+              'start_time': '2024-01-01T11:00:00.000000Z',
+              'end_time': '2024-01-01T12:00:00.000000Z',
+              'location': null,
+              'description': null,
+              'color': '#B085CC',
+              'created_at': '2024-01-01T00:00:00.000000Z',
+              'updated_at': '2024-01-01T00:00:00.000000Z',
+            },
+          ],
+        };
 
-      // Note: This test requires mocking http client which needs mockito
-      // For now, we'll test the model parsing
-      final schedules = (mockResponse['data'] as List)
-          .map((json) => PersonalSchedule.fromJson(json))
-          .toList();
+        // Note: This test requires mocking http client which needs mockito
+        // For now, we'll test the model parsing
+        final schedules = (mockResponse['data'] as List)
+            .map((json) => PersonalSchedule.fromJson(json))
+            .toList();
 
-      // Assert
-      expect(schedules.length, 2);
-      expect(schedules[0].title, 'Meeting with Team');
-      expect(schedules[0].location, 'Office Room A');
-      expect(schedules[1].title, 'Personal Task');
-      expect(schedules[1].location, isNull);
-    });
+        // Assert
+        expect(schedules.length, 2);
+        expect(schedules[0].title, 'Meeting with Team');
+        expect(schedules[0].location, 'Office Room A');
+        expect(schedules[1].title, 'Personal Task');
+        expect(schedules[1].location, isNull);
+      },
+    );
 
-    test('getPersonalSchedules should throw UnauthorizedException on 401', () async {
-      // This test demonstrates the expected behavior
-      // In actual implementation, you would mock the HTTP client
-      expect(
-        () async {
+    test(
+      'getPersonalSchedules should throw UnauthorizedException on 401',
+      () async {
+        // This test demonstrates the expected behavior
+        // In actual implementation, you would mock the HTTP client
+        expect(() async {
           throw UnauthorizedException(message: 'Unauthorized');
-        },
-        throwsA(isA<UnauthorizedException>()),
-      );
-    });
+        }, throwsA(isA<UnauthorizedException>()));
+      },
+    );
   });
 
   group('PersonalScheduleService - Get Personal Schedule', () {
@@ -93,13 +96,44 @@ void main() {
       expect(schedule.description, 'Team discussion');
     });
 
+    test('should parse personal schedule with reminders correctly', () {
+      // Arrange
+      final json = {
+        'id': 1,
+        'user_id': 1,
+        'title': 'Meeting with Team',
+        'start_time': '2024-01-01T09:00:00.000000Z',
+        'end_time': '2024-01-01T10:30:00.000000Z',
+        'location': 'Office Room A',
+        'description': 'Team discussion',
+        'color': '#5CD9C1',
+        'created_at': '2024-01-01T00:00:00.000000Z',
+        'updated_at': '2024-01-01T00:00:00.000000Z',
+        'reminders': [
+          {
+            'id': 1,
+            'remindable_type': 'personal_schedule',
+            'remindable_id': 1,
+            'minutes_before_start': 15,
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+        ],
+      };
+
+      // Act
+      final schedule = PersonalSchedule.fromJson(json);
+
+      // Assert
+      expect(schedule.reminders, hasLength(1));
+      expect(schedule.reminders![0].minutesBeforeStart, 15);
+    });
+
     test('should throw NotFoundException on 404', () {
-      expect(
-        () async {
-          throw NotFoundException(message: 'Personal schedule not found');
-        },
-        throwsA(isA<NotFoundException>()),
-      );
+      expect(() async {
+        throw NotFoundException(message: 'Personal schedule not found');
+      }, throwsA(isA<NotFoundException>()));
     });
   });
 
@@ -154,15 +188,14 @@ void main() {
     });
 
     test('should throw ValidationException on 422', () {
-      expect(
-        () async {
-          throw ValidationException(
-            message: 'Validation failed',
-            errors: {'title': ['Title is required']},
-          );
-        },
-        throwsA(isA<ValidationException>()),
-      );
+      expect(() async {
+        throw ValidationException(
+          message: 'Validation failed',
+          errors: {
+            'title': ['Title is required'],
+          },
+        );
+      }, throwsA(isA<ValidationException>()));
     });
   });
 
@@ -212,22 +245,16 @@ void main() {
     test('should handle delete operation', () {
       // This test demonstrates the expected behavior
       // In actual implementation, you would mock the HTTP client
-      expect(
-        () async {
-          // Simulate successful delete
-          return;
-        },
-        returnsNormally,
-      );
+      expect(() async {
+        // Simulate successful delete
+        return;
+      }, returnsNormally);
     });
 
     test('should throw NotFoundException when schedule not found', () {
-      expect(
-        () async {
-          throw NotFoundException(message: 'Personal schedule not found');
-        },
-        throwsA(isA<NotFoundException>()),
-      );
+      expect(() async {
+        throw NotFoundException(message: 'Personal schedule not found');
+      }, throwsA(isA<NotFoundException>()));
     });
   });
 
@@ -298,4 +325,3 @@ void main() {
     });
   });
 }
-

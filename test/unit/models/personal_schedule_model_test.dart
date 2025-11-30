@@ -117,7 +117,9 @@ void main() {
       ];
 
       // Act
-      final schedules = jsonList.map((json) => PersonalSchedule.fromJson(json)).toList();
+      final schedules = jsonList
+          .map((json) => PersonalSchedule.fromJson(json))
+          .toList();
 
       // Assert
       expect(schedules.length, 2);
@@ -263,6 +265,48 @@ void main() {
       expect(schedule.id, isA<int>());
       expect(schedule.userId, isA<int>());
     });
+    test('should create PersonalSchedule with reminders', () {
+      // Arrange
+      final json = {
+        'id': 1,
+        'user_id': 1,
+        'title': 'Meeting with Team',
+        'start_time': '2024-01-01T09:00:00.000000Z',
+        'end_time': '2024-01-01T10:30:00.000000Z',
+        'location': 'Office Room A',
+        'description': 'Team discussion',
+        'color': '#5CD9C1',
+        'created_at': '2024-01-01T00:00:00.000000Z',
+        'updated_at': '2024-01-01T00:00:00.000000Z',
+        'reminders': [
+          {
+            'id': 1,
+            'remindable_id': 1,
+            'remindable_type': 'personal_schedule',
+            'minutes_before_start': 15,
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+          {
+            'id': 2,
+            'remindable_id': 1,
+            'remindable_type': 'personal_schedule',
+            'minutes_before_start': 30,
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00.000000Z',
+            'updated_at': '2024-01-01T00:00:00.000000Z',
+          },
+        ],
+      };
+
+      // Act
+      final schedule = PersonalSchedule.fromJson(json);
+
+      // Assert
+      expect(schedule.reminders, hasLength(2));
+      expect(schedule.reminders![0].minutesBeforeStart, 15);
+      expect(schedule.reminders![1].minutesBeforeStart, 30);
+    });
   });
 }
-

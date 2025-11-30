@@ -38,6 +38,9 @@ class DioClient {
         onError: (error, handler) async {
           // Handle 401 Unauthorized - try to refresh token
           if (error.response?.statusCode == 401) {
+            print(
+              '🔒 401 Unauthorized intercepted for ${error.requestOptions.path}',
+            );
             // Skip refresh for auth endpoints (login, register, refresh)
             final path = error.requestOptions.path;
             if (path.contains('/api/auth/login') ||
@@ -70,6 +73,7 @@ class DioClient {
 
             // Start token refresh
             _isRefreshing = true;
+            print('🔄 Starting token refresh...');
             try {
               final authResponse = await _authService.refreshToken();
               final newToken = authResponse.accessToken;
@@ -113,11 +117,13 @@ class DioClient {
               }
               _pendingRequests.clear();
               _isRefreshing = false;
+              print('✅ Token refresh successful, retrying requests...');
 
               return handler.resolve(response);
             } catch (e) {
               // Refresh failed, clear auth and reject all pending requests
               _isRefreshing = false;
+              print('❌ Token refresh failed: $e');
               await _authService.clearAuthData();
               for (var pending in _pendingRequests) {
                 pending.completer.completeError(e);

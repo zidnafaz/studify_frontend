@@ -115,26 +115,6 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
     }
   }
 
-  Future<void> _addReminder() async {
-    final result = await showModalBottomSheet<ScheduleReminder>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const AddReminderSheet(),
-    );
-    if (result != null && !_reminders.contains(result)) {
-      setState(() {
-        _reminders.add(result);
-      });
-    }
-  }
-
-  void _removeReminder(ScheduleReminder reminder) {
-    setState(() {
-      _reminders.remove(reminder);
-    });
-  }
-
   Future<void> _selectColor() async {
     final result = await showModalBottomSheet<Color>(
       context: context,
@@ -187,6 +167,26 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
     }
   }
 
+  Future<void> _addReminder() async {
+    final result = await showModalBottomSheet<ScheduleReminder>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddReminderSheet(),
+    );
+    if (result != null && !_reminders.contains(result)) {
+      setState(() {
+        _reminders.add(result);
+      });
+    }
+  }
+
+  void _removeReminder(ScheduleReminder reminder) {
+    setState(() {
+      _reminders.remove(reminder);
+    });
+  }
+
   String _colorToHex(Color color) {
     return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
   }
@@ -231,6 +231,9 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
           'repeat_days': _repeat!.daysOfWeek,
           'repeat_count': _repeat!.repeatCount,
         },
+        // Add reminder data
+        if (_reminders.isNotEmpty)
+          'reminders': _reminders.map((r) => r.minutesBefore).toList(),
       };
 
       await widget.onSave(data);
@@ -257,7 +260,6 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -466,10 +468,64 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Reminder Section
+                  // Reminders Section
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        'Pengingat',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ..._reminders.map(
+                        (reminder) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceVariant.withOpacity(
+                                0.3,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.outline.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.notifications_none,
+                                  size: 20,
+                                  color: colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  reminder.label,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  onPressed: () => _removeReminder(reminder),
+                                  icon: const Icon(Icons.close, size: 18),
+                                  color: colorScheme.error,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       InkWell(
                         onTap: _isLoading ? null : _addReminder,
                         borderRadius: BorderRadius.circular(12),
@@ -477,89 +533,33 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: colorScheme.onSurface.withOpacity(0.3),
+                              color: colorScheme.onSurfaceVariant.withOpacity(
+                                0.3,
+                              ),
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.notifications,
-                                color: colorScheme.onSurface.withOpacity(0.6),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                _reminders.isEmpty
-                                    ? 'Tambah Pengingat'
-                                    : 'Pengingat (${_reminders.length})',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              const Spacer(),
                               Icon(
                                 Icons.add,
                                 color: colorScheme.primary,
                                 size: 20,
                               ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Tambah Pengingat',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      if (_reminders.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? colorScheme.surfaceVariant.withOpacity(0.3)
-                                : colorScheme.background,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: _reminders.map((reminder) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 16,
-                                      color: colorScheme.onSurface.withOpacity(
-                                        0.6,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      reminder.displayText,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: colorScheme.onSurface,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.close,
-                                        size: 18,
-                                        color: colorScheme.error,
-                                      ),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      onPressed: () =>
-                                          _removeReminder(reminder),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -589,7 +589,7 @@ class _UserSelectionDialog extends StatelessWidget {
 
   const _UserSelectionDialog({
     required this.users,
-    required this.selectedUser,
+    this.selectedUser,
     required this.title,
   });
 

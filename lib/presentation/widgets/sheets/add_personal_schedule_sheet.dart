@@ -4,6 +4,10 @@ import 'package:intl/intl.dart';
 import '../classroom/schedule_text_field.dart';
 import '../classroom/time_range_selector.dart';
 import 'color_picker_sheet.dart';
+import 'add_reminder_sheet.dart';
+import 'repeat_selection_sheet.dart';
+import '../../../data/models/schedule_reminder_model.dart';
+import '../../../data/models/schedule_repeat_model.dart';
 
 class AddPersonalScheduleSheet extends StatefulWidget {
   final Function(Map<String, dynamic>) onSave;
@@ -26,6 +30,8 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
   DateTime _selectedDate = DateTime.now();
   Color _selectedColor = const Color(0xFF5CD9C1); // scheduleGreen
   bool _isLoading = false;
+  List<ScheduleReminder> _reminders = [];
+  ScheduleRepeat? _repeat;
 
   @override
   void dispose() {
@@ -99,6 +105,40 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
     }
   }
 
+  Future<void> _selectRepeat() async {
+    final result = await showModalBottomSheet<ScheduleRepeat>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => RepeatSelectionSheet(initialRepeat: _repeat),
+    );
+    if (result != null) {
+      setState(() {
+        _repeat = result;
+      });
+    }
+  }
+
+  Future<void> _addReminder() async {
+    final result = await showModalBottomSheet<ScheduleReminder>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AddReminderSheet(),
+    );
+    if (result != null && !_reminders.contains(result)) {
+      setState(() {
+        _reminders.add(result);
+      });
+    }
+  }
+
+  void _removeReminder(ScheduleReminder reminder) {
+    setState(() {
+      _reminders.remove(reminder);
+    });
+  }
+
   String _colorToHex(Color color) {
     return '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
   }
@@ -138,6 +178,12 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
         if (_descriptionController.text.trim().isNotEmpty)
           'description': _descriptionController.text.trim(),
         'color': _colorToHex(_selectedColor),
+        if (_reminders.isNotEmpty)
+          'reminders': _reminders.map((r) => r.minutesBefore).toList(),
+        if (_repeat != null && _repeat!.daysOfWeek.isNotEmpty) ...{
+          'repeat_days': _repeat!.daysOfWeek,
+          'repeat_count': _repeat!.repeatCount,
+        },
       };
 
       await widget.onSave(data);
@@ -267,6 +313,19 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Repeat Field
+                  ScheduleTextField(
+                    controller: TextEditingController(
+                      text: _repeat?.displayText ?? 'Tidak berulang',
+                    ),
+                    hintText: 'Ulangi',
+                    prefixIcon: Icons.repeat,
+                    readOnly: true,
+                    onTap: _selectRepeat,
+                    enabled: !_isLoading,
+                  ),
+                  const SizedBox(height: 16),
+
                   // Location Field
                   ScheduleTextField(
                     controller: _locationController,
@@ -322,6 +381,102 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Reminders Section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Pengingat',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ..._reminders.map(
+                        (reminder) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceVariant.withOpacity(
+                                0.3,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.outline.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.notifications_none,
+                                  size: 20,
+                                  color: colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  reminder.label,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: colorScheme.onSurface,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  onPressed: () => _removeReminder(reminder),
+                                  icon: const Icon(Icons.close, size: 18),
+                                  color: colorScheme.error,
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _isLoading ? null : _addReminder,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: colorScheme.onSurfaceVariant.withOpacity(
+                                0.3,
+                              ),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: colorScheme.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Tambah Pengingat',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
 

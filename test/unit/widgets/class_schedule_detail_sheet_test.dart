@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:studify/core/constants/app_color.dart';
 import 'package:studify/data/models/class_schedule_model.dart';
 import 'package:studify/data/models/classroom_model.dart';
+import 'package:studify/data/models/reminder_model.dart';
 import 'package:studify/data/models/user_model.dart';
 import 'package:studify/presentation/widgets/sheets/class_schedule_detail_sheet.dart';
 import 'package:studify/providers/auth_provider.dart';
@@ -35,11 +36,7 @@ void main() {
   });
 
   setUp(() {
-    ownerUser = User(
-      id: 1,
-      name: 'Owner User',
-      email: 'owner@test.com',
-    );
+    ownerUser = User(id: 1, name: 'Owner User', email: 'owner@test.com');
 
     coordinatorUser = User(
       id: 2,
@@ -47,11 +44,7 @@ void main() {
       email: 'coordinator@test.com',
     );
 
-    regularUser = User(
-      id: 3,
-      name: 'Regular User',
-      email: 'regular@test.com',
-    );
+    regularUser = User(id: 3, name: 'Regular User', email: 'regular@test.com');
 
     testClassroom = Classroom(
       id: 1,
@@ -82,6 +75,13 @@ void main() {
 
   Widget createWidgetUnderTest(User currentUser) {
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColor.primary,
+          background: AppColor.backgroundPrimary,
+        ),
+        useMaterial3: true,
+      ),
       home: Scaffold(
         body: ChangeNotifierProvider<AuthProvider>(
           create: (_) {
@@ -99,25 +99,33 @@ void main() {
   }
 
   group('ClassScheduleDetailSheet Widget Tests', () {
-    testWidgets('displays schedule title correctly', (WidgetTester tester) async {
+    testWidgets('displays schedule title correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('Pemrograman Web'), findsOneWidget);
     });
 
-    testWidgets('displays schedule time correctly', (WidgetTester tester) async {
+    testWidgets('displays schedule time correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('08:00 - 10:00'), findsOneWidget);
     });
 
-    testWidgets('displays schedule date correctly', (WidgetTester tester) async {
+    testWidgets('displays schedule date correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('20 Nov 2025'), findsOneWidget);
     });
 
-    testWidgets('displays lecturer name correctly', (WidgetTester tester) async {
+    testWidgets('displays lecturer name correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('Dr. John Doe'), findsOneWidget);
@@ -129,7 +137,9 @@ void main() {
       expect(find.text('Ruang 301'), findsOneWidget);
     });
 
-    testWidgets('displays description when available', (WidgetTester tester) async {
+    testWidgets('displays description when available', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('Description'), findsOneWidget);
@@ -142,20 +152,24 @@ void main() {
       expect(find.text('Edit'), findsOneWidget);
     });
 
-    testWidgets('shows Edit button for coordinator 1', (WidgetTester tester) async {
+    testWidgets('shows Edit button for coordinator 1', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(coordinatorUser));
 
       expect(find.text('Edit'), findsOneWidget);
     });
 
-    testWidgets('hides Edit button for regular member', (WidgetTester tester) async {
+    testWidgets('hides Edit button for regular member', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       expect(find.text('Edit'), findsNothing);
     });
 
     testWidgets('displays Add Reminder button', (WidgetTester tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(regularUser));
+      await tester.pumpWidget(createWidgetUnderTest(ownerUser));
 
       expect(find.text('Add Reminder'), findsOneWidget);
       expect(find.widgetWithIcon(InkWell, Icons.add), findsWidgets);
@@ -186,8 +200,9 @@ void main() {
       expect(handleBar, findsWidgets);
     });
 
-    testWidgets('schedule without description hides Description section',
-        (WidgetTester tester) async {
+    testWidgets('schedule without description hides Description section', (
+      WidgetTester tester,
+    ) async {
       final scheduleWithoutDescription = ClassSchedule(
         id: 1,
         classroomId: 1,
@@ -220,7 +235,9 @@ void main() {
       expect(find.text('Description'), findsNothing);
     });
 
-    testWidgets('displays color box with correct color', (WidgetTester tester) async {
+    testWidgets('displays color box with correct color', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       // Find the color box container
@@ -237,7 +254,9 @@ void main() {
       expect(colorBox, isNotNull);
     });
 
-    testWidgets('tapping Edit button pops the sheet', (WidgetTester tester) async {
+    testWidgets('tapping Edit button pops the sheet', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(ownerUser));
 
       final editButton = find.text('Edit');
@@ -257,12 +276,16 @@ void main() {
       expect(find.text('Edit'), findsOneWidget);
     });
 
-    testWidgets('coordinator 1 can see edit button', (WidgetTester tester) async {
+    testWidgets('coordinator 1 can see edit button', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(coordinatorUser));
       expect(find.text('Edit'), findsOneWidget);
     });
 
-    testWidgets('coordinator 2 can see edit button', (WidgetTester tester) async {
+    testWidgets('coordinator 2 can see edit button', (
+      WidgetTester tester,
+    ) async {
       final coordinator2User = User(
         id: 4,
         name: 'Coordinator 2',
@@ -303,31 +326,90 @@ void main() {
       expect(find.text('Edit'), findsOneWidget);
     });
 
-    testWidgets('regular member cannot see edit button',
-        (WidgetTester tester) async {
+    testWidgets('regular member cannot see edit button', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
       expect(find.text('Edit'), findsNothing);
     });
   });
 
   group('ClassScheduleDetailSheet Reminder Tests', () {
-    testWidgets('Add Reminder button is always visible',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(createWidgetUnderTest(regularUser));
+    testWidgets('Add Reminder button is visible for owner', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(ownerUser));
+      await tester.pumpAndSettle();
 
       expect(find.text('Add Reminder'), findsOneWidget);
     });
 
-    testWidgets('Add Reminder button has correct icon',
-        (WidgetTester tester) async {
+    testWidgets('Add Reminder button is hidden for regular user', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
-      final addButton = find.ancestor(
-        of: find.text('Add Reminder'),
-        matching: find.byType(InkWell),
+      expect(find.text('Add Reminder'), findsNothing);
+    });
+
+    testWidgets('Add Reminder button has correct icon', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(createWidgetUnderTest(ownerUser));
+
+      final iconFinder = find.descendant(
+        of: find.ancestor(
+          of: find.text('Add Reminder'),
+          matching: find.byType(InkWell),
+        ),
+        matching: find.byIcon(Icons.add),
       );
 
-      expect(addButton, findsOneWidget);
+      expect(iconFinder, findsOneWidget);
+    });
+
+    testWidgets('displays existing reminders', (WidgetTester tester) async {
+      final scheduleWithReminders = ClassSchedule(
+        id: 1,
+        classroomId: 1,
+        title: 'Test Schedule',
+        startTime: DateTime(2025, 11, 20, 8, 0),
+        endTime: DateTime(2025, 11, 20, 10, 0),
+        color: '#5CD9C1',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        reminders: [
+          Reminder(
+            id: 1,
+            remindableType: 'class_schedule',
+            remindableId: 1,
+            minutesBeforeStart: 15,
+            status: 'pending',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ChangeNotifierProvider<AuthProvider>(
+              create: (_) {
+                final authProvider = MockAuthProvider();
+                authProvider.setMockUser(regularUser);
+                return authProvider;
+              },
+              child: ClassScheduleDetailSheet(
+                schedule: scheduleWithReminders,
+                classroom: testClassroom,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('15 Menit Sebelumnya'), findsOneWidget);
     });
   });
 
@@ -336,13 +418,15 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       final container = tester.widget<Container>(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).color ==
-                  AppColor.backgroundPrimary,
-        ).first,
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is Container &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).color ==
+                      AppColor.backgroundPrimary,
+            )
+            .first,
       );
 
       expect(container, isNotNull);
@@ -352,13 +436,15 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(regularUser));
 
       final container = tester.widget<Container>(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.decoration is BoxDecoration &&
-              (widget.decoration as BoxDecoration).borderRadius ==
-                  const BorderRadius.vertical(top: Radius.circular(24)),
-        ).first,
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget is Container &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).borderRadius ==
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+            )
+            .first,
       );
 
       expect(container, isNotNull);
