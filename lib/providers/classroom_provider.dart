@@ -118,11 +118,17 @@ class ClassroomProvider with ChangeNotifier {
   Future<void> fetchClassSchedules(
     int classroomId, {
     bool notify = true,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     // If notify == false, we manage loading/error without notify; otherwise use wrapper
     if (!notify) {
       try {
-        final result = await _classroomService.getClassSchedules(classroomId);
+        final result = await _classroomService.getClassSchedules(
+          classroomId,
+          startDate: startDate,
+          endDate: endDate,
+        );
         _schedules = result;
       } on ApiException catch (e) {
         _errorMessage = e.message;
@@ -135,7 +141,11 @@ class ClassroomProvider with ChangeNotifier {
     }
 
     await _withLoading(() async {
-      final result = await _classroomService.getClassSchedules(classroomId);
+      final result = await _classroomService.getClassSchedules(
+        classroomId,
+        startDate: startDate,
+        endDate: endDate,
+      );
       _schedules = result;
       return result;
     });

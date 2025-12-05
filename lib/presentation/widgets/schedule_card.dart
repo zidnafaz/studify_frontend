@@ -10,8 +10,9 @@ class ScheduleCard extends StatelessWidget {
 
   String _formatTime(DateTime time) {
     // Format time to HH:MM
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
+    final localTime = time.toLocal();
+    final hour = localTime.hour.toString().padLeft(2, '0');
+    final minute = localTime.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
 

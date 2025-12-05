@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data/models/classroom_model.dart';
@@ -7,6 +8,7 @@ import '../../../data/models/user_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/classroom_provider.dart';
 import '../../widgets/sheets/member_detail_sheet.dart';
+import '../../../core/constants/api_constants.dart';
 
 class ClassroomInfoScreen extends StatefulWidget {
   final Classroom classroom;
@@ -57,6 +59,15 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
         content: Text('Copied to clipboard'),
         duration: Duration(seconds: 2),
       ),
+    );
+  }
+
+  Future<void> _shareClassroom(BuildContext context, String code) async {
+    final String shareUrl = ApiConstants.invite(code);
+
+    await Share.share(
+      'Join my classroom on Studify!\n\nUse code: $code\n\nOr click this link:\n$shareUrl',
+      subject: 'Join my Classroom',
     );
   }
 
@@ -421,6 +432,12 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                                 _copyToClipboard(context, classroom.uniqueCode),
                             icon: Icon(Icons.copy, color: colorScheme.primary),
                             tooltip: 'Copy code',
+                          ),
+                          IconButton(
+                            onPressed: () =>
+                                _shareClassroom(context, classroom.uniqueCode),
+                            icon: Icon(Icons.share, color: colorScheme.primary),
+                            tooltip: 'Share classroom',
                           ),
                         ],
                       ),

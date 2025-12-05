@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import '../../../providers/classroom_provider.dart';
 
 class JoinClassroomScreen extends StatefulWidget {
-  const JoinClassroomScreen({super.key});
+  final String? initialCode;
+  const JoinClassroomScreen({super.key, this.initialCode});
 
   @override
   State<JoinClassroomScreen> createState() => _JoinClassroomScreenState();
@@ -11,8 +12,14 @@ class JoinClassroomScreen extends StatefulWidget {
 
 class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _codeController = TextEditingController();
+  late final TextEditingController _codeController;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _codeController = TextEditingController(text: widget.initialCode);
+  }
 
   @override
   void dispose() {
@@ -82,7 +89,10 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                     top: 0,
                     bottom: 0,
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: colorScheme.onPrimary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),

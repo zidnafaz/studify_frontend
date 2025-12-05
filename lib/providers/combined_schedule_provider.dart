@@ -4,7 +4,8 @@ import '../data/services/combined_schedule_service.dart';
 import '../core/errors/api_exception.dart';
 
 class CombinedScheduleProvider with ChangeNotifier {
-  final CombinedScheduleService _combinedScheduleService = CombinedScheduleService();
+  final CombinedScheduleService _combinedScheduleService =
+      CombinedScheduleService();
 
   List<CombinedSchedule> _schedules = [];
   List<ScheduleSource> _availableSources = [];
@@ -14,7 +15,8 @@ class CombinedScheduleProvider with ChangeNotifier {
 
   // public getters
   List<CombinedSchedule> get schedules => List.unmodifiable(_schedules);
-  List<ScheduleSource> get availableSources => List.unmodifiable(_availableSources);
+  List<ScheduleSource> get availableSources =>
+      List.unmodifiable(_availableSources);
   String? get currentFilter => _currentFilter;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -63,9 +65,17 @@ class CombinedScheduleProvider with ChangeNotifier {
 
   /// Get combined schedules with optional source filter
   /// [source] can be: null (all), 'personal', or 'classroom:{id}'
-  Future<void> fetchCombinedSchedules({String? source}) async {
+  Future<void> fetchCombinedSchedules({
+    String? source,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
     await _withLoading(() async {
-      final response = await _combinedScheduleService.getCombinedSchedules(source: source);
+      final response = await _combinedScheduleService.getCombinedSchedules(
+        source: source,
+        startDate: startDate,
+        endDate: endDate,
+      );
       _schedules = response.data;
       _availableSources = response.meta.availableSources;
       _currentFilter = response.meta.currentFilter;
@@ -74,8 +84,12 @@ class CombinedScheduleProvider with ChangeNotifier {
   }
 
   /// Refresh schedules with current filter
-  Future<void> refresh() async {
-    await fetchCombinedSchedules(source: _currentFilter);
+  Future<void> refresh({DateTime? startDate, DateTime? endDate}) async {
+    await fetchCombinedSchedules(
+      source: _currentFilter,
+      startDate: startDate,
+      endDate: endDate,
+    );
   }
 
   /// Clear all data

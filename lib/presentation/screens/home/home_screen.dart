@@ -12,6 +12,9 @@ import '../auth/profile_screen.dart';
 import '../../widgets/schedule_calendar.dart';
 import '../../widgets/sheets/add_personal_schedule_sheet.dart';
 import '../../widgets/sheets/combined_schedule_detail_sheet.dart';
+import '../../../data/services/device_token_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../../providers/notification_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -109,6 +112,9 @@ class _HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<_HomeTab> {
   String? _selectedSourceId; // 'all', 'personal', or 'classroom:{id}'
+  String _selectedDateFilter = 'all'; // '1d', '3d', '7d', '1m', 'custom', 'all'
+  DateTime? _customStartDate;
+  DateTime? _customEndDate;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _showAllSchedules = true;
@@ -123,10 +129,61 @@ class _HomeTabState extends State<_HomeTab> {
     // Fetch data on init
     Future.microtask(() {
       Provider.of<ClassroomProvider>(context, listen: false).fetchClassrooms();
-      Provider.of<CombinedScheduleProvider>(
+      _fetchSchedules();
+
+      // Sync device token for notifications
+      context.read<DeviceTokenService>().syncDeviceToken();
+
+      // Fetch notifications
+      Provider.of<NotificationProvider>(
         context,
         listen: false,
-      ).fetchCombinedSchedules(source: _selectedSourceId);
+      ).fetchNotifications();
+    });
+
+    // Listen for foreground messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  message.notification!.title ?? 'Notification',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message.notification!.body ?? '',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+              ],
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Theme.of(context).colorScheme.onSurface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+            action: SnackBarAction(
+              label: 'Dismiss',
+              textColor: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.secondary,
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
+            ),
+          ),
+        );
+      }
     });
   }
 
@@ -139,18 +196,28 @@ class _HomeTabState extends State<_HomeTab> {
     final tomorrow = today.add(const Duration(days: 1));
 
     for (var schedule in schedules) {
+      final localStartTime = schedule.startTime.toLocal();
       final scheduleDate = DateTime(
-        schedule.startTime.year,
-        schedule.startTime.month,
-        schedule.startTime.day,
+        localStartTime.year,
+        localStartTime.month,
+        localStartTime.day,
       );
 
-      if (_showAllSchedules && scheduleDate.isBefore(today)) {
-        continue;
-      }
+      // if (_showAllSchedules && scheduleDate.isBefore(today)) {
+      //   continue;
+      // }
 
-      if (!_showAllSchedules && !isSameDay(scheduleDate, _selectedDay)) {
-        continue;
+      // If filter is 'all', only show schedules from selected day onwards in the list
+      // The calendar will still show all events because it uses the raw list
+      if (_selectedDateFilter == 'all' && _selectedDay != null) {
+        final selectedDate = DateTime(
+          _selectedDay!.year,
+          _selectedDay!.month,
+          _selectedDay!.day,
+        );
+        if (scheduleDate.isBefore(selectedDate)) {
+          continue;
+        }
       }
 
       String dateKey;
@@ -183,10 +250,11 @@ class _HomeTabState extends State<_HomeTab> {
     final Map<DateTime, List<ScheduleEvent>> events = {};
 
     for (var schedule in schedules) {
+      final localStartTime = schedule.startTime.toLocal();
       final date = DateTime(
-        schedule.startTime.year,
-        schedule.startTime.month,
-        schedule.startTime.day,
+        localStartTime.year,
+        localStartTime.month,
+        localStartTime.day,
       );
 
       if (!events.containsKey(date)) {
@@ -242,40 +310,43 @@ class _HomeTabState extends State<_HomeTab> {
 
     if (groupedSchedules.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_busy,
-              size: 64,
-              color: colorScheme.onSurface.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _showAllSchedules
-                  ? 'No upcoming schedules'
-                  : 'No schedule on this date',
-              style: TextStyle(
-                color: colorScheme.onSurface.withOpacity(0.7),
-                fontSize: 14,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.event_busy,
+                size: 64,
+                color: colorScheme.onSurface.withOpacity(0.5),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                _showAllSchedules
+                    ? 'No upcoming schedules'
+                    : 'No schedule on this date',
+                style: TextStyle(
+                  color: colorScheme.onSurface.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsets.only(bottom: 20),
       itemCount: groupedSchedules.length,
       itemBuilder: (context, groupIndex) {
         final dateKey = groupedSchedules.keys.elementAt(groupIndex);
         final schedulesForDate = groupedSchedules[dateKey]!;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_showAllSchedules) ...[
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Container(
                 margin: EdgeInsets.only(
                   bottom: 12,
@@ -308,26 +379,26 @@ class _HomeTabState extends State<_HomeTab> {
                   ],
                 ),
               ),
-            ],
 
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0,
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: groupIndex < groupedSchedules.length - 1 ? 8 : 0,
+                ),
+                child: _CombinedScheduleCard(
+                  schedules: schedulesForDate,
+                  onScheduleTap: (schedule) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) =>
+                          CombinedScheduleDetailSheet(schedule: schedule),
+                    );
+                  },
+                ),
               ),
-              child: _CombinedScheduleCard(
-                schedules: schedulesForDate,
-                onScheduleTap: (schedule) {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) =>
-                        CombinedScheduleDetailSheet(schedule: schedule),
-                  );
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -370,6 +441,112 @@ class _HomeTabState extends State<_HomeTab> {
     );
   }
 
+  void _fetchSchedules({DateTime? startDate, DateTime? endDate}) {
+    // If dates not provided, calculate based on current filter state
+    if (startDate == null && endDate == null) {
+      final baseDate = _selectedDay ?? DateTime.now();
+      final start = DateTime(baseDate.year, baseDate.month, baseDate.day);
+
+      if (_selectedDateFilter == 'custom') {
+        startDate = _customStartDate;
+        endDate = _customEndDate;
+      } else {
+        startDate = start;
+        switch (_selectedDateFilter) {
+          case '1d':
+            endDate = startDate;
+            break;
+          case '3d':
+            endDate = startDate!.add(const Duration(days: 2));
+            break;
+          case '7d':
+            endDate = startDate!.add(const Duration(days: 6));
+            break;
+          case '1m':
+            endDate = startDate!.add(const Duration(days: 30));
+            break;
+          case 'all':
+            startDate = null;
+            endDate = null;
+            break;
+        }
+      }
+    }
+
+    Provider.of<CombinedScheduleProvider>(
+      context,
+      listen: false,
+    ).fetchCombinedSchedules(
+      source: _selectedSourceId == 'all' ? null : _selectedSourceId,
+      startDate: startDate,
+      endDate: endDate,
+    );
+  }
+
+  void _handleDateFilterChange(String filter) async {
+    DateTime? startDate;
+    DateTime? endDate;
+    final baseDate = _selectedDay ?? DateTime.now();
+
+    if (filter == 'custom') {
+      final picked = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(baseDate.year - 1),
+        lastDate: DateTime(baseDate.year + 1),
+        initialDateRange: _customStartDate != null && _customEndDate != null
+            ? DateTimeRange(start: _customStartDate!, end: _customEndDate!)
+            : null,
+      );
+
+      if (picked != null) {
+        startDate = picked.start;
+        endDate = picked.end;
+        setState(() {
+          _selectedDateFilter = filter;
+          _customStartDate = startDate;
+          _customEndDate = endDate;
+          _showAllSchedules = false;
+        });
+      } else {
+        return; // Cancelled
+      }
+    } else {
+      setState(() {
+        _selectedDateFilter = filter;
+        _customStartDate = null;
+        _customEndDate = null;
+        _showAllSchedules = filter == 'all';
+      });
+
+      startDate = DateTime(baseDate.year, baseDate.month, baseDate.day);
+
+      switch (filter) {
+        case '1d':
+          endDate = startDate;
+          break;
+        case '3d':
+          endDate = startDate.add(const Duration(days: 2));
+          break;
+        case '7d':
+          endDate = startDate.add(const Duration(days: 6));
+          break;
+        case '1m':
+          endDate = startDate.add(const Duration(days: 30));
+          break;
+        case 'all':
+          startDate = null;
+          endDate = null;
+          break;
+        default:
+          startDate = null;
+          endDate = null;
+          break;
+      }
+    }
+
+    _fetchSchedules(startDate: startDate, endDate: endDate);
+  }
+
   void _handleFilterChange(String? sourceId) {
     if (sourceId == null) return;
 
@@ -377,11 +554,7 @@ class _HomeTabState extends State<_HomeTab> {
       _selectedSourceId = sourceId;
     });
 
-    // Fetch schedules with new filter
-    Provider.of<CombinedScheduleProvider>(
-      context,
-      listen: false,
-    ).fetchCombinedSchedules(source: sourceId == 'all' ? null : sourceId);
+    _fetchSchedules();
   }
 
   @override
@@ -415,6 +588,41 @@ class _HomeTabState extends State<_HomeTab> {
                         ),
                       ),
                       const Spacer(),
+                      // Notification Icon
+                      Consumer<NotificationProvider>(
+                        builder: (context, provider, child) {
+                          return IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/notifications');
+                            },
+                            icon: Stack(
+                              children: [
+                                Icon(
+                                  Icons.notifications_outlined,
+                                  color: colorScheme.onPrimary,
+                                ),
+                                if (provider.unreadCount > 0)
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 8,
+                                        minHeight: 8,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 8),
                       Consumer<CombinedScheduleProvider>(
                         builder: (context, combinedProvider, child) {
                           final sources = combinedProvider.availableSources;
@@ -505,6 +713,7 @@ class _HomeTabState extends State<_HomeTab> {
                     _focusedDay = focusedDay;
                     _showAllSchedules = false;
                   });
+                  _fetchSchedules(); // Trigger fetch when day changes
                 },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
@@ -524,31 +733,78 @@ class _HomeTabState extends State<_HomeTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _getScheduleHeaderText(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
+                    Expanded(
+                      child: Text(
+                        _getScheduleHeaderText(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (!_showAllSchedules)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _showAllSchedules = true;
-                            _selectedDay = DateTime.now();
-                          });
-                        },
-                        child: Text(
-                          'View All',
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                    Row(
+                      children: [
+                        // Filter Dropdown
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceVariant.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButton<String>(
+                            value: _selectedDateFilter,
+                            isDense: true,
+                            underline: const SizedBox(),
+                            icon: Icon(
+                              Icons.filter_list,
+                              size: 16,
+                              color: colorScheme.primary,
+                            ),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: colorScheme.primary,
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: '1d',
+                                child: Text('1 Day'),
+                              ),
+                              DropdownMenuItem(
+                                value: '3d',
+                                child: Text('3 Days'),
+                              ),
+                              DropdownMenuItem(
+                                value: '7d',
+                                child: Text('7 Days'),
+                              ),
+                              DropdownMenuItem(
+                                value: '1m',
+                                child: Text('1 Month'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'custom',
+                                child: Text('Custom'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'all',
+                                child: Text('All'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                _handleDateFilterChange(value);
+                              }
+                            },
                           ),
                         ),
-                      ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -588,8 +844,9 @@ class _CombinedScheduleCard extends StatelessWidget {
   const _CombinedScheduleCard({required this.schedules, this.onScheduleTap});
 
   String _formatTime(DateTime time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
+    final localTime = time.toLocal();
+    final hour = localTime.hour.toString().padLeft(2, '0');
+    final minute = localTime.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
 

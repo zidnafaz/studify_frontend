@@ -256,11 +256,11 @@ class _PersonalScheduleDetailSheetState
   }
 
   String _formatTime(DateTime time) {
-    return DateFormat('HH:mm').format(time);
+    return DateFormat('HH:mm').format(time.toLocal());
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('d MMM yyyy').format(date);
+    return DateFormat('d MMM yyyy').format(date.toLocal());
   }
 
   Widget _buildReminderSection() {
