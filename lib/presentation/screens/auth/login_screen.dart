@@ -155,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 24),const SizedBox(height: 24),
 
                   // Login Button
                   Consumer<AuthProvider>(

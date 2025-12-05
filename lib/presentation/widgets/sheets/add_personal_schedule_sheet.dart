@@ -161,13 +161,18 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
         _startTime.minute,
       );
 
-      final endDateTime = DateTime(
+      var endDateTime = DateTime(
         _selectedDate.year,
         _selectedDate.month,
         _selectedDate.day,
         _endTime.hour,
         _endTime.minute,
       );
+
+      // If end time is before start time, assume it's the next day
+      if (endDateTime.isBefore(startDateTime)) {
+        endDateTime = endDateTime.add(const Duration(days: 1));
+      }
 
       final data = {
         'title': _titleController.text.trim(),
