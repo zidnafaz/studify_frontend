@@ -10,21 +10,48 @@ import 'providers/classroom_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/personal_schedule_provider.dart';
 import 'providers/combined_schedule_provider.dart';
+import 'providers/notification_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
 import 'presentation/screens/auth/splash_screen.dart';
 import 'presentation/screens/home/home_screen.dart';
+import 'presentation/screens/notification/notification_screen.dart';
 import 'core/constants/app_theme.dart';
+import 'data/services/device_token_service.dart';
+import 'core/services/deep_link_service.dart';
+
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);
+
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase initialization failed: $e');
+  }
+
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    DeepLinkService().init(MyApp.navigatorKey);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +62,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
         ChangeNotifierProvider(create: (_) => PersonalScheduleProvider()),
         ChangeNotifierProvider(create: (_) => CombinedScheduleProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        Provider(create: (_) => DeviceTokenService()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           return MaterialApp(
+            navigatorKey: MyApp.navigatorKey,
             title: 'Studify',
             debugShowCheckedModeBanner: false,
             themeMode: themeProvider.themeMode,
@@ -50,6 +80,7 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
               '/home': (context) => const HomeScreen(),
+              '/notifications': (context) => const NotificationScreen(),
 
               // Classroom
               '/classroomList': (context) => const ClassroomScreen(),
