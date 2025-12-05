@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "941139273666",
+    "project_id": "studify-70054",
+    "storage_bucket": "studify-70054.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941139273666:android:24796548a21721a623985b",
+        "android_client_info": {
+          "package_name": "com.example.studify_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp8jeEQsg4Izntif6eyfGM0lSBhG5sjis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
