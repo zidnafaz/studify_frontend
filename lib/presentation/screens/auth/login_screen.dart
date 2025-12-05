@@ -156,25 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
 
-                  // Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // TODO: Implement forgot password
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: colorScheme.secondary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
                   // Login Button
                   Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {

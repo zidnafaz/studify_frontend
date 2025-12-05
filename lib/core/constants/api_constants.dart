@@ -9,7 +9,10 @@ class ApiConstants {
   // static const String baseUrl = 'http://127.0.0.1:8000'; // iOS/Web
 
   // RENDER (Latest deployment) - dev branch:
-  static const String baseUrl = 'https://studify-backend-api-dev.onrender.com';
+  // static const String baseUrl = 'https://studify-backend-api-dev.onrender.com';
+
+  // Deploy On ArenHost
+  static const String baseUrl = 'https://zidnafaz.site';
 
   // Auth Endpoints
   static const String register = '$baseUrl/api/users';
