@@ -10,25 +10,13 @@ class CombinedScheduleService {
   /// - null or 'all': Get all schedules
   /// - 'personal': Get only personal schedules
   /// - 'classroom:{id}': Get only schedules from specific classroom
-  Future<CombinedScheduleResponse> getCombinedSchedules({
-    String? source,
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
+  Future<CombinedScheduleResponse> getCombinedSchedules({String? source}) async {
     try {
-      print(
-        '🔵 Get combined schedules request${source != null ? " (source: $source)" : ""}',
-      );
-
+      print('🔵 Get combined schedules request${source != null ? " (source: $source)" : ""}');
+      
       final queryParams = <String, dynamic>{};
       if (source != null && source != 'all') {
         queryParams['source'] = source;
-      }
-      if (startDate != null) {
-        queryParams['start_date'] = startDate.toIso8601String().split('T')[0];
-      }
-      if (endDate != null) {
-        queryParams['end_date'] = endDate.toIso8601String().split('T')[0];
       }
 
       final response = await _dioClient.get(
@@ -54,3 +42,4 @@ class CombinedScheduleService {
     }
   }
 }
+

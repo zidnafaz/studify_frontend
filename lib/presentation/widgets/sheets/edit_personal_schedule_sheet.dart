@@ -50,15 +50,12 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
     );
 
     // Initialize time and date from schedule
-    final localStartTime = widget.schedule.startTime.toLocal();
-    final localEndTime = widget.schedule.endTime.toLocal();
-
-    _startTime = TimeOfDay.fromDateTime(localStartTime);
-    _endTime = TimeOfDay.fromDateTime(localEndTime);
+    _startTime = TimeOfDay.fromDateTime(widget.schedule.startTime);
+    _endTime = TimeOfDay.fromDateTime(widget.schedule.endTime);
     _selectedDate = DateTime(
-      localStartTime.year,
-      localStartTime.month,
-      localStartTime.day,
+      widget.schedule.startTime.year,
+      widget.schedule.startTime.month,
+      widget.schedule.startTime.day,
     );
 
     // Initialize color from schedule

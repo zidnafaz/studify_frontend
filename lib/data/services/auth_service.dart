@@ -32,12 +32,15 @@ class AuthService {
   // ... (register, login, logout remain same)
 
   // Update Profile
-  Future<User> updateProfile({required String name}) async {
+  Future<User> updateProfile({
+    required String name,
+    required String email,
+  }) async {
     try {
       // Use DioClient to get interceptor support (auto-refresh)
       final response = await DioClient().post(
         '/api/auth/profile',
-        data: {'name': name},
+        data: {'name': name, 'email': email},
       );
 
       if (response.statusCode == 200) {

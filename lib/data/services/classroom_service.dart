@@ -121,25 +121,12 @@ class ClassroomService {
   }
 
   // Get class schedules for a classroom
-  Future<List<ClassSchedule>> getClassSchedules(
-    int classroomId, {
-    DateTime? startDate,
-    DateTime? endDate,
-  }) async {
+  Future<List<ClassSchedule>> getClassSchedules(int classroomId) async {
     try {
       print('🔵 Get schedules request for classroom: $classroomId');
 
-      final queryParams = <String, dynamic>{};
-      if (startDate != null) {
-        queryParams['start_date'] = startDate.toIso8601String().split('T')[0];
-      }
-      if (endDate != null) {
-        queryParams['end_date'] = endDate.toIso8601String().split('T')[0];
-      }
-
       final response = await _dioClient.get(
         '/api/classrooms/$classroomId/schedules',
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
 
       print('📡 Response status: ${response.statusCode}');
@@ -207,28 +194,6 @@ class ClassroomService {
 
       if (response.statusCode == 201) {
         final data = response.data['data'];
-
-        // Debug types
-        if (data is Map) {
-          print('🔍 Debugging types for ClassSchedule:');
-          data.forEach((key, value) {
-            print('Field: $key, Value: $value, Type: ${value.runtimeType}');
-            if (value is List) {
-              print('  List $key items:');
-              for (var item in value) {
-                print('    Item: $item, Type: ${item.runtimeType}');
-                if (item is Map) {
-                  item.forEach((k, v) {
-                    print(
-                      '      SubField: $k, Value: $v, Type: ${v.runtimeType}',
-                    );
-                  });
-                }
-              }
-            }
-          });
-        }
-
         if (data is List) {
           // If it's a list (repeating schedule), return the first one
           // The provider will refresh the list anyway

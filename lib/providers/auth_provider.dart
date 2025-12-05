@@ -173,10 +173,16 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Update Profile
-  Future<bool> updateProfile({required String name}) async {
+  Future<bool> updateProfile({
+    required String name,
+    required String email,
+  }) async {
     try {
       return await _withStatus(() async {
-        final updatedUser = await _authService.updateProfile(name: name);
+        final updatedUser = await _authService.updateProfile(
+          name: name,
+          email: email,
+        );
 
         _setUser(updatedUser);
         _setStatus(AuthStatus.authenticated);

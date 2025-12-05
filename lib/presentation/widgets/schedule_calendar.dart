@@ -96,56 +96,53 @@ class ScheduleCalendar extends StatelessWidget {
           if (onViewModeChanged != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.background,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: colorScheme.onSurface.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildViewModeButton(
-                            context,
-                            CalendarViewMode.full,
-                            Icons.calendar_view_week,
-                            'Full',
-                          ),
-                          Container(
-                            width: 1,
-                            height: 12,
-                            color: colorScheme.onSurface.withOpacity(0.1),
-                          ),
-                          _buildViewModeButton(
-                            context,
-                            CalendarViewMode.minimal,
-                            Icons.calendar_view_month,
-                            'Minimal',
-                          ),
-                          Container(
-                            width: 1,
-                            height: 12,
-                            color: colorScheme.onSurface.withOpacity(0.1),
-                          ),
-                          _buildViewModeButton(
-                            context,
-                            CalendarViewMode.compact,
-                            Icons.calendar_today,
-                            'Compact',
-                          ),
-                        ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.background,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colorScheme.onSurface.withOpacity(0.1),
+                        width: 1,
                       ),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildViewModeButton(
+                          context,
+                          CalendarViewMode.full,
+                          Icons.calendar_view_week,
+                          'Full',
+                        ),
+                        Container(
+                          width: 1,
+                          height: 12,
+                          color: colorScheme.onSurface.withOpacity(0.1),
+                        ),
+                        _buildViewModeButton(
+                          context,
+                          CalendarViewMode.minimal,
+                          Icons.calendar_view_month,
+                          'Minimal',
+                        ),
+                        Container(
+                          width: 1,
+                          height: 12,
+                          color: colorScheme.onSurface.withOpacity(0.1),
+                        ),
+                        _buildViewModeButton(
+                          context,
+                          CalendarViewMode.compact,
+                          Icons.calendar_today,
+                          'Compact',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           TableCalendar<ScheduleEvent>(

@@ -41,6 +41,7 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
       final authProvider = context.read<AuthProvider>();
       final success = await authProvider.updateProfile(
         name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
       );
 
       if (!mounted) return;
@@ -149,15 +150,13 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Email Field (Read Only)
+                  // Email Field
                   TextFormField(
                     controller: _emailController,
-                    readOnly: true,
-                    enabled: false,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       filled: true,
-                      fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                      fillColor: colorScheme.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -166,11 +165,21 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      disabledBorder: OutlineInputBorder(
+                      focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(color: colorScheme.primary),
                       ),
                     ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Email is required';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Enter a valid email';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 24),
 

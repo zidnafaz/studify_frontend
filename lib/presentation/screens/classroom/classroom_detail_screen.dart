@@ -28,9 +28,6 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
   bool _showAllSchedules =
       true; // Default: tampilkan semua jadwal dari hari ini ke depan
   CalendarViewMode _calendarViewMode = CalendarViewMode.full;
-  String _selectedDateFilter = 'all';
-  DateTime? _customStartDate;
-  DateTime? _customEndDate;
 
   @override
   void initState() {
@@ -39,111 +36,11 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
 
     // Fetch class schedules for this classroom
     Future.microtask(() {
-      _fetchSchedules();
+      Provider.of<ClassroomProvider>(
+        context,
+        listen: false,
+      ).fetchClassSchedules(widget.classroom.id);
     });
-  }
-
-  void _fetchSchedules({DateTime? startDate, DateTime? endDate}) {
-    // If dates not provided, calculate based on current filter state
-    if (startDate == null && endDate == null) {
-      final baseDate = _selectedDay ?? DateTime.now();
-      final start = DateTime(baseDate.year, baseDate.month, baseDate.day);
-
-      if (_selectedDateFilter == 'custom') {
-        startDate = _customStartDate;
-        endDate = _customEndDate;
-      } else {
-        startDate = start;
-        switch (_selectedDateFilter) {
-          case '1d':
-            endDate = startDate;
-            break;
-          case '3d':
-            endDate = startDate!.add(const Duration(days: 2));
-            break;
-          case '7d':
-            endDate = startDate!.add(const Duration(days: 6));
-            break;
-          case '1m':
-            endDate = startDate!.add(const Duration(days: 30));
-            break;
-          case 'all':
-            startDate = null;
-            endDate = null;
-            break;
-        }
-      }
-    }
-
-    Provider.of<ClassroomProvider>(context, listen: false).fetchClassSchedules(
-      widget.classroom.id,
-      startDate: startDate,
-      endDate: endDate,
-    );
-  }
-
-  void _handleDateFilterChange(String filter) async {
-    DateTime? startDate;
-    DateTime? endDate;
-    final baseDate = _selectedDay ?? DateTime.now();
-
-    if (filter == 'custom') {
-      final picked = await showDateRangePicker(
-        context: context,
-        firstDate: DateTime(baseDate.year - 1),
-        lastDate: DateTime(baseDate.year + 1),
-        initialDateRange: _customStartDate != null && _customEndDate != null
-            ? DateTimeRange(start: _customStartDate!, end: _customEndDate!)
-            : null,
-      );
-
-      if (picked != null) {
-        startDate = picked.start;
-        endDate = picked.end;
-        setState(() {
-          _selectedDateFilter = filter;
-          _customStartDate = startDate;
-          _customEndDate = endDate;
-          _showAllSchedules = false;
-        });
-      } else {
-        return; // Cancelled
-      }
-    } else {
-      setState(() {
-        _selectedDateFilter = filter;
-        _customStartDate = null;
-        _customEndDate = null;
-        _showAllSchedules = filter == 'all';
-      });
-
-      startDate = DateTime(baseDate.year, baseDate.month, baseDate.day);
-
-      switch (filter) {
-        case '1d':
-          endDate = startDate;
-          break;
-        case '3d':
-          endDate = startDate.add(const Duration(days: 2));
-          break;
-        case '7d':
-          endDate = startDate.add(const Duration(days: 6));
-          break;
-        case '1m':
-          endDate = startDate.add(const Duration(days: 30));
-          break;
-        case 'all':
-          startDate = null;
-          endDate = null;
-          break;
-        default:
-          startDate = null;
-          endDate = null;
-          break;
-      }
-    }
-
-    _fetchSchedules(startDate: startDate, endDate: endDate);
   }
 
   // Group schedules by date
@@ -163,23 +60,13 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
       );
 
       // Skip jadwal yang sudah lewat jika mode "show all"
-      // if (_showAllSchedules && scheduleDate.isBefore(today)) {
-      //   continue;
-      // }
+      if (_showAllSchedules && scheduleDate.isBefore(today)) {
+        continue;
+      }
 
       // Filter berdasarkan tanggal yang dipilih jika tidak show all
-      // Kita percayakan pada server-side filtering untuk range
-      // If filter is 'all', only show schedules from selected day onwards in the list
-      // The calendar will still show all events because it uses the raw list
-      if (_selectedDateFilter == 'all' && _selectedDay != null) {
-        final selectedDate = DateTime(
-          _selectedDay!.year,
-          _selectedDay!.month,
-          _selectedDay!.day,
-        );
-        if (scheduleDate.isBefore(selectedDate)) {
-          continue;
-        }
+      if (!_showAllSchedules && !isSameDay(scheduleDate, _selectedDay)) {
+        continue;
       }
 
       String dateKey;
@@ -308,32 +195,40 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 12, top: groupIndex > 0 ? 20 : 0),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: colorScheme.secondary.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    _getDateIcon(dateKey),
-                    size: 16,
-                    color: colorScheme.onSecondaryContainer,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    dateKey,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+            if (_showAllSchedules) ...[
+              Container(
+                margin: EdgeInsets.only(
+                  bottom: 12,
+                  top: groupIndex > 0 ? 20 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.secondary.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _getDateIcon(dateKey),
+                      size: 16,
                       color: colorScheme.onSecondaryContainer,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Text(
+                      dateKey,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSecondaryContainer,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
 
             Padding(
               padding: EdgeInsets.only(
@@ -582,7 +477,6 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                     _focusedDay = focusedDay;
                     _showAllSchedules = false; // Switch to selected date mode
                   });
-                  _fetchSchedules();
                 },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 events: calendarEvents,
@@ -610,67 +504,23 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    Row(
-                      children: [
-                        // Filter Dropdown
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: DropdownButton<String>(
-                            value: _selectedDateFilter,
-                            isDense: true,
-                            underline: const SizedBox(),
-                            icon: Icon(
-                              Icons.filter_list,
-                              size: 16,
-                              color: colorScheme.primary,
-                            ),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: colorScheme.primary,
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: '1d',
-                                child: Text('1 Day'),
-                              ),
-                              DropdownMenuItem(
-                                value: '3d',
-                                child: Text('3 Days'),
-                              ),
-                              DropdownMenuItem(
-                                value: '7d',
-                                child: Text('7 Days'),
-                              ),
-                              DropdownMenuItem(
-                                value: '1m',
-                                child: Text('1 Month'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'custom',
-                                child: Text('Custom'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'all',
-                                child: Text('All'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                _handleDateFilterChange(value);
-                              }
-                            },
+                    if (!_showAllSchedules)
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _showAllSchedules = true;
+                            _selectedDay = DateTime.now();
+                          });
+                        },
+                        child: Text(
+                          'View All',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),
