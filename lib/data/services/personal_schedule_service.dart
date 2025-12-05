@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import '../../core/errors/api_exception.dart';
 import '../../core/http/dio_client.dart';
 import '../models/personal_schedule_model.dart';
@@ -78,8 +79,8 @@ class PersonalScheduleService {
 
       final requestData = {
         'title': title,
-        'start_time': startTime.toIso8601String(),
-        'end_time': endTime.toIso8601String(),
+        'start_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime),
+        'end_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime),
         if (location != null) 'location': location,
         if (description != null) 'description': description,
         if (color != null) 'color': color,
@@ -100,6 +101,11 @@ class PersonalScheduleService {
 
       if (response.statusCode == 201) {
         return PersonalSchedule.fromJson(response.data['data']);
+      } else if (response.statusCode == 422) {
+        throw ValidationException(
+          message: response.data['message'] ?? 'Validation failed',
+          errors: response.data['errors'],
+        );
       } else {
         throw ApiException(
           message: 'Failed to create personal schedule',
@@ -130,8 +136,13 @@ class PersonalScheduleService {
       final requestBody = <String, dynamic>{};
       if (title != null) requestBody['title'] = title;
       if (startTime != null)
-        requestBody['start_time'] = startTime.toIso8601String();
-      if (endTime != null) requestBody['end_time'] = endTime.toIso8601String();
+        requestBody['start_time'] = DateFormat(
+          'yyyy-MM-dd HH:mm:ss',
+        ).format(startTime);
+      if (endTime != null)
+        requestBody['end_time'] = DateFormat(
+          'yyyy-MM-dd HH:mm:ss',
+        ).format(endTime);
       if (location != null) requestBody['location'] = location;
       if (description != null) requestBody['description'] = description;
       if (color != null) requestBody['color'] = color;
@@ -147,6 +158,11 @@ class PersonalScheduleService {
 
       if (response.statusCode == 200) {
         return PersonalSchedule.fromJson(response.data['data']);
+      } else if (response.statusCode == 422) {
+        throw ValidationException(
+          message: response.data['message'] ?? 'Validation failed',
+          errors: response.data['errors'],
+        );
       } else {
         throw ApiException(
           message: 'Failed to update personal schedule',
