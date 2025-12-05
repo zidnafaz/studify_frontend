@@ -1,6 +1,6 @@
 {
-    "name": "studify_frontend",
-    "short_name": "studify_frontend",
+    "name": "Studify",
+    "short_name": "Studify",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
