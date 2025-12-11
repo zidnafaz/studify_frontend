@@ -8,6 +8,11 @@
     "classroom": "Kelas",
     "deleteClassroom": "Hapus Kelas",
     "deleteClassroomConfirmation": "Apakah Anda yakin ingin menghapus kelas ini?",
+    "transferOwnershipSuccess": "Kepemilikan berhasil ditransfer",
+    "transferOwnershipFailed": "Gagal mentransfer kepemilikan: {error}",
+    "removeMemberSuccess": "Anggota berhasil dihapus",
+    "removeMemberFailed": "Gagal menghapus anggota: {error}",
+    "actionCannotBeUndone": "Tindakan ini tidak dapat dibatalkan.",
     "cancel": "Batal",
     "delete": "Hapus",
     "save": "Simpan",
@@ -169,5 +174,9 @@
     "noClassroomYet": "Belum ada kelas",
     "tapPlusToCreateClassroom": "Ketuk tombol + untuk membuat kelas baru",
     "guestUser": "Pengguna Tamu",
-    "noEmail": "Tidak ada email"
+    "noEmail": "Tidak ada email",
+    "scheduleUpdatedTitle": "Jadwal Diperbarui: {title}",
+    "scheduleUpdatedBody": "Jadwal pada {date} pukul {time} telah diperbarui.",
+    "scheduleCancelledTitle": "Jadwal Dibatalkan: {title}",
+    "scheduleCancelledBody": "Jadwal pada {date} pukul {time} telah dibatalkan."
 }

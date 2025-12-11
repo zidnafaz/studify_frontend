@@ -9,6 +9,8 @@ import 'package:studify/providers/auth_provider.dart';
 import 'package:studify/data/models/classroom_model.dart';
 import 'package:studify/data/models/class_schedule_model.dart';
 import 'package:studify/data/models/user_model.dart' as model;
+import 'package:studify/l10n/generated/app_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 // Generate mocks
 @GenerateMocks([ClassroomProvider, AuthProvider])
@@ -18,7 +20,8 @@ void main() {
   late MockClassroomProvider mockClassroomProvider;
   late MockAuthProvider mockAuthProvider;
 
-  setUp(() {
+  setUp(() async {
+    await initializeDateFormatting();
     mockClassroomProvider = MockClassroomProvider();
     mockAuthProvider = MockAuthProvider();
 
@@ -46,7 +49,11 @@ void main() {
         ),
         ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
       ],
-      child: MaterialApp(home: ClassroomDetailScreen(classroom: classroom)),
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ClassroomDetailScreen(classroom: classroom),
+      ),
     );
   }
 

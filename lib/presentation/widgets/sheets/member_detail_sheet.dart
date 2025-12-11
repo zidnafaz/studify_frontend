@@ -103,7 +103,7 @@ class MemberDetailSheet extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -114,7 +114,7 @@ class MemberDetailSheet extends StatelessWidget {
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
             ),
-            child: const Text('Transfer'),
+            child: Text(AppLocalizations.of(context)!.transferButton),
           ),
         ],
       ),
@@ -137,8 +137,8 @@ class MemberDetailSheet extends StatelessWidget {
         Navigator.pop(context); // Close bottom sheet
         onMemberUpdated?.call(); // Trigger refresh
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Ownership transferred successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.transferOwnershipSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -147,7 +147,7 @@ class MemberDetailSheet extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to transfer ownership: $e'),
+            content: Text(AppLocalizations.of(context)!.transferOwnershipFailed(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -164,7 +164,7 @@ class MemberDetailSheet extends StatelessWidget {
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          'Remove Member',
+          AppLocalizations.of(context)!.removeMemberTitle,
           style: TextStyle(
             color: colorScheme.onSurface,
             fontWeight: FontWeight.w600,
@@ -175,7 +175,7 @@ class MemberDetailSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Are you sure you want to remove this member?',
+              AppLocalizations.of(context)!.removeMemberConfirmation,
               style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
             ),
             const SizedBox(height: 12),
@@ -243,7 +243,7 @@ class MemberDetailSheet extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'This action cannot be undone.',
+                      AppLocalizations.of(context)!.actionCannotBeUndone,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.orange.shade700,
@@ -258,7 +258,7 @@ class MemberDetailSheet extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -269,7 +269,7 @@ class MemberDetailSheet extends StatelessWidget {
               backgroundColor: colorScheme.error,
               foregroundColor: colorScheme.onError,
             ),
-            child: const Text('Remove'),
+            child: Text(AppLocalizations.of(context)!.removeButton),
           ),
         ],
       ),
@@ -292,8 +292,8 @@ class MemberDetailSheet extends StatelessWidget {
         Navigator.pop(context); // Close bottom sheet
         onMemberUpdated?.call(); // Trigger refresh
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Member removed successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.removeMemberSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -302,7 +302,7 @@ class MemberDetailSheet extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to remove member: $e'),
+            content: Text(AppLocalizations.of(context)!.removeMemberFailed(e.toString())),
             backgroundColor: Colors.red,
           ),
         );

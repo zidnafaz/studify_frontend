@@ -8,6 +8,25 @@
     "classroom": "Classroom",
     "deleteClassroom": "Delete Classroom",
     "deleteClassroomConfirmation": "Are you sure you want to delete this classroom?",
+    "transferOwnershipSuccess": "Ownership transferred successfully",
+    "transferOwnershipFailed": "Failed to transfer ownership: {error}",
+    "@transferOwnershipFailed": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "removeMemberSuccess": "Member removed successfully",
+    "removeMemberFailed": "Failed to remove member: {error}",
+    "@removeMemberFailed": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "actionCannotBeUndone": "This action cannot be undone.",
     "cancel": "Cancel",
     "delete": "Delete",
     "save": "Save",
@@ -246,5 +265,43 @@
     "noClassroomYet": "No classroom yet",
     "tapPlusToCreateClassroom": "Tap + button to create new classroom",
     "guestUser": "Guest User",
-    "noEmail": "No email"
+    "noEmail": "No email",
+    "scheduleUpdatedTitle": "Schedule Updated: {title}",
+    "@scheduleUpdatedTitle": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleUpdatedBody": "Schedule on {date} at {time} has been updated.",
+    "@scheduleUpdatedBody": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            },
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleCancelledTitle": "Schedule Cancelled: {title}",
+    "@scheduleCancelledTitle": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleCancelledBody": "Schedule on {date} at {time} has been cancelled.",
+    "@scheduleCancelledBody": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            },
+            "time": {
+                "type": "String"
+            }
+        }
+    }
 }

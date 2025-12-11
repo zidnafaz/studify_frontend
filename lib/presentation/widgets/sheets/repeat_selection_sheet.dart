@@ -217,15 +217,32 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                           ),
                         ),
                         SizedBox(
-                          width: 40,
-                          child: Text(
-                            '$_repeatCount',
+                          width: 60,
+                          child: TextField(
+                            controller: TextEditingController(text: '$_repeatCount')
+                              ..selection = TextSelection.fromPosition(
+                                TextPosition(offset: '$_repeatCount'.length),
+                              ),
                             textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: colorScheme.onSurface,
                             ),
+                            onChanged: (value) {
+                              final newValue = int.tryParse(value);
+                              if (newValue != null && newValue > 0) {
+                                setState(() {
+                                  _repeatCount = newValue;
+                                });
+                              }
+                            },
                           ),
                         ),
                         IconButton(

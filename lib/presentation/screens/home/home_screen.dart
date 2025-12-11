@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -144,7 +145,19 @@ class _HomeTabState extends State<_HomeTab> {
 
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null && mounted) {
+      String? title;
+      String? body;
+
+      if (message.notification != null) {
+        title = message.notification!.title;
+        body = message.notification!.body;
+      } else if (message.data.containsKey('title_key')) {
+        // Handle localized data message
+        title = _getLocalizedText(context, message.data['title_key'], message.data['title_args']);
+        body = _getLocalizedText(context, message.data['body_key'], message.data['body_args']);
+      }
+
+      if (title != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Column(
@@ -152,7 +165,7 @@ class _HomeTabState extends State<_HomeTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  message.notification!.title ?? AppLocalizations.of(context)!.notification,
+                  title ?? AppLocalizations.of(context)!.notification,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.surface,
@@ -160,7 +173,7 @@ class _HomeTabState extends State<_HomeTab> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  message.notification!.body ?? '',
+                  body ?? '',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.surface,
                   ),
@@ -179,13 +192,37 @@ class _HomeTabState extends State<_HomeTab> {
                   ? Theme.of(context).colorScheme.primaryContainer
                   : Theme.of(context).colorScheme.secondary,
               onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).clearSnackBars();
               },
             ),
           ),
         );
       }
     });
+  }
+
+  String? _getLocalizedText(BuildContext context, String? key, String? argsJson) {
+    if (key == null) return null;
+    final l10n = AppLocalizations.of(context)!;
+    Map<String, dynamic> args = {};
+    if (argsJson != null) {
+      try {
+        args = json.decode(argsJson);
+      } catch (_) {}
+    }
+
+    switch (key) {
+      case 'schedule_updated_title':
+        return l10n.scheduleUpdatedTitle(args['title'] ?? '');
+      case 'schedule_updated_body':
+        return l10n.scheduleUpdatedBody(args['date'] ?? '', args['time'] ?? '');
+      case 'schedule_cancelled_title':
+        return l10n.scheduleCancelledTitle(args['title'] ?? '');
+      case 'schedule_cancelled_body':
+        return l10n.scheduleCancelledBody(args['date'] ?? '', args['time'] ?? '');
+      default:
+        return null;
+    }
   }
 
   Map<String, List<CombinedSchedule>> _groupSchedulesByDate(

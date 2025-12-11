@@ -120,7 +120,11 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
           messenger.showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.classroomDeleted)),
           );
-          navigator.pushNamedAndRemoveUntil('/classroomList', (route) => false);
+          
+          navigator.pushNamedAndRemoveUntil(
+            '/classroomList',
+            (route) => false,
+          );
         }
       } catch (e) {
         if (mounted) {
