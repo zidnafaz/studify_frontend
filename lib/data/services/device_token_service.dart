@@ -23,11 +23,18 @@ class DeviceTokenService {
     }
   }
 
+  Future<NotificationSettings> requestPermission() async {
+    return await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
   Future<void> syncDeviceToken() async {
     try {
       // Request permission first (especially for iOS)
-      NotificationSettings settings = await _firebaseMessaging
-          .requestPermission(alert: true, badge: true, sound: true);
+      NotificationSettings settings = await requestPermission();
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/class_schedule_model.dart';
@@ -40,6 +41,27 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
     // Fetch class schedules for this classroom
     Future.microtask(() {
       _fetchSchedules();
+      // Also fetch classroom details to ensure we have the latest members
+      Provider.of<ClassroomProvider>(context, listen: false).fetchClassroom(widget.classroom.id);
+    });
+
+    // Listen for FCM messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.data['type'] == 'member_joined' &&
+          message.data['classroom_id'] == widget.classroom.id.toString()) {
+        // Refresh classroom details to get new members
+        if (mounted) {
+          Provider.of<ClassroomProvider>(context, listen: false)
+              .fetchClassroom(widget.classroom.id);
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${message.data['user_name']} baru saja bergabung!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
     });
   }
 

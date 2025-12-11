@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/schedule_repeat_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
 import '../../../data/models/user_model.dart';
+import '../../../providers/classroom_provider.dart';
 import '../classroom/schedule_text_field.dart';
 import '../classroom/time_range_selector.dart';
 import 'repeat_selection_sheet.dart';
@@ -131,7 +133,8 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
   }
 
   Future<void> _selectCoordinator1() async {
-    final users = widget.classroom.users ?? [];
+    final provider = context.read<ClassroomProvider>();
+    final users = provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
     if (users.isEmpty) return;
 
     final result = await showDialog<User>(
@@ -150,7 +153,8 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
   }
 
   Future<void> _selectCoordinator2() async {
-    final users = widget.classroom.users ?? [];
+    final provider = context.read<ClassroomProvider>();
+    final users = provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
     if (users.isEmpty) return;
 
     final result = await showDialog<User>(

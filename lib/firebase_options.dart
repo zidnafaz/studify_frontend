@@ -21,10 +21,7 @@ class DefaultFirebaseOptions {
     // ignore: missing_enum_constant_in_switch
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for ios - '
@@ -60,5 +57,13 @@ class DefaultFirebaseOptions {
     messagingSenderId: "941139273666",
     appId: "1:941139273666:web:48dca86407072d3923985b",
     measurementId: "G-TXTT6GYJSC"
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyAp8jeEQsg4Izntif6eyfGM0lSBhG5sjis',
+    appId: '1:941139273666:android:24796548a21721a623985b',
+    messagingSenderId: '941139273666',
+    projectId: 'studify-70054',
+    storageBucket: 'studify-70054.firebasestorage.app',
   );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../widgets/profile/profile_header.dart';
@@ -17,13 +18,25 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  String _version = '';
+
   @override
   void initState() {
     super.initState();
+    _initPackageInfo();
     // Fetch latest user data when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AuthProvider>().checkAuthStatus();
     });
+  }
+
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _version = info.version;
+      });
+    }
   }
 
   void _showComingSoon(BuildContext context, String featureName) {
@@ -193,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ProfileMenuItem(
                   icon: Icons.info_outline,
                   title: AppLocalizations.of(context)!.version,
-                  subtitle: 'v1.0.0',
+                  subtitle: _version.isNotEmpty ? 'v$_version' : 'Loading...',
                 ),
               ],
             ),

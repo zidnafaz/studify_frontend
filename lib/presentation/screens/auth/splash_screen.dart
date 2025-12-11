@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../data/services/device_token_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,13 +13,32 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String _version = '';
+
   @override
   void initState() {
     super.initState();
+    _initPackageInfo();
     _checkSession();
   }
 
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _version = info.version;
+      });
+    }
+  }
+
   Future<void> _checkSession() async {
+    // Request notification permission immediately on app start
+    try {
+      await context.read<DeviceTokenService>().requestPermission();
+    } catch (e) {
+      debugPrint('Error requesting notification permission: $e');
+    }
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     try {
@@ -73,6 +94,16 @@ class _SplashScreenState extends State<SplashScreen> {
                 fit: BoxFit.contain,
               ),
             ),
+            if (_version.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text(
+                'Version $_version',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ],
         ),
       ),
