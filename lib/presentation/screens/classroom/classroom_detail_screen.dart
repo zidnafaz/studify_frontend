@@ -618,10 +618,6 @@ class _ClassroomDetailScreenState extends State<ClassroomDetailScreen> {
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
                           child: DropdownButton<String>(
                             value: _selectedDateFilter,
                             isDense: true,

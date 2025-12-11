@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../data/models/combined_schedule_model.dart';
 import '../../../data/models/class_schedule_model.dart';
 import '../../../data/models/classroom_model.dart';
@@ -95,7 +96,7 @@ class CombinedScheduleDetailSheet extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                'Classroom not found',
+                AppLocalizations.of(context)!.classroomNotFound,
                 style: TextStyle(color: colorScheme.onSurface),
               ),
             ),

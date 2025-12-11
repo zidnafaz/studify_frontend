@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class ColorPickerSheet extends StatelessWidget {
   final Color? selectedColor;
@@ -37,7 +38,7 @@ class ColorPickerSheet extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Pilih Warna',
+                AppLocalizations.of(context)!.selectColorTitle,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,

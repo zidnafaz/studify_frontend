@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../classroom/schedule_text_field.dart';
 import '../classroom/time_range_selector.dart';
@@ -206,7 +207,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
           if (mounted) {
             ScaffoldMessenger.of(currentContext).showSnackBar(
               SnackBar(
-                content: Text('Gagal membuat jadwal: $e'),
+                content: Text(AppLocalizations.of(context)!.scheduleCreateError(e.toString())),
                 backgroundColor: Colors.red,
               ),
             );
@@ -252,13 +253,13 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                         onPressed: _isLoading
                             ? null
                             : () => Navigator.pop(context),
-                        child: const Text(
-                          'Batal',
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
                           style: TextStyle(color: Colors.red, fontSize: 16),
                         ),
                       ),
                       Text(
-                        'Jadwal Pribadi Baru',
+                        AppLocalizations.of(context)!.newPersonalScheduleTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -268,7 +269,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                       TextButton(
                         onPressed: _isLoading ? null : _save,
                         child: Text(
-                          'Simpan',
+                          AppLocalizations.of(context)!.save,
                           style: TextStyle(
                             color: colorScheme.primary,
                             fontSize: 16,
@@ -283,10 +284,10 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   // Title Field
                   ScheduleTextField(
                     controller: _titleController,
-                    hintText: 'Judul',
+                    hintText: AppLocalizations.of(context)!.titleHint,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Judul tidak boleh kosong';
+                        return AppLocalizations.of(context)!.titleRequired;
                       }
                       return null;
                     },
@@ -321,9 +322,9 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   // Repeat Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _repeat?.displayText ?? 'Tidak berulang',
+                      text: _repeat?.displayText ?? AppLocalizations.of(context)!.noRepeat,
                     ),
-                    hintText: 'Ulangi',
+                    hintText: AppLocalizations.of(context)!.repeatLabel,
                     prefixIcon: Icons.repeat,
                     readOnly: true,
                     onTap: _selectRepeat,
@@ -334,7 +335,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   // Location Field
                   ScheduleTextField(
                     controller: _locationController,
-                    hintText: 'Lokasi',
+                    hintText: AppLocalizations.of(context)!.locationHint,
                     prefixIcon: Icons.location_on,
                     enabled: !_isLoading,
                   ),
@@ -361,7 +362,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                           ),
                           const SizedBox(width: 16),
                           Text(
-                            'Warna',
+                            AppLocalizations.of(context)!.colorLabel,
                             style: TextStyle(
                               fontSize: 16,
                               color: colorScheme.onSurface,
@@ -394,7 +395,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pengingat',
+                        AppLocalizations.of(context)!.remindersLabel,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -470,7 +471,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Tambah Pengingat',
+                                AppLocalizations.of(context)!.addReminderButton,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -488,7 +489,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   // Description Field
                   ScheduleTextField(
                     controller: _descriptionController,
-                    hintText: 'Deskripsi',
+                    hintText: AppLocalizations.of(context)!.descriptionHint,
                     maxLines: 4,
                     enabled: !_isLoading,
                   ),

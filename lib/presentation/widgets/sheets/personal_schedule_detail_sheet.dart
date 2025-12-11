@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../data/models/personal_schedule_model.dart';
 import '../../../data/models/schedule_reminder_model.dart';
 import '../../../providers/personal_schedule_provider.dart';
@@ -61,9 +62,9 @@ class _PersonalScheduleDetailSheetState
         });
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Failed to add reminder: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)!.addReminderError(e.toString()))));
         }
       }
     }
@@ -94,7 +95,9 @@ class _PersonalScheduleDetailSheetState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove reminder: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)!
+                  .removeReminderError(e.toString()))),
         );
       }
     }

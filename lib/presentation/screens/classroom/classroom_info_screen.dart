@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/user_model.dart';
@@ -55,9 +56,9 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   void _copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Copied to clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.copiedToClipboard),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -87,19 +88,19 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Classroom?'),
-        content: const Text(
-          'This action cannot be undone. All schedules and data associated with this classroom will be permanently deleted.',
+        title: Text(AppLocalizations.of(context)!.deleteClassroom),
+        content: Text(
+          AppLocalizations.of(context)!.deleteClassroomConfirmation,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -117,7 +118,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
         
         if (mounted) {
           messenger.showSnackBar(
-            const SnackBar(content: Text('Classroom deleted successfully')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.classroomDeleted)),
           );
           navigator.pushNamedAndRemoveUntil('/classroomList', (route) => false);
         }
@@ -125,7 +126,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           messenger.showSnackBar(
-            SnackBar(content: Text('Failed to delete: $e')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.failedToDelete(e.toString()))),
           );
         }
       }

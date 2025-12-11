@@ -6,6 +6,8 @@ import '../../widgets/profile/profile_header.dart';
 import '../../widgets/profile/profile_menu_item.dart';
 import '../../widgets/sheets/personal_details_sheet.dart';
 import '../../widgets/sheets/theme_sheet.dart';
+import '../../widgets/sheets/language_sheet.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showComingSoon(BuildContext context, String featureName) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$featureName coming soon'),
+        content: Text(AppLocalizations.of(context)!.comingSoon(featureName)),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -51,12 +53,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _openLanguageSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const LanguageSheet(),
+    );
+  }
+
   Future<void> _contactAdmin() async {
-    _showComingSoon(context, 'FAQ');
+    _showComingSoon(context, AppLocalizations.of(context)!.faq);
   }
 
   Future<void> _sendFeedback() async {
-    _showComingSoon(context, 'Send Feedback');
+    _showComingSoon(context, AppLocalizations.of(context)!.sendFeedback);
   }
 
   Future<void> _signOut() async {
@@ -64,16 +75,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Sign out'),
-          content: const Text('Are you sure you want to sign out of Studify?'),
+          title: Text(AppLocalizations.of(context)!.signOut),
+          content: Text(AppLocalizations.of(context)!.signOutConfirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Sign out'),
+              child: Text(AppLocalizations.of(context)!.signOut),
             ),
           ],
         );
@@ -117,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Profile',
+                  AppLocalizations.of(context)!.profile,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -137,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ProfileHeader(user: user),
             const SizedBox(height: 20),
             Text(
-              'Account',
+              AppLocalizations.of(context)!.account,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -149,15 +160,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               items: [
                 ProfileMenuItem(
                   icon: Icons.person_outline,
-                  title: 'Personal Details',
-                  subtitle: 'Name and email',
+                  title: AppLocalizations.of(context)!.personalDetails,
+                  subtitle: AppLocalizations.of(context)!.nameAndEmail,
                   onTap: _openPersonalDetailsSheet,
                 ),
               ],
             ),
             const SizedBox(height: 20),
             Text(
-              'Settings',
+              AppLocalizations.of(context)!.settings,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -169,20 +180,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               items: [
                 ProfileMenuItem(
                   icon: Icons.palette_outlined,
-                  title: 'Theme',
-                  subtitle: 'Light/Dark theme settings',
+                  title: AppLocalizations.of(context)!.theme,
+                  subtitle: AppLocalizations.of(context)!.themeSubtitle,
                   onTap: _openThemeSheet,
                 ),
-                const ProfileMenuItem(
+                ProfileMenuItem(
+                  icon: Icons.language,
+                  title: AppLocalizations.of(context)!.language,
+                  subtitle: AppLocalizations.of(context)!.changeLanguage,
+                  onTap: _openLanguageSheet,
+                ),
+                ProfileMenuItem(
                   icon: Icons.info_outline,
-                  title: 'Version',
+                  title: AppLocalizations.of(context)!.version,
                   subtitle: 'v1.0.0',
                 ),
               ],
             ),
             const SizedBox(height: 20),
             Text(
-              'Support',
+              AppLocalizations.of(context)!.support,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -194,14 +211,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               items: [
                 ProfileMenuItem(
                   icon: Icons.help_outline,
-                  title: 'FAQ',
-                  subtitle: 'Contact admin for help',
+                  title: AppLocalizations.of(context)!.faq,
+                  subtitle: AppLocalizations.of(context)!.contactAdmin,
                   onTap: _contactAdmin,
                 ),
                 ProfileMenuItem(
                   icon: Icons.feedback_outlined,
-                  title: 'Send Feedback',
-                  subtitle: 'Tell us how we can improve Studify',
+                  title: AppLocalizations.of(context)!.sendFeedback,
+                  subtitle: AppLocalizations.of(context)!.feedbackSubtitle,
                   onTap: _sendFeedback,
                 ),
               ],
@@ -234,8 +251,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   onPressed: _signOut,
                   icon: const Icon(Icons.logout),
-                  label: const Text(
-                    'Sign Out',
+                  label: Text(
+                    AppLocalizations.of(context)!.signOut,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../providers/classroom_provider.dart';
 
 class CreateClassroomScreen extends StatefulWidget {
@@ -43,8 +44,8 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
         Navigator.pop(context);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Classroom berhasil dibuat'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.classroomCreatedSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -53,7 +54,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal membuat classroom: $e'),
+            content: Text(AppLocalizations.of(context)!.classroomCreateError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -93,7 +94,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                   ),
                   Center(
                     child: Text(
-                      'Create New Class',
+                      AppLocalizations.of(context)!.createNewClassTitle,
                       style: TextStyle(
                         color: colorScheme.onPrimary,
                         fontSize: 20,
@@ -118,7 +119,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  hintText: 'Class Name',
+                  hintText: AppLocalizations.of(context)!.classNameHint,
                   hintStyle: TextStyle(
                     color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
@@ -152,7 +153,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                 enabled: !_isLoading,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Nama classroom tidak boleh kosong';
+                    return AppLocalizations.of(context)!.classNameRequired;
                   }
                   return null;
                 },
@@ -164,7 +165,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  hintText: 'Description',
+                  hintText: AppLocalizations.of(context)!.descriptionHint,
                   hintStyle: TextStyle(
                     color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
@@ -223,9 +224,9 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                             color: colorScheme.surface,
                           ),
                         )
-                      : const Text(
-                          'Create Class',
-                          style: TextStyle(
+                      : Text(
+                          AppLocalizations.of(context)!.createClassButton,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

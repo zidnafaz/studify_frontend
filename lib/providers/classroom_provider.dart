@@ -61,7 +61,7 @@ class ClassroomProvider with ChangeNotifier {
       _setError(e.message);
       rethrow;
     } catch (e) {
-      _setError('Terjadi kesalahan: $e');
+      _setError('An error occurred: $e');
       rethrow;
     } finally {
       _setLoading(false);

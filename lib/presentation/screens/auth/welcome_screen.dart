@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -40,7 +41,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 40),
               // App Name
               Text(
-                'Studify',
+                AppLocalizations.of(context)!.welcomeTitle,
                 style: TextStyle(
                   fontSize: 48,
                   fontWeight: FontWeight.bold,
@@ -51,7 +52,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
               // Tagline
               Text(
-                'Your Smart Study Companion',
+                AppLocalizations.of(context)!.welcomeSubtitle,
                 style: TextStyle(
                   fontSize: 18,
                   color: colorScheme.onSurface,
@@ -61,7 +62,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Organize and Study Together',
+                AppLocalizations.of(context)!.welcomeDescription,
                 style: TextStyle(
                   fontSize: 14,
                   color: colorScheme.onSurface.withOpacity(0.7),
@@ -90,7 +91,7 @@ class WelcomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: const Text('Login'),
+                  child: Text(AppLocalizations.of(context)!.login),
                 ),
               ),
               const SizedBox(height: 16),
@@ -114,7 +115,7 @@ class WelcomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: const Text('Sign Up'),
+                  child: Text(AppLocalizations.of(context)!.signUp),
                 ),
               ),
               const SizedBox(height: 40),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/class_schedule_model.dart';
@@ -329,13 +330,13 @@ class _EditClassScheduleSheetState extends State<EditClassScheduleSheet> {
                         onPressed: _isLoading
                             ? null
                             : () => Navigator.pop(context),
-                        child: const Text(
-                          'Batal',
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
                           style: TextStyle(color: Colors.red, fontSize: 16),
                         ),
                       ),
                       Text(
-                        'Edit Class Event',
+                        AppLocalizations.of(context)!.editClassScheduleTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -345,7 +346,7 @@ class _EditClassScheduleSheetState extends State<EditClassScheduleSheet> {
                       TextButton(
                         onPressed: _isLoading ? null : _save,
                         child: Text(
-                          'Simpan',
+                          AppLocalizations.of(context)!.save,
                           style: TextStyle(
                             color: colorScheme.primary,
                             fontSize: 16,
@@ -360,10 +361,10 @@ class _EditClassScheduleSheetState extends State<EditClassScheduleSheet> {
                   // Title Field
                   ScheduleTextField(
                     controller: _titleController,
-                    hintText: 'Title',
+                    hintText: AppLocalizations.of(context)!.titleHint,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Judul tidak boleh kosong';
+                        return AppLocalizations.of(context)!.titleRequired;
                       }
                       return null;
                     },

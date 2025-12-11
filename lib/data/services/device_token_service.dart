@@ -10,8 +10,10 @@ class DeviceTokenService {
   Future<String?> getDeviceToken() async {
     try {
       if (kIsWeb) {
-        // For web, you might need a VAPID key
-        return await _firebaseMessaging.getToken();
+        // Ganti dengan VAPID Key dari Firebase Console -> Project Settings -> Cloud Messaging -> Web configuration
+        return await _firebaseMessaging.getToken(
+          vapidKey: "BDEj5ZDR7QFQJ_CXY-c6GxOpMnXyJ-KivHTjgJ_OoDrp-oA2guuBXugo9wqJlN-1_iR_NPwXl8-LyjN_EtW73aU",
+        );
       } else {
         return await _firebaseMessaging.getToken();
       }

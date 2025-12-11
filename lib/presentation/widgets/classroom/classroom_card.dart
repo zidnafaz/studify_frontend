@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 
@@ -53,7 +54,7 @@ class ClassroomCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  classroom.description ?? 'Tidak ada deskripsi',
+                  classroom.description ?? AppLocalizations.of(context)!.noDescription,
                   style: TextStyle(
                     fontSize: 14,
                     color: colorScheme.onSurface.withOpacity(0.6),

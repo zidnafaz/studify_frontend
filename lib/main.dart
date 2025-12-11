@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
+
 import 'package:studify/data/models/classroom_model.dart';
 import 'package:studify/presentation/screens/classroom/classroom_detail_screen.dart';
 import 'package:studify/presentation/screens/classroom/classroom_info_screen.dart';
@@ -11,6 +14,7 @@ import 'providers/theme_provider.dart';
 import 'providers/personal_schedule_provider.dart';
 import 'providers/combined_schedule_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/locale_provider.dart';
 import 'presentation/screens/auth/welcome_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/register_screen.dart';
@@ -22,13 +26,16 @@ import 'data/services/device_token_service.dart';
 import 'core/services/deep_link_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);
 
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint('Firebase initialization failed: $e');
   }
@@ -60,13 +67,14 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ClassroomProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()..loadTheme()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => PersonalScheduleProvider()),
         ChangeNotifierProvider(create: (_) => CombinedScheduleProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         Provider(create: (_) => DeviceTokenService()),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, _) {
           return MaterialApp(
             navigatorKey: MyApp.navigatorKey,
             title: 'Studify',
@@ -74,6 +82,17 @@ class _MyAppState extends State<MyApp> {
             themeMode: themeProvider.themeMode,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
+            locale: localeProvider.locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('id'), // Indonesian
+            ],
             home: const SplashScreen(),
             routes: {
               '/welcome': (context) => const WelcomeScreen(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/schedule_repeat_model.dart';
@@ -138,7 +139,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
       builder: (context) => _UserSelectionDialog(
         users: users,
         selectedUser: _coordinator1,
-        title: 'Pilih Koordinator 1',
+        title: AppLocalizations.of(context)!.selectCoordinator1,
       ),
     );
     if (result != null) {
@@ -157,7 +158,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
       builder: (context) => _UserSelectionDialog(
         users: users,
         selectedUser: _coordinator2,
-        title: 'Pilih Koordinator 2',
+        title: AppLocalizations.of(context)!.selectCoordinator2,
       ),
     );
     if (result != null) {
@@ -245,7 +246,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal membuat jadwal: $e'),
+            content: Text(AppLocalizations.of(context)!.scheduleCreateError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -291,7 +292,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                             ? null
                             : () => Navigator.pop(context),
                         child: Text(
-                          'Batal',
+                          AppLocalizations.of(context)!.cancel,
                           style: TextStyle(
                             color: colorScheme.error,
                             fontSize: 16,
@@ -299,7 +300,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                         ),
                       ),
                       Text(
-                        'Jadwal Kelas Baru',
+                        AppLocalizations.of(context)!.newClassScheduleTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -309,7 +310,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                       TextButton(
                         onPressed: _isLoading ? null : _save,
                         child: Text(
-                          'Simpan',
+                          AppLocalizations.of(context)!.save,
                           style: TextStyle(
                             color: colorScheme.primary,
                             fontSize: 16,
@@ -324,10 +325,10 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Title Field
                   ScheduleTextField(
                     controller: _titleController,
-                    hintText: 'Judul',
+                    hintText: AppLocalizations.of(context)!.titleHint,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Judul tidak boleh kosong';
+                        return AppLocalizations.of(context)!.titleRequired;
                       }
                       return null;
                     },
@@ -362,7 +363,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Repeat Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _repeat?.displayText ?? 'Tidak berulang',
+                      text: _repeat?.displayText ?? AppLocalizations.of(context)!.noRepeat,
                     ),
                     prefixIcon: Icons.repeat,
                     readOnly: true,
@@ -374,7 +375,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Lecturer Field
                   ScheduleTextField(
                     controller: _lecturerController,
-                    hintText: 'Dosen',
+                    hintText: AppLocalizations.of(context)!.lecturerHint,
                     prefixIcon: Icons.person,
                     enabled: !_isLoading,
                   ),
@@ -413,7 +414,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Location Field
                   ScheduleTextField(
                     controller: _locationController,
-                    hintText: 'Lokasi',
+                    hintText: AppLocalizations.of(context)!.locationHint,
                     prefixIcon: Icons.location_on,
                     enabled: !_isLoading,
                   ),
@@ -440,7 +441,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                           ),
                           const SizedBox(width: 16),
                           Text(
-                            'Warna',
+                            AppLocalizations.of(context)!.colorLabel,
                             style: TextStyle(
                               fontSize: 16,
                               color: colorScheme.onSurface,
@@ -473,7 +474,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pengingat',
+                        AppLocalizations.of(context)!.remindersLabel,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -549,7 +550,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Tambah Pengingat',
+                                AppLocalizations.of(context)!.addReminderButton,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -567,7 +568,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Description Field
                   ScheduleTextField(
                     controller: _descriptionController,
-                    hintText: 'Deskripsi',
+                    hintText: AppLocalizations.of(context)!.descriptionHint,
                     maxLines: 4,
                     enabled: !_isLoading,
                   ),
@@ -637,7 +638,7 @@ class _UserSelectionDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
       ],
     );

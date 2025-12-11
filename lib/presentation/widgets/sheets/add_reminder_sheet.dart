@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/schedule_reminder_model.dart';
 
@@ -58,7 +59,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tambah Pengingat',
+                    AppLocalizations.of(context)!.addReminderTitle,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -68,7 +69,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                   TextButton(
                     onPressed: _save,
                     child: Text(
-                      'Simpan',
+                      AppLocalizations.of(context)!.save,
                       style: TextStyle(
                         color: colorScheme.primary,
                         fontSize: 16,
@@ -162,7 +163,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'menit sebelumnya',
+                    AppLocalizations.of(context)!.minutesBeforeLabel,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,

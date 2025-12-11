@@ -1,4 +1,5 @@
 # Miscellaneous
+lib/l10n/generated/
 *.class
 *.log
 *.pyc
