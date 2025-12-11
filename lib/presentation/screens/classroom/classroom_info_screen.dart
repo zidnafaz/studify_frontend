@@ -71,6 +71,67 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
     );
   }
 
+  Future<void> _handleDeleteClassroom(BuildContext context, Classroom classroom) async {
+    final otherMembers = classroom.users?.where((u) => u.id != classroom.ownerId).toList() ?? [];
+    
+    if (otherMembers.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot delete classroom. Please remove all members first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Classroom?'),
+        content: const Text(
+          'This action cannot be undone. All schedules and data associated with this classroom will be permanently deleted.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      // Capture references before async gap
+      final messenger = ScaffoldMessenger.of(context);
+      final navigator = Navigator.of(context);
+      final provider = Provider.of<ClassroomProvider>(context, listen: false);
+
+      try {
+        setState(() => _isLoading = true);
+        await provider.deleteClassroom(classroom.id);
+        
+        if (mounted) {
+          messenger.showSnackBar(
+            const SnackBar(content: Text('Classroom deleted successfully')),
+          );
+          navigator.pushNamedAndRemoveUntil('/classroomList', (route) => false);
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          messenger.showSnackBar(
+            SnackBar(content: Text('Failed to delete: $e')),
+          );
+        }
+      }
+    }
+  }
+
   String _getMemberRole(User user) {
     final classroom = _detailedClassroom ?? widget.classroom;
     if (user.id == classroom.ownerId) {
@@ -646,6 +707,49 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                         ],
                       ),
                     ),
+                  ),
+                ],
+
+                // Delete Classroom Button (only for owners)
+                if (isOwner) ...[
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _handleDeleteClassroom(context, classroom),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.error,
+                        foregroundColor: colorScheme.onError,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.delete_forever, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Delete Classroom',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You can only delete this classroom if there are no other members.',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ],

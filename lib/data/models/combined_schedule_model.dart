@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../core/utils/json_utils.dart';
 import 'user_model.dart';
 import 'reminder_model.dart';
 
@@ -7,6 +8,7 @@ part 'combined_schedule_model.g.dart';
 /// Unified model for both personal and class schedules
 @JsonSerializable()
 class CombinedSchedule {
+  @JsonKey(fromJson: parseInt)
   final int id;
   final String type; // 'personal' or 'class'
   final String title;
@@ -18,15 +20,15 @@ class CombinedSchedule {
   final String? lecturer; // Only for class schedules
   final String? description;
   final String color;
-  @JsonKey(name: 'source_id')
+  @JsonKey(name: 'source_id', fromJson: parseIntNullable)
   final int? sourceId; // Classroom ID for class schedules, null for personal
   @JsonKey(name: 'source_name')
   final String sourceName; // Classroom name or 'Personal Schedule'
 
   // Class schedule specific fields
-  @JsonKey(name: 'coordinator_1')
+  @JsonKey(name: 'coordinator_1', fromJson: parseIntNullable)
   final int? coordinator1;
-  @JsonKey(name: 'coordinator_2')
+  @JsonKey(name: 'coordinator_2', fromJson: parseIntNullable)
   final int? coordinator2;
   @JsonKey(name: 'coordinator1')
   final User? coordinator1User;
@@ -55,33 +57,39 @@ class CombinedSchedule {
   });
 
   factory CombinedSchedule.fromJson(Map<String, dynamic> json) {
-    // Helper function to safely convert to DateTime
-    DateTime? _parseDateTime(dynamic value) {
-      if (value == null) return null;
-      if (value is DateTime) return value;
-      if (value is String) {
-        try {
-          return DateTime.parse(value);
-        } catch (e) {
-          return null;
+    try {
+      // Helper function to safely convert to DateTime
+      DateTime? _parseDateTime(dynamic value) {
+        if (value == null) return null;
+        if (value is DateTime) return value;
+        if (value is String) {
+          try {
+            return DateTime.parse(value);
+          } catch (e) {
+            return null;
+          }
         }
+        return null;
       }
-      return null;
-    }
 
-    // Handle potential type mismatches from backend
-    if (json['start_time'] != null) {
-      json['start_time'] =
-          _parseDateTime(json['start_time'])?.toIso8601String() ??
-          json['start_time'];
-    }
-    if (json['end_time'] != null) {
-      json['end_time'] =
-          _parseDateTime(json['end_time'])?.toIso8601String() ??
-          json['end_time'];
-    }
+      // Handle potential type mismatches from backend
+      if (json['start_time'] != null) {
+        json['start_time'] =
+            _parseDateTime(json['start_time'])?.toIso8601String() ??
+            json['start_time'];
+      }
+      if (json['end_time'] != null) {
+        json['end_time'] =
+            _parseDateTime(json['end_time'])?.toIso8601String() ??
+            json['end_time'];
+      }
 
-    return _$CombinedScheduleFromJson(json);
+      return _$CombinedScheduleFromJson(json);
+    } catch (e) {
+      print('❌ Error parsing CombinedSchedule: $e');
+      print('JSON content: $json');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() => _$CombinedScheduleToJson(this);
@@ -97,7 +105,7 @@ class ScheduleSource {
   final String type; // 'all', 'personal', or 'classroom'
   final String name;
   final String description;
-  @JsonKey(name: 'classroom_id')
+  @JsonKey(name: 'classroom_id', fromJson: parseIntNullable)
   final int? classroomId; // Only for classroom type
 
   ScheduleSource({
@@ -131,6 +139,7 @@ class CombinedScheduleResponse {
 /// Meta information for combined schedules response
 @JsonSerializable()
 class CombinedScheduleMeta {
+  @JsonKey(fromJson: parseInt)
   final int total;
   @JsonKey(name: 'available_sources')
   final List<ScheduleSource> availableSources;

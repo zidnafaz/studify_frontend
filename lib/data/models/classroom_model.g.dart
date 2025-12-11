@@ -7,8 +7,8 @@ part of 'classroom_model.dart';
 // **************************************************************************
 
 Classroom _$ClassroomFromJson(Map<String, dynamic> json) => Classroom(
-  id: (json['id'] as num).toInt(),
-  ownerId: (json['owner_id'] as num).toInt(),
+  id: parseInt(json['id']),
+  ownerId: parseInt(json['owner_id']),
   name: json['name'] as String,
   uniqueCode: json['unique_code'] as String,
   description: json['description'] as String?,

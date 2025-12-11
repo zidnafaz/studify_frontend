@@ -1,12 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../core/utils/json_utils.dart';
 import 'user_model.dart';
 
 part 'classroom_model.g.dart';
 
 @JsonSerializable()
 class Classroom {
+  @JsonKey(fromJson: parseInt)
   final int id;
-  @JsonKey(name: 'owner_id')
+  @JsonKey(name: 'owner_id', fromJson: parseInt)
   final int ownerId;
   final String name;
   @JsonKey(name: 'unique_code')

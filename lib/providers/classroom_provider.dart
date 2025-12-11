@@ -310,6 +310,17 @@ class ClassroomProvider with ChangeNotifier {
     });
   }
 
+  Future<void> deleteClassroom(int classroomId) async {
+    await _withLoading(() async {
+      await _classroomService.deleteClassroom(classroomId);
+      _classrooms.removeWhere((c) => c.id == classroomId);
+      if (_selectedClassroom?.id == classroomId) {
+        _selectedClassroom = null;
+      }
+      return true;
+    });
+  }
+
   void clearError() {
     _setError(null);
     _safeNotifyListeners();

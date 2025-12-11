@@ -7,10 +7,10 @@ part of 'reminder_model.dart';
 // **************************************************************************
 
 Reminder _$ReminderFromJson(Map<String, dynamic> json) => Reminder(
-  id: (json['id'] as num).toInt(),
-  remindableId: (json['remindable_id'] as num).toInt(),
+  id: parseInt(json['id']),
+  remindableId: parseInt(json['remindable_id']),
   remindableType: json['remindable_type'] as String,
-  minutesBeforeStart: (json['minutes_before_start'] as num).toInt(),
+  minutesBeforeStart: parseInt(json['minutes_before_start']),
   status: json['status'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
   updatedAt: DateTime.parse(json['updated_at'] as String),

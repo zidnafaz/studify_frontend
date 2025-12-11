@@ -1,9 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../core/utils/json_utils.dart';
 
 part 'user_model.g.dart';
 
 @JsonSerializable()
 class User {
+  @JsonKey(fromJson: parseInt)
   final int id;
   final String name;
   final String email;
@@ -30,7 +32,7 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  
+
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
@@ -39,10 +41,7 @@ class CoordinatorSchedule {
   final String title;
   final String color;
 
-  CoordinatorSchedule({
-    required this.title,
-    required this.color,
-  });
+  CoordinatorSchedule({required this.title, required this.color});
 
   factory CoordinatorSchedule.fromJson(Map<String, dynamic> json) =>
       _$CoordinatorScheduleFromJson(json);

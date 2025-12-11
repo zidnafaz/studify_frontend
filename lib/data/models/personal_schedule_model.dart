@@ -1,12 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../core/utils/json_utils.dart';
 import 'reminder_model.dart';
 
 part 'personal_schedule_model.g.dart';
 
 @JsonSerializable()
 class PersonalSchedule {
+  @JsonKey(fromJson: parseInt)
   final int id;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: parseInt)
   final int userId;
   final String title;
   @JsonKey(name: 'start_time')

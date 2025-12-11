@@ -8,10 +8,10 @@ part of 'class_schedule_model.dart';
 
 ClassSchedule _$ClassScheduleFromJson(Map<String, dynamic> json) =>
     ClassSchedule(
-      id: (json['id'] as num).toInt(),
-      classroomId: (json['classroom_id'] as num).toInt(),
-      coordinator1: (json['coordinator_1'] as num?)?.toInt(),
-      coordinator2: (json['coordinator_2'] as num?)?.toInt(),
+      id: parseInt(json['id']),
+      classroomId: parseInt(json['classroom_id']),
+      coordinator1: parseIntNullable(json['coordinator_1']),
+      coordinator2: parseIntNullable(json['coordinator_2']),
       title: json['title'] as String,
       startTime: DateTime.parse(json['start_time'] as String),
       endTime: DateTime.parse(json['end_time'] as String),

@@ -8,8 +8,8 @@ part of 'personal_schedule_model.dart';
 
 PersonalSchedule _$PersonalScheduleFromJson(Map<String, dynamic> json) =>
     PersonalSchedule(
-      id: (json['id'] as num).toInt(),
-      userId: (json['user_id'] as num).toInt(),
+      id: parseInt(json['id']),
+      userId: parseInt(json['user_id']),
       title: json['title'] as String,
       startTime: DateTime.parse(json['start_time'] as String),
       endTime: DateTime.parse(json['end_time'] as String),

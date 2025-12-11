@@ -8,7 +8,7 @@ part of 'combined_schedule_model.dart';
 
 CombinedSchedule _$CombinedScheduleFromJson(Map<String, dynamic> json) =>
     CombinedSchedule(
-      id: (json['id'] as num).toInt(),
+      id: parseInt(json['id']),
       type: json['type'] as String,
       title: json['title'] as String,
       startTime: DateTime.parse(json['start_time'] as String),
@@ -17,10 +17,10 @@ CombinedSchedule _$CombinedScheduleFromJson(Map<String, dynamic> json) =>
       lecturer: json['lecturer'] as String?,
       description: json['description'] as String?,
       color: json['color'] as String,
-      sourceId: (json['source_id'] as num?)?.toInt(),
+      sourceId: parseIntNullable(json['source_id']),
       sourceName: json['source_name'] as String,
-      coordinator1: (json['coordinator_1'] as num?)?.toInt(),
-      coordinator2: (json['coordinator_2'] as num?)?.toInt(),
+      coordinator1: parseIntNullable(json['coordinator_1']),
+      coordinator2: parseIntNullable(json['coordinator_2']),
       coordinator1User: json['coordinator1'] == null
           ? null
           : User.fromJson(json['coordinator1'] as Map<String, dynamic>),
@@ -58,7 +58,7 @@ ScheduleSource _$ScheduleSourceFromJson(Map<String, dynamic> json) =>
       type: json['type'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
-      classroomId: (json['classroom_id'] as num?)?.toInt(),
+      classroomId: parseIntNullable(json['classroom_id']),
     );
 
 Map<String, dynamic> _$ScheduleSourceToJson(ScheduleSource instance) =>
@@ -86,7 +86,7 @@ Map<String, dynamic> _$CombinedScheduleResponseToJson(
 CombinedScheduleMeta _$CombinedScheduleMetaFromJson(
   Map<String, dynamic> json,
 ) => CombinedScheduleMeta(
-  total: (json['total'] as num).toInt(),
+  total: parseInt(json['total']),
   availableSources: (json['available_sources'] as List<dynamic>)
       .map((e) => ScheduleSource.fromJson(e as Map<String, dynamic>))
       .toList(),
