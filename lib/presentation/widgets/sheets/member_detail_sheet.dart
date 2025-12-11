@@ -27,7 +27,7 @@ class MemberDetailSheet extends StatelessWidget {
 
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
@@ -102,12 +102,12 @@ class MemberDetailSheet extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(dialogContext); // Close dialog
               await _transferOwnership(context);
             },
             style: ElevatedButton.styleFrom(
@@ -160,7 +160,7 @@ class MemberDetailSheet extends StatelessWidget {
 
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
@@ -257,12 +257,12 @@ class MemberDetailSheet extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(dialogContext); // Close dialog
               await _removeMember(context);
             },
             style: ElevatedButton.styleFrom(

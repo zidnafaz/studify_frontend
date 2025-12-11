@@ -21,7 +21,6 @@ class ClassroomInfoScreen extends StatefulWidget {
 }
 
 class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
-  Classroom? _detailedClassroom;
   bool _isLoading = true;
 
   @override
@@ -47,7 +46,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
 
     if (mounted) {
       setState(() {
-        _detailedClassroom = classroomProvider.selectedClassroom;
+        // _detailedClassroom is no longer needed as we use Consumer
         _isLoading = false;
       });
     }
@@ -137,8 +136,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
     }
   }
 
-  String _getMemberRole(User user) {
-    final classroom = _detailedClassroom ?? widget.classroom;
+  String _getMemberRole(User user, Classroom classroom) {
     if (user.id == classroom.ownerId) {
       return 'Owner';
     }
@@ -149,7 +147,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   }
 
   Future<void> _showEditDescriptionDialog(BuildContext context) async {
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
     final controller = TextEditingController(text: classroom.description);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -203,7 +202,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       context,
       listen: false,
     );
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
 
     try {
       await classroomProvider.updateClassroomDescription(
@@ -212,9 +211,6 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       );
 
       if (mounted) {
-        setState(() {
-          _detailedClassroom = classroomProvider.selectedClassroom;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Description updated successfully'),
@@ -256,12 +252,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/classroomList',
-                (route) => false,
-              );
-
+              Navigator.pop(context); // Close dialog first
               await _leaveClassroom();
             },
             style: ElevatedButton.styleFrom(
@@ -280,13 +271,17 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       context,
       listen: false,
     );
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
 
     try {
       await classroomProvider.leaveClassroom(classroom.id);
 
       if (mounted) {
-        Navigator.pop(context); // Go back to classroom list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/classroomList',
+          (route) => false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Left classroom successfully'),
@@ -370,7 +365,6 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       builder: (context, classroomProvider, child) {
         final classroom =
             classroomProvider.selectedClassroom ??
-            _detailedClassroom ??
             widget.classroom;
         final authProvider = Provider.of<AuthProvider>(context);
         final currentUserId = authProvider.user?.id ?? 0;
@@ -600,7 +594,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                     ),
                     itemBuilder: (context, index) {
                       final user = sortedUsers[index];
-                      final role = _getMemberRole(user);
+                      final role = _getMemberRole(user, classroom);
 
                       return InkWell(
                         onTap: () {

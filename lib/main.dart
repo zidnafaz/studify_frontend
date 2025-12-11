@@ -24,6 +24,7 @@ import 'presentation/screens/notification/notification_screen.dart';
 import 'core/constants/app_theme.dart';
 import 'data/services/device_token_service.dart';
 import 'core/services/deep_link_service.dart';
+import 'core/services/notification_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -36,6 +37,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await NotificationService().init();
   } catch (e) {
     debugPrint('Firebase initialization failed: $e');
   }
