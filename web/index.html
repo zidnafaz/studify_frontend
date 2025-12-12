@@ -35,12 +35,49 @@
 </head>
 
 <body>
-  <div id="download-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+  <div id="download-container" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
     <a href="studify.apk" download
       style="background-color: #0175C2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-family: sans-serif; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
       Download Android App
     </a>
   </div>
+
+  <script>
+    function updateDownloadButtonVisibility() {
+      var container = document.getElementById('download-container');
+      if (!container) return;
+
+      // Check current URL hash or path
+      var href = window.location.href;
+      // Show only if 'welcome', 'login', or 'register' is in the URL
+      // Adjust this condition based on your actual routing (e.g., #/login)
+      var shouldShow = href.includes('welcome') || href.includes('login') || href.includes('register');
+
+      container.style.display = shouldShow ? 'block' : 'none';
+
+      // If no hash/path is present (initial load might be root), deciding on default behavior.
+      // Assuming root redirects to welcome/home, the router will update the URL eventually.
+    }
+
+    // Determine visibility on load
+    window.addEventListener('load', updateDownloadButtonVisibility);
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', updateDownloadButtonVisibility);
+
+    // Also poll/listen for popstate to cover pushState navigations if necessary
+    window.addEventListener('popstate', updateDownloadButtonVisibility);
+
+    // MutationObserver to watch for URL changes if single-page app routing doesn't trigger standard events reliably
+    // (Optional, but robust for some Flutter router implementations)
+    var observer = new MutationObserver(function (mutations) {
+      updateDownloadButtonVisibility();
+    });
+    // Observing body might be overkill, but observing title or just polling can work.
+    // Let's stick to a simple polling interval as a fallback for Flutter's internal navigation
+    setInterval(updateDownloadButtonVisibility, 500); 
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 

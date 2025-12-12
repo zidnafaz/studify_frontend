@@ -6,6 +6,7 @@ import 'package:studify/presentation/screens/classroom/join_classroom_screen.dar
 import 'package:studify/providers/classroom_provider.dart';
 import 'package:studify/core/constants/app_theme.dart';
 import 'package:studify/providers/theme_provider.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
 
 // Create a MockClassroomProvider
 class MockClassroomProvider extends Mock implements ClassroomProvider {}
@@ -27,6 +28,8 @@ void main() {
           ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: AppTheme.lightTheme,
           home: const JoinClassroomScreen(initialCode: initialCode),
         ),
@@ -54,6 +57,8 @@ void main() {
           ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: AppTheme.lightTheme,
           home: const JoinClassroomScreen(),
         ),
@@ -66,6 +71,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Assert
-    expect(find.text('Kode tidak boleh kosong'), findsOneWidget);
+    expect(find.text('Code is required'), findsOneWidget);
   });
 }

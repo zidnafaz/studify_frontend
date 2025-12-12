@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
 
 import '../../../data/models/classroom_model.dart';
 import '../../../data/models/user_model.dart';
@@ -20,7 +21,6 @@ class ClassroomInfoScreen extends StatefulWidget {
 }
 
 class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
-  Classroom? _detailedClassroom;
   bool _isLoading = true;
 
   @override
@@ -46,7 +46,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
 
     if (mounted) {
       setState(() {
-        _detailedClassroom = classroomProvider.selectedClassroom;
+        // _detailedClassroom is no longer needed as we use Consumer
         _isLoading = false;
       });
     }
@@ -55,9 +55,9 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   void _copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Copied to clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.copiedToClipboard),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -71,8 +71,72 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
     );
   }
 
-  String _getMemberRole(User user) {
-    final classroom = _detailedClassroom ?? widget.classroom;
+  Future<void> _handleDeleteClassroom(BuildContext context, Classroom classroom) async {
+    final otherMembers = classroom.users?.where((u) => u.id != classroom.ownerId).toList() ?? [];
+    
+    if (otherMembers.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot delete classroom. Please remove all members first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteClassroom),
+        content: Text(
+          AppLocalizations.of(context)!.deleteClassroomConfirmation,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(AppLocalizations.of(context)!.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      // Capture references before async gap
+      final messenger = ScaffoldMessenger.of(context);
+      final navigator = Navigator.of(context);
+      final provider = Provider.of<ClassroomProvider>(context, listen: false);
+
+      try {
+        setState(() => _isLoading = true);
+        await provider.deleteClassroom(classroom.id);
+        
+        if (mounted) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.classroomDeleted)),
+          );
+          
+          navigator.pushNamedAndRemoveUntil(
+            '/classroomList',
+            (route) => false,
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          messenger.showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.failedToDelete(e.toString()))),
+          );
+        }
+      }
+    }
+  }
+
+  String _getMemberRole(User user, Classroom classroom) {
     if (user.id == classroom.ownerId) {
       return 'Owner';
     }
@@ -83,7 +147,8 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
   }
 
   Future<void> _showEditDescriptionDialog(BuildContext context) async {
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroomProvider = Provider.of<ClassroomProvider>(context, listen: false);
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
     final controller = TextEditingController(text: classroom.description);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -137,7 +202,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       context,
       listen: false,
     );
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
 
     try {
       await classroomProvider.updateClassroomDescription(
@@ -146,9 +211,6 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       );
 
       if (mounted) {
-        setState(() {
-          _detailedClassroom = classroomProvider.selectedClassroom;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Description updated successfully'),
@@ -190,12 +252,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/classroomList',
-                (route) => false,
-              );
-
+              Navigator.pop(context); // Close dialog first
               await _leaveClassroom();
             },
             style: ElevatedButton.styleFrom(
@@ -214,13 +271,17 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       context,
       listen: false,
     );
-    final classroom = _detailedClassroom ?? widget.classroom;
+    final classroom = classroomProvider.selectedClassroom ?? widget.classroom;
 
     try {
       await classroomProvider.leaveClassroom(classroom.id);
 
       if (mounted) {
-        Navigator.pop(context); // Go back to classroom list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/classroomList',
+          (route) => false,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Left classroom successfully'),
@@ -304,7 +365,6 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
       builder: (context, classroomProvider, child) {
         final classroom =
             classroomProvider.selectedClassroom ??
-            _detailedClassroom ??
             widget.classroom;
         final authProvider = Provider.of<AuthProvider>(context);
         final currentUserId = authProvider.user?.id ?? 0;
@@ -534,7 +594,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                     ),
                     itemBuilder: (context, index) {
                       final user = sortedUsers[index];
-                      final role = _getMemberRole(user);
+                      final role = _getMemberRole(user, classroom);
 
                       return InkWell(
                         onTap: () {
@@ -646,6 +706,49 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                         ],
                       ),
                     ),
+                  ),
+                ],
+
+                // Delete Classroom Button (only for owners)
+                if (isOwner) ...[
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _handleDeleteClassroom(context, classroom),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.error,
+                        foregroundColor: colorScheme.onError,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.delete_forever, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Delete Classroom',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You can only delete this classroom if there are no other members.',
+                    style: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ],

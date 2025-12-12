@@ -9,6 +9,7 @@ import 'package:studify/data/models/reminder_model.dart';
 import 'package:studify/data/models/user_model.dart';
 import 'package:studify/presentation/widgets/sheets/class_schedule_detail_sheet.dart';
 import 'package:studify/providers/auth_provider.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
 
 // Mock AuthProvider for testing
 class MockAuthProvider extends AuthProvider {
@@ -75,6 +76,8 @@ void main() {
 
   Widget createWidgetUnderTest(User currentUser) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColor.primary,

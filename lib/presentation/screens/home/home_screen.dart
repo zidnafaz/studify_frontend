@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ import '../../widgets/sheets/combined_schedule_detail_sheet.dart';
 import '../../../data/services/device_token_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../../providers/notification_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -78,21 +80,21 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w400,
               fontSize: 12,
             ),
-            items: const [
+            items: [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
+                icon: const Icon(Icons.home_outlined),
+                activeIcon: const Icon(Icons.home),
+                label: AppLocalizations.of(context)!.home,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.group_outlined),
-                activeIcon: Icon(Icons.group),
-                label: 'Classroom',
+                icon: const Icon(Icons.group_outlined),
+                activeIcon: const Icon(Icons.group),
+                label: AppLocalizations.of(context)!.classroom,
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Profile',
+                icon: const Icon(Icons.person_outline),
+                activeIcon: const Icon(Icons.person),
+                label: AppLocalizations.of(context)!.profile,
               ),
             ],
           ),
@@ -143,7 +145,19 @@ class _HomeTabState extends State<_HomeTab> {
 
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null && mounted) {
+      String? title;
+      String? body;
+
+      if (message.notification != null) {
+        title = message.notification!.title;
+        body = message.notification!.body;
+      } else if (message.data.containsKey('title_key')) {
+        // Handle localized data message
+        title = _getLocalizedText(context, message.data['title_key'], message.data['title_args']);
+        body = _getLocalizedText(context, message.data['body_key'], message.data['body_args']);
+      }
+
+      if (title != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Column(
@@ -151,7 +165,7 @@ class _HomeTabState extends State<_HomeTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  message.notification!.title ?? 'Notification',
+                  title ?? AppLocalizations.of(context)!.notification,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.surface,
@@ -159,7 +173,7 @@ class _HomeTabState extends State<_HomeTab> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  message.notification!.body ?? '',
+                  body ?? '',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.surface,
                   ),
@@ -173,18 +187,42 @@ class _HomeTabState extends State<_HomeTab> {
             ),
             margin: const EdgeInsets.all(16),
             action: SnackBarAction(
-              label: 'Dismiss',
+              label: AppLocalizations.of(context)!.dismiss,
               textColor: Theme.of(context).brightness == Brightness.dark
                   ? Theme.of(context).colorScheme.primaryContainer
                   : Theme.of(context).colorScheme.secondary,
               onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).clearSnackBars();
               },
             ),
           ),
         );
       }
     });
+  }
+
+  String? _getLocalizedText(BuildContext context, String? key, String? argsJson) {
+    if (key == null) return null;
+    final l10n = AppLocalizations.of(context)!;
+    Map<String, dynamic> args = {};
+    if (argsJson != null) {
+      try {
+        args = json.decode(argsJson);
+      } catch (_) {}
+    }
+
+    switch (key) {
+      case 'schedule_updated_title':
+        return l10n.scheduleUpdatedTitle(args['title'] ?? '');
+      case 'schedule_updated_body':
+        return l10n.scheduleUpdatedBody(args['date'] ?? '', args['time'] ?? '');
+      case 'schedule_cancelled_title':
+        return l10n.scheduleCancelledTitle(args['title'] ?? '');
+      case 'schedule_cancelled_body':
+        return l10n.scheduleCancelledBody(args['date'] ?? '', args['time'] ?? '');
+      default:
+        return null;
+    }
   }
 
   Map<String, List<CombinedSchedule>> _groupSchedulesByDate(
@@ -222,9 +260,9 @@ class _HomeTabState extends State<_HomeTab> {
 
       String dateKey;
       if (isSameDay(scheduleDate, today)) {
-        dateKey = 'Today';
+        dateKey = AppLocalizations.of(context)!.today;
       } else if (isSameDay(scheduleDate, tomorrow)) {
-        dateKey = 'Tomorrow';
+        dateKey = AppLocalizations.of(context)!.tomorrow;
       } else if (scheduleDate.year == now.year) {
         dateKey = DateFormat('d MMM').format(scheduleDate);
       } else {
@@ -271,7 +309,7 @@ class _HomeTabState extends State<_HomeTab> {
 
   String _getScheduleHeaderText() {
     if (_showAllSchedules) {
-      return 'Upcoming Schedule';
+      return AppLocalizations.of(context)!.upcomingSchedule;
     } else {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -283,21 +321,21 @@ class _HomeTabState extends State<_HomeTab> {
       );
 
       if (isSameDay(selected, today)) {
-        return 'Today\'s Schedule';
+        return AppLocalizations.of(context)!.todaysSchedule;
       } else if (isSameDay(selected, tomorrow)) {
-        return 'Tomorrow\'s Schedule';
+        return AppLocalizations.of(context)!.tomorrowsSchedule;
       } else if (selected.year == now.year) {
-        return 'Schedule ${DateFormat('d MMM').format(selected)}';
+        return AppLocalizations.of(context)!.scheduleDate(DateFormat('d MMM').format(selected));
       } else {
-        return 'Schedule ${DateFormat('d MMM yyyy').format(selected)}';
+        return AppLocalizations.of(context)!.scheduleDate(DateFormat('d MMM yyyy').format(selected));
       }
     }
   }
 
   IconData _getDateIcon(String dateKey) {
-    if (dateKey == 'Today') {
+    if (dateKey == AppLocalizations.of(context)!.today) {
       return Icons.today;
-    } else if (dateKey == 'Tomorrow') {
+    } else if (dateKey == AppLocalizations.of(context)!.tomorrow) {
       return Icons.event;
     } else {
       return Icons.calendar_month;
@@ -322,8 +360,8 @@ class _HomeTabState extends State<_HomeTab> {
               const SizedBox(height: 16),
               Text(
                 _showAllSchedules
-                    ? 'No upcoming schedules'
-                    : 'No schedule on this date',
+                    ? AppLocalizations.of(context)!.noUpcomingSchedules
+                    : AppLocalizations.of(context)!.noScheduleOnDate,
                 style: TextStyle(
                   color: colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
@@ -752,10 +790,6 @@ class _HomeTabState extends State<_HomeTab> {
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
                           child: DropdownButton<String>(
                             value: _selectedDateFilter,
                             isDense: true,
@@ -770,30 +804,30 @@ class _HomeTabState extends State<_HomeTab> {
                               fontWeight: FontWeight.w500,
                               color: colorScheme.primary,
                             ),
-                            items: const [
+                            items: [
                               DropdownMenuItem(
                                 value: '1d',
-                                child: Text('1 Day'),
+                                child: Text(AppLocalizations.of(context)!.oneDay),
                               ),
                               DropdownMenuItem(
                                 value: '3d',
-                                child: Text('3 Days'),
+                                child: Text(AppLocalizations.of(context)!.threeDays),
                               ),
                               DropdownMenuItem(
                                 value: '7d',
-                                child: Text('7 Days'),
+                                child: Text(AppLocalizations.of(context)!.sevenDays),
                               ),
                               DropdownMenuItem(
                                 value: '1m',
-                                child: Text('1 Month'),
+                                child: Text(AppLocalizations.of(context)!.oneMonth),
                               ),
                               DropdownMenuItem(
                                 value: 'custom',
-                                child: Text('Custom'),
+                                child: Text(AppLocalizations.of(context)!.custom),
                               ),
                               DropdownMenuItem(
                                 value: 'all',
-                                child: Text('All'),
+                                child: Text(AppLocalizations.of(context)!.all),
                               ),
                             ],
                             onChanged: (value) {

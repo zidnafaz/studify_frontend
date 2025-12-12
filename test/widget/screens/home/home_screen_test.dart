@@ -15,6 +15,8 @@ import 'package:studify/data/models/notification_model.dart';
 import 'package:studify/data/models/combined_schedule_model.dart';
 import 'package:studify/data/services/device_token_service.dart';
 import 'package:studify/data/models/user_model.dart' as model;
+import 'package:studify/l10n/generated/app_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 // Generate mocks
 @GenerateMocks([
@@ -35,7 +37,8 @@ void main() {
   late MockPersonalScheduleProvider mockPersonalScheduleProvider;
   late MockDeviceTokenService mockDeviceTokenService;
 
-  setUp(() {
+  setUp(() async {
+    await initializeDateFormatting();
     mockScheduleProvider = MockCombinedScheduleProvider();
     mockAuthProvider = MockAuthProvider();
     mockClassroomProvider = MockClassroomProvider();
@@ -89,7 +92,11 @@ void main() {
         ),
         Provider<DeviceTokenService>.value(value: mockDeviceTokenService),
       ],
-      child: const MaterialApp(home: HomeScreen()),
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: HomeScreen(),
+      ),
     );
   }
 

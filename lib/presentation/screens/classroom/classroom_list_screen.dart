@@ -7,6 +7,7 @@ import '../../widgets/classroom/empty_classroom_state.dart';
 import '../../widgets/sheets/classroom_action_sheet.dart';
 import '../../widgets/primary_floating_action_button.dart';
 import 'classroom_detail_screen.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class ClassroomScreen extends StatefulWidget {
   const ClassroomScreen({super.key});
@@ -31,7 +32,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal memuat classroom: $e'),
+            content: Text(AppLocalizations.of(context)!.failedToLoadClassroom(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -57,7 +58,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Classroom List',
+                  AppLocalizations.of(context)!.classroomList,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -79,7 +80,7 @@ class _ClassroomScreenState extends State<ClassroomScreen> {
       ),
       floatingActionButton: PrimaryFloatingActionButton(
         onPressed: _showClassroomActionSheet,
-        tooltip: 'Classroom Actions',
+        tooltip: AppLocalizations.of(context)!.classroomActions,
       ),
     );
   }

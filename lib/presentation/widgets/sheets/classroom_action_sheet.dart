@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../screens/classroom/join_classroom_screen.dart';
 import '../../screens/classroom/create_classroom_screen.dart';
@@ -51,7 +52,7 @@ class ClassroomActionSheet extends StatelessWidget {
                   ),
                 ),
                 title: Text(
-                  'Join Class',
+                  AppLocalizations.of(context)!.joinClassOption,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -94,7 +95,7 @@ class ClassroomActionSheet extends StatelessWidget {
                   ),
                 ),
                 title: Text(
-                  'Create Class',
+                  AppLocalizations.of(context)!.createClassOption,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../providers/classroom_provider.dart';
 
 class JoinClassroomScreen extends StatefulWidget {
@@ -46,7 +47,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Berhasil bergabung ke ${classroom.name}'),
+            content: Text(AppLocalizations.of(context)!.classroomJoinSuccess(classroom.name)),
             backgroundColor: Colors.green,
           ),
         );
@@ -55,7 +56,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal bergabung: $e'),
+            content: Text(AppLocalizations.of(context)!.classroomJoinError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -98,7 +99,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                   ),
                   Center(
                     child: Text(
-                      'Join New Class',
+                      AppLocalizations.of(context)!.joinNewClassTitle,
                       style: TextStyle(
                         color: colorScheme.onPrimary,
                         fontSize: 20,
@@ -122,7 +123,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
               TextFormField(
                 controller: _codeController,
                 decoration: InputDecoration(
-                  hintText: 'Enter Code',
+                  hintText: AppLocalizations.of(context)!.enterCodeHint,
                   hintStyle: TextStyle(
                     color: colorScheme.onSurfaceVariant.withOpacity(0.5),
                   ),
@@ -163,10 +164,10 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                 enabled: !_isLoading,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Kode tidak boleh kosong';
+                    return AppLocalizations.of(context)!.codeRequired;
                   }
                   if (value.trim().length < 6) {
-                    return 'Kode harus minimal 6 karakter';
+                    return AppLocalizations.of(context)!.codeMinLength;
                   }
                   return null;
                 },
@@ -194,9 +195,9 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
                             color: colorScheme.surface,
                           ),
                         )
-                      : const Text(
-                          'Join Class',
-                          style: TextStyle(
+                      : Text(
+                          AppLocalizations.of(context)!.joinClassButton,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

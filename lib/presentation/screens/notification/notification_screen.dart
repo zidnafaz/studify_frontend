@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../providers/notification_provider.dart';
 import '../../../data/models/notification_model.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -30,7 +31,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(AppLocalizations.of(context)!.notifications),
         centerTitle: true,
         actions: [
           TextButton(
@@ -41,7 +42,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ).markAllRead();
             },
             child: Text(
-              'Mark all as read',
+              AppLocalizations.of(context)!.markAllAsRead,
               style: TextStyle(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.w600,
@@ -69,7 +70,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No notifications yet',
+                    AppLocalizations.of(context)!.noNotifications,
                     style: TextStyle(
                       color: colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 16,

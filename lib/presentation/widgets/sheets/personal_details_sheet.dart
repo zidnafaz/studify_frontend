@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
 
 class PersonalDetailsSheet extends StatefulWidget {
@@ -48,8 +49,8 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
       if (success) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.profileUpdateSuccess),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
@@ -58,7 +59,8 @@ class _PersonalDetailsSheetState extends State<PersonalDetailsSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              authProvider.errorMessage ?? 'Failed to update profile',
+              authProvider.errorMessage ??
+                  AppLocalizations.of(context)!.profileUpdateError,
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,

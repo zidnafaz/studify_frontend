@@ -37,10 +37,22 @@ class CombinedScheduleService {
       );
 
       print('📡 Response status: ${response.statusCode}');
-      print('📄 Response body: ${response.data}');
+      // print('📄 Response body: ${response.data}'); // Commented out to avoid huge logs, enable if needed
 
       if (response.statusCode == 200) {
-        return CombinedScheduleResponse.fromJson(response.data);
+        final data = response.data;
+        if (data is! Map<String, dynamic>) {
+          throw ApiException(message: 'Invalid response format: expected Map, got ${data.runtimeType}');
+        }
+        
+        try {
+          return CombinedScheduleResponse.fromJson(data);
+        } catch (e, stack) {
+          print('❌ JSON Parsing Error: $e');
+          print('Stack trace: $stack');
+          print('Problematic JSON data: $data');
+          rethrow;
+        }
       } else {
         throw ApiException(
           message: 'Failed to get combined schedules',

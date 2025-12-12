@@ -10,8 +10,10 @@ class DeviceTokenService {
   Future<String?> getDeviceToken() async {
     try {
       if (kIsWeb) {
-        // For web, you might need a VAPID key
-        return await _firebaseMessaging.getToken();
+        // Ganti dengan VAPID Key dari Firebase Console -> Project Settings -> Cloud Messaging -> Web configuration
+        return await _firebaseMessaging.getToken(
+          vapidKey: "BDEj5ZDR7QFQJ_CXY-c6GxOpMnXyJ-KivHTjgJ_OoDrp-oA2guuBXugo9wqJlN-1_iR_NPwXl8-LyjN_EtW73aU",
+        );
       } else {
         return await _firebaseMessaging.getToken();
       }
@@ -21,11 +23,18 @@ class DeviceTokenService {
     }
   }
 
+  Future<NotificationSettings> requestPermission() async {
+    return await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
   Future<void> syncDeviceToken() async {
     try {
       // Request permission first (especially for iOS)
-      NotificationSettings settings = await _firebaseMessaging
-          .requestPermission(alert: true, badge: true, sound: true);
+      NotificationSettings settings = await requestPermission();
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {

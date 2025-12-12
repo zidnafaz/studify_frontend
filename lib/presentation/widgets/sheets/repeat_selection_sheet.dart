@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../data/models/schedule_repeat_model.dart';
 
 class RepeatSelectionSheet extends StatefulWidget {
@@ -14,15 +15,15 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
   late List<int> _selectedDays;
   int _repeatCount = 1;
 
-  final List<String> _dayNames = [
-    'Senin',
-    'Selasa',
-    'Rabu',
-    'Kamis',
-    'Jumat',
-    'Sabtu',
-    'Minggu',
-  ];
+  // final List<String> _dayNames = [
+  //   'Senin',
+  //   'Selasa',
+  //   'Rabu',
+  //   'Kamis',
+  //   'Jumat',
+  //   'Sabtu',
+  //   'Minggu',
+  // ];
 
   @override
   void initState() {
@@ -53,6 +54,17 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final dayNames = [
+      l10n.monday,
+      l10n.tuesday,
+      l10n.wednesday,
+      l10n.thursday,
+      l10n.friday,
+      l10n.saturday,
+      l10n.sunday,
+    ];
+
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -61,19 +73,15 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
           topRight: Radius.circular(20),
         ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
                   Text(
-                    'Tambah Pengulangan',
+                    AppLocalizations.of(context)!.addRepeatTitle,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -83,7 +91,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                   TextButton(
                     onPressed: _save,
                     child: Text(
-                      'Simpan',
+                      AppLocalizations.of(context)!.save,
                       style: TextStyle(
                         color: colorScheme.primary,
                         fontSize: 16,
@@ -97,7 +105,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
 
               // Description
               Text(
-                'Ulangi pengingat ini setiap',
+                AppLocalizations.of(context)!.repeatEveryLabel,
                 style: TextStyle(
                   fontSize: 14,
                   color: colorScheme.onSurfaceVariant,
@@ -115,7 +123,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-                  children: List.generate(_dayNames.length, (index) {
+                  children: List.generate(dayNames.length, (index) {
                     final dayValue = index + 1;
                     final isSelected = _selectedDays.contains(dayValue);
 
@@ -134,7 +142,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  _dayNames[index],
+                                  dayNames[index],
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: colorScheme.onSurface,
@@ -180,7 +188,7 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Ulangi sebanyak berapa kali',
+                    AppLocalizations.of(context)!.repeatCountLabel,
                     style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -209,15 +217,32 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
                           ),
                         ),
                         SizedBox(
-                          width: 40,
-                          child: Text(
-                            '$_repeatCount',
+                          width: 60,
+                          child: TextField(
+                            controller: TextEditingController(text: '$_repeatCount')
+                              ..selection = TextSelection.fromPosition(
+                                TextPosition(offset: '$_repeatCount'.length),
+                              ),
                             textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: colorScheme.onSurface,
                             ),
+                            onChanged: (value) {
+                              final newValue = int.tryParse(value);
+                              if (newValue != null && newValue > 0) {
+                                setState(() {
+                                  _repeatCount = newValue;
+                                });
+                              }
+                            },
                           ),
                         ),
                         IconButton(
@@ -235,8 +260,6 @@ class _RepeatSelectionSheetState extends State<RepeatSelectionSheet> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class ThemeSheet extends StatelessWidget {
   const ThemeSheet({super.key});
@@ -42,7 +43,7 @@ class ThemeSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Theme',
+                  AppLocalizations.of(context)!.theme,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -52,7 +53,7 @@ class ThemeSheet extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildThemeOption(
                   context,
-                  title: 'Light',
+                  title: AppLocalizations.of(context)!.light,
                   icon: Icons.light_mode,
                   isSelected: themeProvider.themeMode == ThemeMode.light,
                   onTap: () {
@@ -63,7 +64,7 @@ class ThemeSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildThemeOption(
                   context,
-                  title: 'Dark',
+                  title: AppLocalizations.of(context)!.dark,
                   icon: Icons.dark_mode,
                   isSelected: themeProvider.themeMode == ThemeMode.dark,
                   onTap: () {
@@ -74,7 +75,7 @@ class ThemeSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 _buildThemeOption(
                   context,
-                  title: 'System',
+                  title: AppLocalizations.of(context)!.system,
                   icon: Icons.brightness_auto,
                   isSelected: themeProvider.themeMode == ThemeMode.system,
                   onTap: () {

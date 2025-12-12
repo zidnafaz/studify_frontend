@@ -61,7 +61,7 @@ class ClassroomProvider with ChangeNotifier {
       _setError(e.message);
       rethrow;
     } catch (e) {
-      _setError('Terjadi kesalahan: $e');
+      _setError('An error occurred: $e');
       rethrow;
     } finally {
       _setLoading(false);
@@ -307,6 +307,17 @@ class ClassroomProvider with ChangeNotifier {
       }
 
       return updatedClassroom;
+    });
+  }
+
+  Future<void> deleteClassroom(int classroomId) async {
+    await _withLoading(() async {
+      await _classroomService.deleteClassroom(classroomId);
+      _classrooms.removeWhere((c) => c.id == classroomId);
+      if (_selectedClassroom?.id == classroomId) {
+        _selectedClassroom = null;
+      }
+      return true;
     });
   }
 

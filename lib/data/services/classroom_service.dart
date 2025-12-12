@@ -458,4 +458,28 @@ class ClassroomService {
       throw ApiException(message: e.toString());
     }
   }
+
+  // Delete classroom
+  Future<void> deleteClassroom(int classroomId) async {
+    try {
+      print('🔵 Delete classroom request: $classroomId');
+
+      final response = await _dioClient.delete('/api/classrooms/$classroomId');
+
+      print('📡 Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
+      } else {
+        throw ApiException(
+          message: 'Failed to delete classroom',
+          statusCode: response.statusCode,
+        );
+      }
+    } catch (e) {
+      print('❌ Delete classroom error: $e');
+      if (e is ApiException) rethrow;
+      throw ApiException(message: e.toString());
+    }
+  }
 }

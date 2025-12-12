@@ -6,6 +6,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:studify/core/services/deep_link_service.dart';
 import 'package:studify/presentation/screens/classroom/join_classroom_screen.dart';
+import 'package:studify/l10n/generated/app_localizations.dart';
 
 // Generate mocks
 @GenerateMocks([AppLinks])
@@ -42,6 +43,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           navigatorKey: navigatorKey,
           home: Container(),
           navigatorObservers: [mockNavigatorObserver],

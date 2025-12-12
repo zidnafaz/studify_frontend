@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 import '../../../data/models/personal_schedule_model.dart';
 import '../classroom/schedule_text_field.dart';
@@ -224,7 +225,7 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
           if (mounted) {
             ScaffoldMessenger.of(currentContext).showSnackBar(
               SnackBar(
-                content: Text('Gagal memperbarui jadwal: $e'),
+                content: Text(AppLocalizations.of(context)!.scheduleUpdateError(e.toString())),
                 backgroundColor: Colors.red,
               ),
             );
@@ -270,13 +271,13 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                         onPressed: _isLoading
                             ? null
                             : () => Navigator.pop(context),
-                        child: const Text(
-                          'Batal',
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
                           style: TextStyle(color: Colors.red, fontSize: 16),
                         ),
                       ),
                       Text(
-                        'Edit Jadwal Pribadi',
+                        AppLocalizations.of(context)!.editPersonalScheduleTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -286,7 +287,7 @@ class _EditPersonalScheduleSheetState extends State<EditPersonalScheduleSheet> {
                       TextButton(
                         onPressed: _isLoading ? null : _save,
                         child: Text(
-                          'Simpan',
+                          AppLocalizations.of(context)!.save,
                           style: TextStyle(
                             color: colorScheme.primary,
                             fontSize: 16,

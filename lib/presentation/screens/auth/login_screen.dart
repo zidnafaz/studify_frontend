@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../providers/auth_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +19,24 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String _version = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      _initPackageInfo();
+    }
+  }
+
+  Future<void> _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _version = info.version;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -41,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.errorMessage ?? 'Login failed'),
+              content: Text(authProvider.errorMessage ?? AppLocalizations.of(context)!.loginFailed),
               backgroundColor: Colors.red,
             ),
           );
@@ -54,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colorScheme.background,
@@ -92,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Title
                   Text(
-                    'Welcome Back!',
+                    l10n.welcomeBack,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
@@ -102,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Login to continue your learning journey',
+                    l10n.loginSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -113,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Email Field
                   CustomTextField(
-                    hintText: 'Email',
+                    hintText: l10n.emailHint,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icon(
@@ -123,12 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email tidak boleh kosong';
+                        return l10n.emailRequired;
                       }
                       if (!RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                       ).hasMatch(value)) {
-                        return 'Email tidak valid';
+                        return l10n.emailInvalid;
                       }
                       return null;
                     },
@@ -137,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Password Field
                   CustomTextField(
-                    hintText: 'Password',
+                    hintText: l10n.passwordHint,
                     controller: _passwordController,
                     isPassword: true,
                     prefixIcon: Icon(
@@ -147,10 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password tidak boleh kosong';
+                        return l10n.passwordRequired;
                       }
                       if (value.length < 6) {
-                        return 'Password minimal 6 karakter';
+                        return l10n.passwordMinLength;
                       }
                       return null;
                     },
@@ -161,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {
                       return CustomButton(
-                        text: 'Login',
+                        text: l10n.login,
                         onPressed: _handleLogin,
                         isLoading: authProvider.status == AuthStatus.loading,
                       );
@@ -180,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'OR',
+                          l10n.or,
                           style: TextStyle(
                             color: colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 12,
@@ -202,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Don\'t have an account? ',
+                        l10n.dontHaveAccount,
                         style: TextStyle(
                           color: colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
@@ -213,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushNamed(context, '/register');
                         },
                         child: Text(
-                          'Sign Up',
+                          l10n.signUp,
                           style: TextStyle(
                             color: colorScheme.secondary,
                             fontSize: 14,
@@ -223,6 +245,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
+                  if (kIsWeb && _version.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      'Version $_version',
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.5),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

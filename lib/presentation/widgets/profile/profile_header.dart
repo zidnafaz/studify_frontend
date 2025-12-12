@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../data/models/user_model.dart';
 
 class ProfileHeader extends StatelessWidget {
@@ -8,8 +9,8 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = user?.name ?? 'Guest User';
-    final email = user?.email ?? 'No email';
+    final name = user?.name ?? AppLocalizations.of(context)!.guestUser;
+    final email = user?.email ?? AppLocalizations.of(context)!.noEmail;
     final initials = name.isNotEmpty
         ? name
               .split(' ')

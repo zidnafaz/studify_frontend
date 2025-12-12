@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class EmptyClassroomState extends StatelessWidget {
   const EmptyClassroomState({super.key});
@@ -17,7 +18,7 @@ class EmptyClassroomState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Belum ada classroom',
+            AppLocalizations.of(context)!.noClassroomYet,
             style: TextStyle(
               fontSize: 16,
               color: colorScheme.onSurfaceVariant,
@@ -26,7 +27,7 @@ class EmptyClassroomState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap tombol + untuk membuat classroom baru',
+            AppLocalizations.of(context)!.tapPlusToCreateClassroom,
             style: TextStyle(
               fontSize: 14,
               color: colorScheme.onSurfaceVariant.withOpacity(0.7),

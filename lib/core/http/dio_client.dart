@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 import '../errors/api_exception.dart';
 import '../../data/services/auth_service.dart';
@@ -33,6 +34,12 @@ class DioClient {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+
+          // Add Accept-Language header
+          final prefs = await SharedPreferences.getInstance();
+          final languageCode = prefs.getString('language_code') ?? 'en';
+          options.headers['Accept-Language'] = languageCode;
+
           return handler.next(options);
         },
         onError: (error, handler) async {

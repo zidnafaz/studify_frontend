@@ -4,6 +4,7 @@ import '../../../providers/auth_provider.dart';
 
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -47,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.errorMessage ?? 'Registration failed'),
+              content: Text(authProvider.errorMessage ?? AppLocalizations.of(context)!.registrationFailed),
               backgroundColor: Colors.red,
             ),
           );
@@ -59,6 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colorScheme.background,
@@ -80,7 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 // Header
                 Text(
-                  'Create Account',
+                  l10n.createAccount,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -89,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign up to get started',
+                  l10n.registerSubtitle,
                   style: TextStyle(
                     fontSize: 14,
                     color: colorScheme.onSurface.withOpacity(0.7),
@@ -99,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Name Field
                 CustomTextField(
-                  hintText: 'Full Name',
+                  hintText: l10n.fullNameHint,
                   controller: _nameController,
                   keyboardType: TextInputType.name,
                   prefixIcon: Icon(
@@ -109,10 +111,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Nama tidak boleh kosong';
+                      return l10n.nameRequired;
                     }
                     if (value.length < 3) {
-                      return 'Nama minimal 3 karakter';
+                      return l10n.nameMinLength;
                     }
                     return null;
                   },
@@ -121,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Email Field
                 CustomTextField(
-                  hintText: 'Email',
+                  hintText: l10n.emailHint,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(
@@ -131,12 +133,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Email tidak boleh kosong';
+                      return l10n.emailRequired;
                     }
                     if (!RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value)) {
-                      return 'Email tidak valid';
+                      return l10n.emailInvalid;
                     }
                     return null;
                   },
@@ -145,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Password Field
                 CustomTextField(
-                  hintText: 'Password',
+                  hintText: l10n.passwordHint,
                   controller: _passwordController,
                   isPassword: true,
                   prefixIcon: Icon(
@@ -155,10 +157,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Password tidak boleh kosong';
+                      return l10n.passwordRequired;
                     }
                     if (value.length < 6) {
-                      return 'Password minimal 6 karakter';
+                      return l10n.passwordMinLength;
                     }
                     return null;
                   },
@@ -167,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Confirm Password Field
                 CustomTextField(
-                  hintText: 'Confirm Password',
+                  hintText: l10n.confirmPasswordHint,
                   controller: _confirmPasswordController,
                   isPassword: true,
                   prefixIcon: Icon(
@@ -177,10 +179,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Konfirmasi password tidak boleh kosong';
+                      return l10n.confirmPasswordRequired;
                     }
                     if (value != _passwordController.text) {
-                      return 'Password tidak cocok';
+                      return l10n.passwordMismatch;
                     }
                     return null;
                   },
@@ -191,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
                     return CustomButton(
-                      text: 'Sign Up',
+                      text: l10n.signUp,
                       onPressed: _handleRegister,
                       isLoading: authProvider.status == AuthStatus.loading,
                     );
@@ -210,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'OR',
+                        l10n.or,
                         style: TextStyle(
                           color: colorScheme.onSurface.withOpacity(0.5),
                           fontSize: 12,
@@ -232,7 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      l10n.alreadyHaveAccount,
                       style: TextStyle(
                         color: colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 14,
@@ -243,7 +245,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        'Login',
+                        l10n.login,
                         style: TextStyle(
                           color: colorScheme.secondary,
                           fontSize: 14,

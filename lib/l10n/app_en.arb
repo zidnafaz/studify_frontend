@@ -1,0 +1,307 @@
+{
+    "appTitle": "Studify",
+    "helloWorld": "Hello World!",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "language": "Language",
+    "changeLanguage": "Change Language",
+    "classroom": "Classroom",
+    "deleteClassroom": "Delete Classroom",
+    "deleteClassroomConfirmation": "Are you sure you want to delete this classroom?",
+    "transferOwnershipSuccess": "Ownership transferred successfully",
+    "transferOwnershipFailed": "Failed to transfer ownership: {error}",
+    "@transferOwnershipFailed": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "removeMemberSuccess": "Member removed successfully",
+    "removeMemberFailed": "Failed to remove member: {error}",
+    "@removeMemberFailed": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "actionCannotBeUndone": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "edit": "Edit",
+    "description": "Description",
+    "noDescription": "No description",
+    "members": "Members",
+    "owner": "Owner",
+    "coordinator": "Coordinator",
+    "member": "Member",
+    "copiedToClipboard": "Copied to clipboard",
+    "classroomDeleted": "Classroom deleted successfully",
+    "failedToDelete": "Failed to delete: {error}",
+    "@failedToDelete": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "login": "Login",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "or": "OR",
+    "welcomeTitle": "Studify",
+    "welcomeSubtitle": "Your Smart Study Companion",
+    "welcomeDescription": "Organize and Study Together",
+    "welcomeBack": "Welcome Back!",
+    "loginSubtitle": "Login to continue your learning journey",
+    "emailHint": "Email",
+    "passwordHint": "Password",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "loginFailed": "Login failed",
+    "dontHaveAccount": "Don't have an account? ",
+    "createAccount": "Create Account",
+    "registerSubtitle": "Sign up to get started",
+    "fullNameHint": "Full Name",
+    "confirmPasswordHint": "Confirm Password",
+    "nameRequired": "Name is required",
+    "nameMinLength": "Name must be at least 3 characters",
+    "confirmPasswordRequired": "Confirm password is required",
+    "passwordMismatch": "Passwords do not match",
+    "registrationFailed": "Registration failed",
+    "alreadyHaveAccount": "Already have an account? ",
+    "home": "Home",
+    "profile": "Profile",
+    "notification": "Notification",
+    "dismiss": "Dismiss",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "upcomingSchedule": "Upcoming Schedule",
+    "todaysSchedule": "Today's Schedule",
+    "tomorrowsSchedule": "Tomorrow's Schedule",
+    "scheduleDate": "Schedule {date}",
+    "@scheduleDate": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            }
+        }
+    },
+    "noUpcomingSchedules": "No upcoming schedules",
+    "noScheduleOnDate": "No schedule on this date",
+    "oneDay": "1 Day",
+    "threeDays": "3 Days",
+    "sevenDays": "7 Days",
+    "oneMonth": "1 Month",
+    "custom": "Custom",
+    "all": "All",
+    "failedToLoadClassroom": "Failed to load classroom: {error}",
+    "@failedToLoadClassroom": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "classroomList": "Classroom List",
+    "classroomActions": "Classroom Actions",
+    "comingSoon": "{feature} coming soon",
+    "@comingSoon": {
+        "placeholders": {
+            "feature": {
+                "type": "String"
+            }
+        }
+    },
+    "account": "Account",
+    "personalDetails": "Personal Details",
+    "nameAndEmail": "Name and email",
+    "theme": "Theme",
+    "themeSubtitle": "Light/Dark theme settings",
+    "version": "Version",
+    "support": "Support",
+    "faq": "FAQ",
+    "contactAdmin": "Contact admin for help",
+    "sendFeedback": "Send Feedback",
+    "feedbackSubtitle": "Tell us how we can improve Studify",
+    "signOut": "Sign Out",
+    "signOutConfirmation": "Are you sure you want to sign out of Studify?",
+    "notifications": "Notifications",
+    "markAllAsRead": "Mark all as read",
+    "noNotifications": "No notifications yet",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "classroomCreatedSuccess": "Classroom created successfully",
+    "classroomCreateError": "Failed to create classroom: {error}",
+    "@classroomCreateError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "createNewClassTitle": "Create New Class",
+    "classNameHint": "Class Name",
+    "classNameRequired": "Class name is required",
+    "descriptionHint": "Description",
+    "createClassButton": "Create Class",
+    "classroomJoinSuccess": "Successfully joined {classroomName}",
+    "@classroomJoinSuccess": {
+        "placeholders": {
+            "classroomName": {
+                "type": "String"
+            }
+        }
+    },
+    "classroomJoinError": "Failed to join: {error}",
+    "@classroomJoinError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "joinNewClassTitle": "Join New Class",
+    "enterCodeHint": "Enter Code",
+    "codeRequired": "Code is required",
+    "codeMinLength": "Code must be at least 6 characters",
+    "joinClassButton": "Join Class",
+    "joinClassOption": "Join Class",
+    "createClassOption": "Create Class",
+    "newClassScheduleTitle": "New Class Schedule",
+    "newPersonalScheduleTitle": "New Personal Schedule",
+    "titleHint": "Title",
+    "titleRequired": "Title is required",
+    "lecturerHint": "Lecturer",
+    "locationHint": "Location",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "repeatLabel": "Repeat",
+    "colorLabel": "Color",
+    "remindersLabel": "Reminders",
+    "addReminderButton": "Add Reminder",
+    "selectCoordinator1": "Select Coordinator 1",
+    "selectCoordinator2": "Select Coordinator 2",
+    "scheduleCreateError": "Failed to create schedule: {error}",
+    "@scheduleCreateError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "noRepeat": "No repeat",
+    "addReminderTitle": "Add Reminder",
+    "minutesBeforeLabel": "minutes before",
+    "addRepeatTitle": "Add Repeat",
+    "repeatEveryLabel": "Repeat every",
+    "repeatCountLabel": "Repeat count",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "selectColorTitle": "Select Color",
+    "editClassScheduleTitle": "Edit Class Schedule",
+    "editPersonalScheduleTitle": "Edit Personal Schedule",
+    "scheduleUpdateError": "Failed to update schedule: {error}",
+    "@scheduleUpdateError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "transferOwnershipTitle": "Transfer Ownership",
+    "transferOwnershipConfirmation": "Are you sure you want to transfer ownership to:",
+    "transferOwnershipWarning": "You will become a regular member after this action.",
+    "transferButton": "Transfer",
+    "removeMemberTitle": "Remove Member",
+    "removeMemberConfirmation": "Are you sure you want to remove this member?",
+    "removeButton": "Remove",
+    "memberDetailsTitle": "Member Details",
+    "roleLabel": "Role",
+    "joinedDateLabel": "Joined Date",
+    "actionsLabel": "Actions",
+    "profileUpdateSuccess": "Profile updated successfully",
+    "profileUpdateError": "Failed to update profile",
+    "fullNameLabel": "Full Name",
+    "emailLabel": "Email Address",
+    "saveChangesButton": "Save Changes",
+    "leaveClassroomTitle": "Leave Classroom",
+    "leaveClassroomConfirmation": "Are you sure you want to leave this classroom? You will need the classroom code to join again.",
+    "leaveButton": "Leave",
+    "deleteScheduleTitle": "Delete Schedule",
+    "deleteScheduleConfirmation": "Are you sure you want to delete this schedule?",
+    "scheduleDetailsTitle": "Schedule Details",
+    "addReminderError": "Failed to add reminder: {error}",
+    "@addReminderError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "removeReminderError": "Failed to remove reminder: {error}",
+    "@removeReminderError": {
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "classroomNotFound": "Classroom not found",
+    "transferOwnership": "Transfer Ownership",
+    "transferOwnershipConfirmation": "Are you sure you want to transfer ownership to:",
+    "transferOwnershipWarning": "You will become a regular member after this action.",
+    "noClassroomYet": "No classroom yet",
+    "tapPlusToCreateClassroom": "Tap + button to create new classroom",
+    "guestUser": "Guest User",
+    "noEmail": "No email",
+    "scheduleUpdatedTitle": "Schedule Updated: {title}",
+    "@scheduleUpdatedTitle": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleUpdatedBody": "Schedule on {date} at {time} has been updated.",
+    "@scheduleUpdatedBody": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            },
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleCancelledTitle": "Schedule Cancelled: {title}",
+    "@scheduleCancelledTitle": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "scheduleCancelledBody": "Schedule on {date} at {time} has been cancelled.",
+    "@scheduleCancelledBody": {
+        "placeholders": {
+            "date": {
+                "type": "String"
+            },
+            "time": {
+                "type": "String"
+            }
+        }
+    }
+}
