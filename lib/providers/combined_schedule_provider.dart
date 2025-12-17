@@ -4,8 +4,10 @@ import '../data/services/combined_schedule_service.dart';
 import '../core/errors/api_exception.dart';
 
 class CombinedScheduleProvider with ChangeNotifier {
-  final CombinedScheduleService _combinedScheduleService =
-      CombinedScheduleService();
+  final CombinedScheduleService _combinedScheduleService;
+
+  CombinedScheduleProvider({CombinedScheduleService? service})
+      : _combinedScheduleService = service ?? CombinedScheduleService();
 
   List<CombinedSchedule> _schedules = [];
   List<ScheduleSource> _availableSources = [];

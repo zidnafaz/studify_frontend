@@ -3,7 +3,11 @@ import '../data/models/notification_model.dart';
 import '../data/services/notification_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
-  final NotificationService _service = NotificationService();
+  final NotificationService _service;
+
+  NotificationProvider({NotificationService? service})
+      : _service = service ?? NotificationService();
+
   List<NotificationModel> _notifications = [];
   bool _isLoading = false;
 

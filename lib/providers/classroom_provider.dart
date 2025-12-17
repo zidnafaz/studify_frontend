@@ -6,7 +6,10 @@ import '../data/services/classroom_service.dart';
 import '../core/errors/api_exception.dart';
 
 class ClassroomProvider with ChangeNotifier {
-  final ClassroomService _classroomService = ClassroomService();
+  final ClassroomService _classroomService;
+
+  ClassroomProvider({ClassroomService? service})
+      : _classroomService = service ?? ClassroomService();
 
   List<Classroom> _classrooms = [];
   Classroom? _selectedClassroom;

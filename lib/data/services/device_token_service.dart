@@ -4,8 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:studify/core/http/dio_client.dart';
 
 class DeviceTokenService {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final DioClient _dioClient = DioClient();
+  final FirebaseMessaging _firebaseMessaging;
+  final DioClient _dioClient;
+
+  DeviceTokenService({
+    FirebaseMessaging? firebaseMessaging,
+    DioClient? dioClient,
+  })  : _firebaseMessaging = firebaseMessaging ?? FirebaseMessaging.instance,
+        _dioClient = dioClient ?? DioClient();
 
   Future<String?> getDeviceToken() async {
     try {

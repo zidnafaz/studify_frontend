@@ -2,7 +2,10 @@ import '../models/notification_model.dart';
 import '../../core/http/dio_client.dart';
 
 class NotificationService {
-  final DioClient _dioClient = DioClient();
+  final DioClient _dioClient;
+
+  NotificationService({DioClient? dioClient})
+      : _dioClient = dioClient ?? DioClient();
 
   Future<List<NotificationModel>> fetchNotifications() async {
     try {

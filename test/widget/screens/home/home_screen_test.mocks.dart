@@ -3,21 +3,22 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i7;
-import 'dart:ui' as _i8;
+import 'dart:async' as _i8;
+import 'dart:ui' as _i9;
 
+import 'package:firebase_messaging/firebase_messaging.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:studify/data/models/class_schedule_model.dart' as _i3;
 import 'package:studify/data/models/classroom_model.dart' as _i2;
-import 'package:studify/data/models/combined_schedule_model.dart' as _i6;
-import 'package:studify/data/models/notification_model.dart' as _i12;
+import 'package:studify/data/models/combined_schedule_model.dart' as _i7;
+import 'package:studify/data/models/notification_model.dart' as _i13;
 import 'package:studify/data/models/personal_schedule_model.dart' as _i4;
-import 'package:studify/data/services/device_token_service.dart' as _i14;
-import 'package:studify/providers/auth_provider.dart' as _i9;
-import 'package:studify/providers/classroom_provider.dart' as _i10;
-import 'package:studify/providers/combined_schedule_provider.dart' as _i5;
-import 'package:studify/providers/notification_provider.dart' as _i11;
-import 'package:studify/providers/personal_schedule_provider.dart' as _i13;
+import 'package:studify/data/services/device_token_service.dart' as _i15;
+import 'package:studify/providers/auth_provider.dart' as _i10;
+import 'package:studify/providers/classroom_provider.dart' as _i11;
+import 'package:studify/providers/combined_schedule_provider.dart' as _i6;
+import 'package:studify/providers/notification_provider.dart' as _i12;
+import 'package:studify/providers/personal_schedule_provider.dart' as _i14;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -50,30 +51,36 @@ class _FakePersonalSchedule_2 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeNotificationSettings_3 extends _i1.SmartFake
+    implements _i5.NotificationSettings {
+  _FakeNotificationSettings_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [CombinedScheduleProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCombinedScheduleProvider extends _i1.Mock
-    implements _i5.CombinedScheduleProvider {
+    implements _i6.CombinedScheduleProvider {
   MockCombinedScheduleProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i6.CombinedSchedule> get schedules =>
+  List<_i7.CombinedSchedule> get schedules =>
       (super.noSuchMethod(
             Invocation.getter(#schedules),
-            returnValue: <_i6.CombinedSchedule>[],
+            returnValue: <_i7.CombinedSchedule>[],
           )
-          as List<_i6.CombinedSchedule>);
+          as List<_i7.CombinedSchedule>);
 
   @override
-  List<_i6.ScheduleSource> get availableSources =>
+  List<_i7.ScheduleSource> get availableSources =>
       (super.noSuchMethod(
             Invocation.getter(#availableSources),
-            returnValue: <_i6.ScheduleSource>[],
+            returnValue: <_i7.ScheduleSource>[],
           )
-          as List<_i6.ScheduleSource>);
+          as List<_i7.ScheduleSource>);
 
   @override
   bool get isLoading =>
@@ -86,7 +93,7 @@ class MockCombinedScheduleProvider extends _i1.Mock
           as bool);
 
   @override
-  _i7.Future<void> fetchCombinedSchedules({
+  _i8.Future<void> fetchCombinedSchedules({
     String? source,
     DateTime? startDate,
     DateTime? endDate,
@@ -97,22 +104,22 @@ class MockCombinedScheduleProvider extends _i1.Mock
               #startDate: startDate,
               #endDate: endDate,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> refresh({DateTime? startDate, DateTime? endDate}) =>
+  _i8.Future<void> refresh({DateTime? startDate, DateTime? endDate}) =>
       (super.noSuchMethod(
             Invocation.method(#refresh, [], {
               #startDate: startDate,
               #endDate: endDate,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
   void clear() => super.noSuchMethod(
@@ -121,13 +128,13 @@ class MockCombinedScheduleProvider extends _i1.Mock
   );
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -148,18 +155,18 @@ class MockCombinedScheduleProvider extends _i1.Mock
 /// A class which mocks [AuthProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAuthProvider extends _i1.Mock implements _i9.AuthProvider {
+class MockAuthProvider extends _i1.Mock implements _i10.AuthProvider {
   MockAuthProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i9.AuthStatus get status =>
+  _i10.AuthStatus get status =>
       (super.noSuchMethod(
             Invocation.getter(#status),
-            returnValue: _i9.AuthStatus.initial,
+            returnValue: _i10.AuthStatus.initial,
           )
-          as _i9.AuthStatus);
+          as _i10.AuthStatus);
 
   @override
   bool get isAuthenticated =>
@@ -175,16 +182,16 @@ class MockAuthProvider extends _i1.Mock implements _i9.AuthProvider {
           as bool);
 
   @override
-  _i7.Future<void> checkAuthStatus() =>
+  _i8.Future<void> checkAuthStatus() =>
       (super.noSuchMethod(
             Invocation.method(#checkAuthStatus, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<bool> register({
+  _i8.Future<bool> register({
     required String? name,
     required String? email,
     required String? password,
@@ -197,43 +204,43 @@ class MockAuthProvider extends _i1.Mock implements _i9.AuthProvider {
               #password: password,
               #passwordConfirmation: passwordConfirmation,
             }),
-            returnValue: _i7.Future<bool>.value(false),
+            returnValue: _i8.Future<bool>.value(false),
           )
-          as _i7.Future<bool>);
+          as _i8.Future<bool>);
 
   @override
-  _i7.Future<bool> login({required String? email, required String? password}) =>
+  _i8.Future<bool> login({required String? email, required String? password}) =>
       (super.noSuchMethod(
             Invocation.method(#login, [], {#email: email, #password: password}),
-            returnValue: _i7.Future<bool>.value(false),
+            returnValue: _i8.Future<bool>.value(false),
           )
-          as _i7.Future<bool>);
+          as _i8.Future<bool>);
 
   @override
-  _i7.Future<void> logout() =>
+  _i8.Future<void> logout() =>
       (super.noSuchMethod(
             Invocation.method(#logout, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<bool> updateProfile({required String? name}) =>
+  _i8.Future<bool> updateProfile({required String? name}) =>
       (super.noSuchMethod(
             Invocation.method(#updateProfile, [], {#name: name}),
-            returnValue: _i7.Future<bool>.value(false),
+            returnValue: _i8.Future<bool>.value(false),
           )
-          as _i7.Future<bool>);
+          as _i8.Future<bool>);
 
   @override
-  _i7.Future<void> refreshToken() =>
+  _i8.Future<void> refreshToken() =>
       (super.noSuchMethod(
             Invocation.method(#refreshToken, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
   void clearError() => super.noSuchMethod(
@@ -242,13 +249,13 @@ class MockAuthProvider extends _i1.Mock implements _i9.AuthProvider {
   );
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -269,7 +276,7 @@ class MockAuthProvider extends _i1.Mock implements _i9.AuthProvider {
 /// A class which mocks [ClassroomProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
+class MockClassroomProvider extends _i1.Mock implements _i11.ClassroomProvider {
   MockClassroomProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -301,25 +308,25 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
           as bool);
 
   @override
-  _i7.Future<void> fetchClassrooms() =>
+  _i8.Future<void> fetchClassrooms() =>
       (super.noSuchMethod(
             Invocation.method(#fetchClassrooms, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> fetchClassroom(int? classroomId) =>
+  _i8.Future<void> fetchClassroom(int? classroomId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchClassroom, [classroomId]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<_i2.Classroom> createClassroom({
+  _i8.Future<_i2.Classroom> createClassroom({
     required String? name,
     String? description,
   }) =>
@@ -328,7 +335,7 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #name: name,
               #description: description,
             }),
-            returnValue: _i7.Future<_i2.Classroom>.value(
+            returnValue: _i8.Future<_i2.Classroom>.value(
               _FakeClassroom_0(
                 this,
                 Invocation.method(#createClassroom, [], {
@@ -338,23 +345,23 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               ),
             ),
           )
-          as _i7.Future<_i2.Classroom>);
+          as _i8.Future<_i2.Classroom>);
 
   @override
-  _i7.Future<_i2.Classroom> joinClassroom(String? uniqueCode) =>
+  _i8.Future<_i2.Classroom> joinClassroom(String? uniqueCode) =>
       (super.noSuchMethod(
             Invocation.method(#joinClassroom, [uniqueCode]),
-            returnValue: _i7.Future<_i2.Classroom>.value(
+            returnValue: _i8.Future<_i2.Classroom>.value(
               _FakeClassroom_0(
                 this,
                 Invocation.method(#joinClassroom, [uniqueCode]),
               ),
             ),
           )
-          as _i7.Future<_i2.Classroom>);
+          as _i8.Future<_i2.Classroom>);
 
   @override
-  _i7.Future<void> fetchClassSchedules(
+  _i8.Future<void> fetchClassSchedules(
     int? classroomId, {
     bool? notify = true,
     DateTime? startDate,
@@ -366,13 +373,13 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               [classroomId],
               {#notify: notify, #startDate: startDate, #endDate: endDate},
             ),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<_i3.ClassSchedule> createClassSchedule({
+  _i8.Future<_i3.ClassSchedule> createClassSchedule({
     required int? classroomId,
     required String? title,
     required DateTime? startTime,
@@ -403,7 +410,7 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #repeatCount: repeatCount,
               #reminders: reminders,
             }),
-            returnValue: _i7.Future<_i3.ClassSchedule>.value(
+            returnValue: _i8.Future<_i3.ClassSchedule>.value(
               _FakeClassSchedule_1(
                 this,
                 Invocation.method(#createClassSchedule, [], {
@@ -424,10 +431,10 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               ),
             ),
           )
-          as _i7.Future<_i3.ClassSchedule>);
+          as _i8.Future<_i3.ClassSchedule>);
 
   @override
-  _i7.Future<_i3.ClassSchedule> updateClassSchedule({
+  _i8.Future<_i3.ClassSchedule> updateClassSchedule({
     required int? classroomId,
     required int? scheduleId,
     String? title,
@@ -456,7 +463,7 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #coordinator2: coordinator2,
               #reminders: reminders,
             }),
-            returnValue: _i7.Future<_i3.ClassSchedule>.value(
+            returnValue: _i8.Future<_i3.ClassSchedule>.value(
               _FakeClassSchedule_1(
                 this,
                 Invocation.method(#updateClassSchedule, [], {
@@ -476,10 +483,10 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               ),
             ),
           )
-          as _i7.Future<_i3.ClassSchedule>);
+          as _i8.Future<_i3.ClassSchedule>);
 
   @override
-  _i7.Future<void> deleteClassSchedule({
+  _i8.Future<void> deleteClassSchedule({
     required int? classroomId,
     required int? scheduleId,
   }) =>
@@ -488,22 +495,22 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #classroomId: classroomId,
               #scheduleId: scheduleId,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> leaveClassroom(int? classroomId) =>
+  _i8.Future<void> leaveClassroom(int? classroomId) =>
       (super.noSuchMethod(
             Invocation.method(#leaveClassroom, [classroomId]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> removeMember({
+  _i8.Future<void> removeMember({
     required int? classroomId,
     required int? userId,
   }) =>
@@ -512,13 +519,13 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #classroomId: classroomId,
               #userId: userId,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> transferOwnership({
+  _i8.Future<void> transferOwnership({
     required int? classroomId,
     required int? newOwnerId,
   }) =>
@@ -527,13 +534,13 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #classroomId: classroomId,
               #newOwnerId: newOwnerId,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> updateClassroomDescription({
+  _i8.Future<void> updateClassroomDescription({
     required int? classroomId,
     String? description,
   }) =>
@@ -542,10 +549,19 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
               #classroomId: classroomId,
               #description: description,
             }),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
+
+  @override
+  _i8.Future<void> deleteClassroom(int? classroomId) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteClassroom, [classroomId]),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
+          )
+          as _i8.Future<void>);
 
   @override
   void clearError() => super.noSuchMethod(
@@ -560,13 +576,13 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
   );
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -588,18 +604,18 @@ class MockClassroomProvider extends _i1.Mock implements _i10.ClassroomProvider {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockNotificationProvider extends _i1.Mock
-    implements _i11.NotificationProvider {
+    implements _i12.NotificationProvider {
   MockNotificationProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i12.NotificationModel> get notifications =>
+  List<_i13.NotificationModel> get notifications =>
       (super.noSuchMethod(
             Invocation.getter(#notifications),
-            returnValue: <_i12.NotificationModel>[],
+            returnValue: <_i13.NotificationModel>[],
           )
-          as List<_i12.NotificationModel>);
+          as List<_i13.NotificationModel>);
 
   @override
   bool get isLoading =>
@@ -617,40 +633,40 @@ class MockNotificationProvider extends _i1.Mock
           as bool);
 
   @override
-  _i7.Future<void> fetchNotifications() =>
+  _i8.Future<void> fetchNotifications() =>
       (super.noSuchMethod(
             Invocation.method(#fetchNotifications, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> markAsRead(int? id) =>
+  _i8.Future<void> markAsRead(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#markAsRead, [id]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<void> markAllRead() =>
+  _i8.Future<void> markAllRead() =>
       (super.noSuchMethod(
             Invocation.method(#markAllRead, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -672,7 +688,7 @@ class MockNotificationProvider extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockPersonalScheduleProvider extends _i1.Mock
-    implements _i13.PersonalScheduleProvider {
+    implements _i14.PersonalScheduleProvider {
   MockPersonalScheduleProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -696,16 +712,16 @@ class MockPersonalScheduleProvider extends _i1.Mock
           as bool);
 
   @override
-  _i7.Future<void> fetchPersonalSchedules() =>
+  _i8.Future<void> fetchPersonalSchedules() =>
       (super.noSuchMethod(
             Invocation.method(#fetchPersonalSchedules, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  _i7.Future<_i4.PersonalSchedule> createPersonalSchedule({
+  _i8.Future<_i4.PersonalSchedule> createPersonalSchedule({
     required String? title,
     required DateTime? startTime,
     required DateTime? endTime,
@@ -728,7 +744,7 @@ class MockPersonalScheduleProvider extends _i1.Mock
               #repeatDays: repeatDays,
               #repeatCount: repeatCount,
             }),
-            returnValue: _i7.Future<_i4.PersonalSchedule>.value(
+            returnValue: _i8.Future<_i4.PersonalSchedule>.value(
               _FakePersonalSchedule_2(
                 this,
                 Invocation.method(#createPersonalSchedule, [], {
@@ -745,10 +761,10 @@ class MockPersonalScheduleProvider extends _i1.Mock
               ),
             ),
           )
-          as _i7.Future<_i4.PersonalSchedule>);
+          as _i8.Future<_i4.PersonalSchedule>);
 
   @override
-  _i7.Future<_i4.PersonalSchedule> updatePersonalSchedule({
+  _i8.Future<_i4.PersonalSchedule> updatePersonalSchedule({
     required int? scheduleId,
     String? title,
     DateTime? startTime,
@@ -769,7 +785,7 @@ class MockPersonalScheduleProvider extends _i1.Mock
               #color: color,
               #reminders: reminders,
             }),
-            returnValue: _i7.Future<_i4.PersonalSchedule>.value(
+            returnValue: _i8.Future<_i4.PersonalSchedule>.value(
               _FakePersonalSchedule_2(
                 this,
                 Invocation.method(#updatePersonalSchedule, [], {
@@ -785,25 +801,25 @@ class MockPersonalScheduleProvider extends _i1.Mock
               ),
             ),
           )
-          as _i7.Future<_i4.PersonalSchedule>);
+          as _i8.Future<_i4.PersonalSchedule>);
 
   @override
-  _i7.Future<void> deletePersonalSchedule(int? scheduleId) =>
+  _i8.Future<void> deletePersonalSchedule(int? scheduleId) =>
       (super.noSuchMethod(
             Invocation.method(#deletePersonalSchedule, [scheduleId]),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#addListener, [listener]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i9.VoidCallback? listener) => super.noSuchMethod(
     Invocation.method(#removeListener, [listener]),
     returnValueForMissingStub: null,
   );
@@ -825,25 +841,38 @@ class MockPersonalScheduleProvider extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockDeviceTokenService extends _i1.Mock
-    implements _i14.DeviceTokenService {
+    implements _i15.DeviceTokenService {
   MockDeviceTokenService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i7.Future<String?> getDeviceToken() =>
+  _i8.Future<String?> getDeviceToken() =>
       (super.noSuchMethod(
             Invocation.method(#getDeviceToken, []),
-            returnValue: _i7.Future<String?>.value(),
+            returnValue: _i8.Future<String?>.value(),
           )
-          as _i7.Future<String?>);
+          as _i8.Future<String?>);
 
   @override
-  _i7.Future<void> syncDeviceToken() =>
+  _i8.Future<_i5.NotificationSettings> requestPermission() =>
+      (super.noSuchMethod(
+            Invocation.method(#requestPermission, []),
+            returnValue: _i8.Future<_i5.NotificationSettings>.value(
+              _FakeNotificationSettings_3(
+                this,
+                Invocation.method(#requestPermission, []),
+              ),
+            ),
+          )
+          as _i8.Future<_i5.NotificationSettings>);
+
+  @override
+  _i8.Future<void> syncDeviceToken() =>
       (super.noSuchMethod(
             Invocation.method(#syncDeviceToken, []),
-            returnValue: _i7.Future<void>.value(),
-            returnValueForMissingStub: _i7.Future<void>.value(),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
           )
-          as _i7.Future<void>);
+          as _i8.Future<void>);
 }

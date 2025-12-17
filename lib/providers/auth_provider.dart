@@ -6,7 +6,10 @@ import '../core/errors/api_exception.dart';
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthService _authService;
+
+  AuthProvider({AuthService? authService})
+      : _authService = authService ?? AuthService();
 
   AuthStatus _status = AuthStatus.initial;
   User? _user;

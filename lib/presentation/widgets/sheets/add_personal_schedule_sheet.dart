@@ -255,15 +255,18 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                             : () => Navigator.pop(context),
                         child: Text(
                           AppLocalizations.of(context)!.cancel,
-                          style: TextStyle(color: Colors.red, fontSize: 16),
+                          style: TextStyle(color: Colors.red, fontSize: 14),
                         ),
                       ),
-                      Text(
-                        AppLocalizations.of(context)!.newPersonalScheduleTitle,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
+                      Flexible(
+                        child: Text(
+                          AppLocalizations.of(context)!.newPersonalScheduleTitle,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       TextButton(
@@ -272,7 +275,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                           AppLocalizations.of(context)!.save,
                           style: TextStyle(
                             color: colorScheme.primary,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
