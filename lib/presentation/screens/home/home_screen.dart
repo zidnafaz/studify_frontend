@@ -82,18 +82,33 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             items: [
               BottomNavigationBarItem(
-                icon: const Icon(Icons.home_outlined),
-                activeIcon: const Icon(Icons.home),
+                icon: const Icon(
+                  Icons.home_outlined,
+                  key: Key('bottom_nav_home'),
+                ),
+                activeIcon: const Icon(Icons.home, key: Key('bottom_nav_home')),
                 label: AppLocalizations.of(context)!.home,
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.group_outlined),
-                activeIcon: const Icon(Icons.group),
+                icon: const Icon(
+                  Icons.group_outlined,
+                  key: Key('bottom_nav_classroom'),
+                ),
+                activeIcon: const Icon(
+                  Icons.group,
+                  key: Key('bottom_nav_classroom'),
+                ),
                 label: AppLocalizations.of(context)!.classroom,
               ),
               BottomNavigationBarItem(
-                icon: const Icon(Icons.person_outline),
-                activeIcon: const Icon(Icons.person),
+                icon: const Icon(
+                  Icons.person_outline,
+                  key: Key('bottom_nav_profile'),
+                ),
+                activeIcon: const Icon(
+                  Icons.person,
+                  key: Key('bottom_nav_profile'),
+                ),
                 label: AppLocalizations.of(context)!.profile,
               ),
             ],
@@ -153,8 +168,16 @@ class _HomeTabState extends State<_HomeTab> {
         body = message.notification!.body;
       } else if (message.data.containsKey('title_key')) {
         // Handle localized data message
-        title = _getLocalizedText(context, message.data['title_key'], message.data['title_args']);
-        body = _getLocalizedText(context, message.data['body_key'], message.data['body_args']);
+        title = _getLocalizedText(
+          context,
+          message.data['title_key'],
+          message.data['title_args'],
+        );
+        body = _getLocalizedText(
+          context,
+          message.data['body_key'],
+          message.data['body_args'],
+        );
       }
 
       if (title != null && mounted) {
@@ -201,7 +224,11 @@ class _HomeTabState extends State<_HomeTab> {
     });
   }
 
-  String? _getLocalizedText(BuildContext context, String? key, String? argsJson) {
+  String? _getLocalizedText(
+    BuildContext context,
+    String? key,
+    String? argsJson,
+  ) {
     if (key == null) return null;
     final l10n = AppLocalizations.of(context)!;
     Map<String, dynamic> args = {};
@@ -219,7 +246,10 @@ class _HomeTabState extends State<_HomeTab> {
       case 'schedule_cancelled_title':
         return l10n.scheduleCancelledTitle(args['title'] ?? '');
       case 'schedule_cancelled_body':
-        return l10n.scheduleCancelledBody(args['date'] ?? '', args['time'] ?? '');
+        return l10n.scheduleCancelledBody(
+          args['date'] ?? '',
+          args['time'] ?? '',
+        );
       default:
         return null;
     }
@@ -325,9 +355,13 @@ class _HomeTabState extends State<_HomeTab> {
       } else if (isSameDay(selected, tomorrow)) {
         return AppLocalizations.of(context)!.tomorrowsSchedule;
       } else if (selected.year == now.year) {
-        return AppLocalizations.of(context)!.scheduleDate(DateFormat('d MMM').format(selected));
+        return AppLocalizations.of(
+          context,
+        )!.scheduleDate(DateFormat('d MMM').format(selected));
       } else {
-        return AppLocalizations.of(context)!.scheduleDate(DateFormat('d MMM yyyy').format(selected));
+        return AppLocalizations.of(
+          context,
+        )!.scheduleDate(DateFormat('d MMM yyyy').format(selected));
       }
     }
   }
@@ -602,6 +636,7 @@ class _HomeTabState extends State<_HomeTab> {
 
     return Scaffold(
       backgroundColor: colorScheme.background,
+
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(88),
         child: Padding(
@@ -807,23 +842,33 @@ class _HomeTabState extends State<_HomeTab> {
                             items: [
                               DropdownMenuItem(
                                 value: '1d',
-                                child: Text(AppLocalizations.of(context)!.oneDay),
+                                child: Text(
+                                  AppLocalizations.of(context)!.oneDay,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: '3d',
-                                child: Text(AppLocalizations.of(context)!.threeDays),
+                                child: Text(
+                                  AppLocalizations.of(context)!.threeDays,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: '7d',
-                                child: Text(AppLocalizations.of(context)!.sevenDays),
+                                child: Text(
+                                  AppLocalizations.of(context)!.sevenDays,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: '1m',
-                                child: Text(AppLocalizations.of(context)!.oneMonth),
+                                child: Text(
+                                  AppLocalizations.of(context)!.oneMonth,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: 'custom',
-                                child: Text(AppLocalizations.of(context)!.custom),
+                                child: Text(
+                                  AppLocalizations.of(context)!.custom,
+                                ),
                               ),
                               DropdownMenuItem(
                                 value: 'all',
@@ -860,6 +905,7 @@ class _HomeTabState extends State<_HomeTab> {
               _selectedSourceId == 'all' ||
               _selectedSourceId == null
           ? FloatingActionButton(
+              key: const Key('home_add_schedule_fab'),
               onPressed: _showAddScheduleSheet,
               backgroundColor: colorScheme.primary,
               shape: const CircleBorder(),

@@ -48,7 +48,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.errorMessage ?? AppLocalizations.of(context)!.registrationFailed),
+              content: Text(
+                authProvider.errorMessage ??
+                    AppLocalizations.of(context)!.registrationFailed,
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -101,6 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Name Field
                 CustomTextField(
+                  key: const Key('register_name_field'),
                   hintText: l10n.fullNameHint,
                   controller: _nameController,
                   keyboardType: TextInputType.name,
@@ -123,6 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Email Field
                 CustomTextField(
+                  key: const Key('register_email_field'),
                   hintText: l10n.emailHint,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -147,6 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Password Field
                 CustomTextField(
+                  key: const Key('register_password_field'),
                   hintText: l10n.passwordHint,
                   controller: _passwordController,
                   isPassword: true,
@@ -169,6 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Confirm Password Field
                 CustomTextField(
+                  key: const Key('register_confirm_password_field'),
                   hintText: l10n.confirmPasswordHint,
                   controller: _confirmPasswordController,
                   isPassword: true,
@@ -193,6 +200,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) {
                     return CustomButton(
+                      key: const Key('register_submit_btn'),
                       text: l10n.signUp,
                       onPressed: _handleRegister,
                       isLoading: authProvider.status == AuthStatus.loading,

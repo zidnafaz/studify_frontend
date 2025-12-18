@@ -134,7 +134,8 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
   Future<void> _selectCoordinator1() async {
     final provider = context.read<ClassroomProvider>();
-    final users = provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
+    final users =
+        provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
     if (users.isEmpty) return;
 
     final result = await showDialog<User>(
@@ -154,7 +155,8 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
   Future<void> _selectCoordinator2() async {
     final provider = context.read<ClassroomProvider>();
-    final users = provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
+    final users =
+        provider.selectedClassroom?.users ?? widget.classroom.users ?? [];
     if (users.isEmpty) return;
 
     final result = await showDialog<User>(
@@ -250,7 +252,9 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.scheduleCreateError(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.scheduleCreateError(e.toString()),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -312,6 +316,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                         ),
                       ),
                       TextButton(
+                        key: const Key('class_schedule_save_btn'),
                         onPressed: _isLoading ? null : _save,
                         child: Text(
                           AppLocalizations.of(context)!.save,
@@ -328,6 +333,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
                   // Title Field
                   ScheduleTextField(
+                    key: const Key('class_schedule_title'),
                     controller: _titleController,
                     hintText: AppLocalizations.of(context)!.titleHint,
                     validator: (value) {
@@ -367,7 +373,9 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
                   // Repeat Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _repeat?.displayText ?? AppLocalizations.of(context)!.noRepeat,
+                      text:
+                          _repeat?.displayText ??
+                          AppLocalizations.of(context)!.noRepeat,
                     ),
                     prefixIcon: Icons.repeat,
                     readOnly: true,
@@ -378,6 +386,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
                   // Lecturer Field
                   ScheduleTextField(
+                    key: const Key('class_schedule_lecturer'),
                     controller: _lecturerController,
                     hintText: AppLocalizations.of(context)!.lecturerHint,
                     prefixIcon: Icons.person,
@@ -417,6 +426,7 @@ class _AddClassScheduleSheetState extends State<AddClassScheduleSheet> {
 
                   // Location Field
                   ScheduleTextField(
+                    key: const Key('class_schedule_location'),
                     controller: _locationController,
                     hintText: AppLocalizations.of(context)!.locationHint,
                     prefixIcon: Icons.location_on,

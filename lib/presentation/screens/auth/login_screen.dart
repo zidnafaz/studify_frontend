@@ -62,7 +62,10 @@ class _LoginScreenState extends State<LoginScreen> {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.errorMessage ?? AppLocalizations.of(context)!.loginFailed),
+              content: Text(
+                authProvider.errorMessage ??
+                    AppLocalizations.of(context)!.loginFailed,
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -135,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Email Field
                   CustomTextField(
+                    key: const Key('login_email_field'),
                     hintText: l10n.emailHint,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -159,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Password Field
                   CustomTextField(
+                    key: const Key('login_password_field'),
                     hintText: l10n.passwordHint,
                     controller: _passwordController,
                     isPassword: true,
@@ -177,12 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),const SizedBox(height: 24),
+                  const SizedBox(height: 24), const SizedBox(height: 24),
 
                   // Login Button
                   Consumer<AuthProvider>(
                     builder: (context, authProvider, child) {
                       return CustomButton(
+                        key: const Key('login_submit_btn'),
                         text: l10n.login,
                         onPressed: _handleLogin,
                         isLoading: authProvider.status == AuthStatus.loading,

@@ -47,7 +47,11 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.classroomJoinSuccess(classroom.name)),
+            content: Text(
+              AppLocalizations.of(
+                context,
+              )!.classroomJoinSuccess(classroom.name),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -56,7 +60,9 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.classroomJoinError(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.classroomJoinError(e.toString()),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -121,6 +127,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
+                key: const Key('join_class_code_field'),
                 controller: _codeController,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.enterCodeHint,
@@ -177,6 +184,7 @@ class _JoinClassroomScreenState extends State<JoinClassroomScreen> {
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('join_class_submit_btn'),
                   onPressed: _isLoading ? null : _joinClassroom,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,

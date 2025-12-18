@@ -38,6 +38,7 @@ class ClassroomActionSheet extends StatelessWidget {
 
               // Join Class Option
               ListTile(
+                key: const Key('sheet_join_class'),
                 leading: Container(
                   width: 40,
                   height: 40,
@@ -81,6 +82,7 @@ class ClassroomActionSheet extends StatelessWidget {
 
               // Create Class Option
               ListTile(
+                key: const Key('sheet_create_class'),
                 leading: Container(
                   width: 40,
                   height: 40,

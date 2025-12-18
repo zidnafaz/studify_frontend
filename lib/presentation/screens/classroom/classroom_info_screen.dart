@@ -477,6 +477,7 @@ class _ClassroomInfoScreenState extends State<ClassroomInfoScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   classroom.uniqueCode,
+                                  key: const Key('classroom_info_code'),
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w700,

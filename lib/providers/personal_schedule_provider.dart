@@ -4,8 +4,10 @@ import '../data/services/personal_schedule_service.dart';
 import '../core/errors/api_exception.dart';
 
 class PersonalScheduleProvider with ChangeNotifier {
-  final PersonalScheduleService _personalScheduleService =
-      PersonalScheduleService();
+  final PersonalScheduleService _personalScheduleService;
+
+  PersonalScheduleProvider({PersonalScheduleService? service})
+    : _personalScheduleService = service ?? PersonalScheduleService();
 
   List<PersonalSchedule> _schedules = [];
   bool _isLoading = false;

@@ -97,6 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
+              key: const Key('profile_confirm_logout_btn'),
               child: Text(AppLocalizations.of(context)!.signOut),
             ),
           ],
@@ -264,12 +265,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   onPressed: _signOut,
                   icon: const Icon(Icons.logout),
+                  key: const Key('profile_logout_btn'),
                   label: Text(
                     AppLocalizations.of(context)!.signOut,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

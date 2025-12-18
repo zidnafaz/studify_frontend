@@ -207,7 +207,11 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
           if (mounted) {
             ScaffoldMessenger.of(currentContext).showSnackBar(
               SnackBar(
-                content: Text(AppLocalizations.of(context)!.scheduleCreateError(e.toString())),
+                content: Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.scheduleCreateError(e.toString()),
+                ),
                 backgroundColor: Colors.red,
               ),
             );
@@ -260,7 +264,9 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                       ),
                       Flexible(
                         child: Text(
-                          AppLocalizations.of(context)!.newPersonalScheduleTitle,
+                          AppLocalizations.of(
+                            context,
+                          )!.newPersonalScheduleTitle,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -286,6 +292,7 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
 
                   // Title Field
                   ScheduleTextField(
+                    key: const Key('schedule_title_field'),
                     controller: _titleController,
                     hintText: AppLocalizations.of(context)!.titleHint,
                     validator: (value) {
@@ -325,7 +332,9 @@ class _AddPersonalScheduleSheetState extends State<AddPersonalScheduleSheet> {
                   // Repeat Field
                   ScheduleTextField(
                     controller: TextEditingController(
-                      text: _repeat?.displayText ?? AppLocalizations.of(context)!.noRepeat,
+                      text:
+                          _repeat?.displayText ??
+                          AppLocalizations.of(context)!.noRepeat,
                     ),
                     hintText: AppLocalizations.of(context)!.repeatLabel,
                     prefixIcon: Icons.repeat,

@@ -45,7 +45,9 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.classroomCreatedSuccess),
+            content: Text(
+              AppLocalizations.of(context)!.classroomCreatedSuccess,
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -54,7 +56,9 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.classroomCreateError(e.toString())),
+            content: Text(
+              AppLocalizations.of(context)!.classroomCreateError(e.toString()),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -88,7 +92,10 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
                     top: 0,
                     bottom: 0,
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: colorScheme.onPrimary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -117,6 +124,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
             children: [
               // Class Name Field
               TextFormField(
+                key: const Key('create_class_name'),
                 controller: _nameController,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.classNameHint,
@@ -163,6 +171,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
 
               // Description Field
               TextFormField(
+                key: const Key('create_class_desc'),
                 controller: _descriptionController,
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.descriptionHint,
@@ -206,6 +215,7 @@ class _CreateClassroomScreenState extends State<CreateClassroomScreen> {
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('create_class_submit'),
                   onPressed: _isLoading ? null : _createClassroom,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,

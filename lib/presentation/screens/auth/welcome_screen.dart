@@ -76,6 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
+                  key: const Key('welcome_login_btn'),
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
@@ -100,6 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 56,
                 child: OutlinedButton(
+                  key: const Key('welcome_register_btn'),
                   onPressed: () {
                     Navigator.pushNamed(context, '/register');
                   },
